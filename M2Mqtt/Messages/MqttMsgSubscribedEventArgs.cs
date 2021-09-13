@@ -23,42 +23,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgSubscribedEventArgs : EventArgs
     {
-        #region Properties...
+        public ushort MessageId { get; internal set; }
 
-        /// <summary>
-        /// Message identifier
-        /// </summary>
-        public ushort MessageId
-        {
-            get { return messageId; }
-            internal set { messageId = value; }
-        }
+        public byte[] GrantedQoSLevels { get; internal set; }
 
-        /// <summary>
-        /// List of granted QOS Levels
-        /// </summary>
-        public byte[] GrantedQoSLevels
-        {
-            get { return grantedQosLevels; }
-            internal set { grantedQosLevels = value; }
-        }
-
-        #endregion
-
-        // message identifier
-        ushort messageId;
-        // granted QOS levels
-        byte[] grantedQosLevels;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="messageId">Message identifier for subscribed topics</param>
-        /// <param name="grantedQosLevels">List of granted QOS Levels</param>
         public MqttMsgSubscribedEventArgs(ushort messageId, byte[] grantedQosLevels)
         {
-            this.messageId = messageId;
-            this.grantedQosLevels = grantedQosLevels;
+            MessageId = messageId;
+            GrantedQoSLevels = grantedQosLevels;
         }
     }
 }

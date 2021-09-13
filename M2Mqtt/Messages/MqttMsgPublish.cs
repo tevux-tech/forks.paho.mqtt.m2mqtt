@@ -25,69 +25,25 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgPublish : MqttMsgBase
     {
-        #region Properties...
+        public string Topic { get; set; }
 
-        /// <summary>
-        /// Message topic
-        /// </summary>
-        public string Topic
-        {
-            get { return topic; }
-            set { topic = value; }
-        }
+        public byte[] Message { get; set; }
 
-        /// <summary>
-        /// Message data
-        /// </summary>
-        public byte[] Message
-        {
-            get { return message; }
-            set { message = value; }
-        }
-
-        #endregion
-
-        // message topic
-        private string topic;
-        // message data
-        private byte[] message;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgPublish()
         {
             type = MQTT_MSG_PUBLISH_TYPE;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="topic">Message topic</param>
-        /// <param name="message">Message data</param>
-        public MqttMsgPublish(string topic, byte[] message) :
-            this(topic, message, false, QOS_LEVEL_AT_MOST_ONCE, false)
+        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QOS_LEVEL_AT_MOST_ONCE, false)
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="topic">Message topic</param>
-        /// <param name="message">Message data</param>
-        /// <param name="dupFlag">Duplicate flag</param>
-        /// <param name="qosLevel">Quality of Service level</param>
-        /// <param name="retain">Retain flag</param>
-        public MqttMsgPublish(string topic,
-            byte[] message,
-            bool dupFlag,
-            byte qosLevel,
-            bool retain) : base()
+        public MqttMsgPublish(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain) : base()
         {
             type = MQTT_MSG_PUBLISH_TYPE;
 
-            this.topic = topic;
-            this.message = message;
+            Topic = topic;
+            Message = message;
             this.dupFlag = dupFlag;
             this.qosLevel = qosLevel;
             this.retain = retain;
@@ -104,18 +60,18 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int index = 0;
 
             // topic can't contain wildcards
-            if ((topic.IndexOf('#') != -1) || (topic.IndexOf('+') != -1))
+            if ((Topic.IndexOf('#') != -1) || (Topic.IndexOf('+') != -1))
                 throw new MqttClientException(MqttClientErrorCode.TopicWildcard);
 
             // check topic length
-            if ((topic.Length < MIN_TOPIC_LENGTH) || (topic.Length > MAX_TOPIC_LENGTH))
+            if ((Topic.Length < MIN_TOPIC_LENGTH) || (Topic.Length > MAX_TOPIC_LENGTH))
                 throw new MqttClientException(MqttClientErrorCode.TopicLength);
 
             // check wrong QoS level (both bits can't be set 1)
             if (qosLevel > QOS_LEVEL_EXACTLY_ONCE)
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
 
-            byte[] topicUtf8 = Encoding.UTF8.GetBytes(topic);
+            byte[] topicUtf8 = Encoding.UTF8.GetBytes(Topic);
 
             // topic name
             varHeaderSize += topicUtf8.Length + 2;
@@ -128,9 +84,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // check on message with zero length
-            if (message != null)
+            if (Message != null)
                 // message data
-                payloadSize += message.Length;
+                payloadSize += Message.Length;
 
             remainingLength += (varHeaderSize + payloadSize);
 
@@ -177,11 +133,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // check on message with zero length
-            if (message != null)
+            if (Message != null)
             {
                 // message data
-                Array.Copy(message, 0, buffer, index, message.Length);
-                index += message.Length;
+                Array.Copy(Message, 0, buffer, index, Message.Length);
+                index += Message.Length;
             }
 
             return buffer;
@@ -215,7 +171,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             topicUtf8 = new byte[topicUtf8Length];
             Array.Copy(buffer, index, topicUtf8, 0, topicUtf8Length);
             index += topicUtf8Length;
-            msg.topic = new string(Encoding.UTF8.GetChars(topicUtf8));
+            msg.Topic = new string(Encoding.UTF8.GetChars(topicUtf8));
 
             // read QoS level from fixed header
             msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);
@@ -240,12 +196,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int messageSize = remainingLength - index;
             int remaining = messageSize;
             int messageOffset = 0;
-            msg.message = new byte[messageSize];
+            msg.Message = new byte[messageSize];
 
             // BUG FIX 26/07/2013 : receiving large payload
 
             // copy first part of payload data received
-            Array.Copy(buffer, index, msg.message, messageOffset, received - index);
+            Array.Copy(buffer, index, msg.Message, messageOffset, received - index);
             remaining -= (received - index);
             messageOffset += (received - index);
 
@@ -254,7 +210,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             {
                 // receive other payload data
                 received = channel.Receive(buffer);
-                Array.Copy(buffer, 0, msg.message, messageOffset, received);
+                Array.Copy(buffer, 0, msg.Message, messageOffset, received);
                 remaining -= received;
                 messageOffset += received;
             }
@@ -268,7 +224,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return GetTraceString(
                 "PUBLISH",
                 new object[] { "messageId", "topic", "message" },
-                new object[] { messageId, topic, message });
+                new object[] { messageId, Topic, Message });
 #else
             return base.ToString();
 #endif

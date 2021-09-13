@@ -23,29 +23,12 @@ namespace uPLibrary.Networking.M2Mqtt.Internal
     /// </summary>
     public class MsgInternalEvent : InternalEvent
     {
-        #region Properties ...
 
-        /// <summary>
-        /// Related message
-        /// </summary>
-        public MqttMsgBase Message
-        {
-            get { return msg; }
-            set { msg = value; }
-        }
+        public MqttMsgBase Message { get; set; }
 
-        #endregion
-
-        // related message
-        protected MqttMsgBase msg;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="msg">Related message</param>
         public MsgInternalEvent(MqttMsgBase msg)
         {
-            this.msg = msg;
+            Message = msg;
         }
     }
 }

@@ -22,42 +22,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgUnsubscribeEventArgs : EventArgs
     {
-        #region Properties...
 
-        /// <summary>
-        /// Message identifier
-        /// </summary>
-        public ushort MessageId
+        public ushort MessageId { get; internal set; }
+
+        public string[] TopicsToUnsubscribe { get; internal set; }
+
+        public MqttMsgUnsubscribeEventArgs(ushort messageId, string[] topicsToUnsubscribe)
         {
-            get { return messageId; }
-            internal set { messageId = value; }
-        }
-
-        /// <summary>
-        /// Topics requested to subscribe
-        /// </summary>
-        public string[] Topics
-        {
-            get { return topics; }
-            internal set { topics = value; }
-        }
-
-        #endregion
-
-        // message identifier
-        ushort messageId;
-        // topics requested to unsubscribe
-        string[] topics;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="messageId">Message identifier for subscribed topics</param>
-        /// <param name="topics">Topics requested to subscribe</param>
-        public MqttMsgUnsubscribeEventArgs(ushort messageId, string[] topics)
-        {
-            this.messageId = messageId;
-            this.topics = topics;
+            MessageId = messageId;
+            TopicsToUnsubscribe = topicsToUnsubscribe;
         }
     }
 }

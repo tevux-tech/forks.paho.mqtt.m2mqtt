@@ -24,9 +24,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgPingResp : MqttMsgBase
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgPingResp()
         {
             type = MQTT_MSG_PINGRESP_TYPE;
@@ -47,7 +44,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             {
                 // [v3.1.1] check flag bits
                 if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_PINGRESP_FLAG_BITS)
+                {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
+                }
             }
 
             // already know remaininglength is zero (MQTT specification),
@@ -64,9 +63,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_PINGRESP_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_PINGRESP_FLAG_BITS; // [v.3.1.1]
+            {
+                buffer[index++] = (MQTT_MSG_PINGRESP_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_PINGRESP_FLAG_BITS;
+            }
             else
+            {
                 buffer[index++] = (MQTT_MSG_PINGRESP_TYPE << MSG_TYPE_OFFSET);
+            }
+
             buffer[index++] = 0x00;
 
             return buffer;

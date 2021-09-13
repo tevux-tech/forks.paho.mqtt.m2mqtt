@@ -23,52 +23,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgPublishedEventArgs : EventArgs
     {
-        #region Properties...
+        public ushort MessageId { get; internal set; }
 
-        /// <summary>
-        /// Message identifier
-        /// </summary>
-        public ushort MessageId
-        {
-            get { return messageId; }
-            internal set { messageId = value; }
-        }
+        public bool IsPublished { get; internal set; }
 
-        /// <summary>
-        /// Message published (or failed due to retries)
-        /// </summary>
-        public bool IsPublished
-        {
-            get { return isPublished; }
-            internal set { isPublished = value; }
-        }
 
-        #endregion
-
-        // message identifier
-        ushort messageId;
-
-        // published flag
-        bool isPublished;
-
-        /// <summary>
-        /// Constructor (published message)
-        /// </summary>
-        /// <param name="messageId">Message identifier published</param>
-        public MqttMsgPublishedEventArgs(ushort messageId)
-            : this(messageId, true)
+        public MqttMsgPublishedEventArgs(ushort messageId) : this(messageId, true)
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="messageId">Message identifier</param>
-        /// <param name="isPublished">Publish flag</param>
         public MqttMsgPublishedEventArgs(ushort messageId, bool isPublished)
         {
-            this.messageId = messageId;
-            this.isPublished = isPublished;
+            MessageId = messageId;
+            IsPublished = isPublished;
         }
     }
 }

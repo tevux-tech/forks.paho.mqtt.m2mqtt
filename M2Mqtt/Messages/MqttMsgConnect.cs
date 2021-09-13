@@ -73,38 +73,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
         #endregion
 
-        #region Properties...
+        public string ProtocolName { get; set; }
+        public byte ProtocolVersion { get; set; }
+        public string ClientId { get; set; }
 
-        /// <summary>
-        /// Protocol name
-        /// </summary>
-        public string ProtocolName
-        {
-            get { return protocolName; }
-            set { protocolName = value; }
-        }
-
-        /// <summary>
-        /// Protocol version
-        /// </summary>
-        public byte ProtocolVersion
-        {
-            get { return protocolVersion; }
-            set { protocolVersion = value; }
-        }
-
-        /// <summary>
-        /// Client identifier
-        /// </summary>
-        public string ClientId
-        {
-            get { return clientId; }
-            set { clientId = value; }
-        }
-
-        /// <summary>
-        /// Will retain flag
-        /// </summary>
         public bool WillRetain
         {
             get { return willRetain; }
@@ -120,95 +92,18 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             set { willQosLevel = value; }
         }
 
-        /// <summary>
-        /// Will flag
-        /// </summary>
-        public bool WillFlag
-        {
-            get { return willFlag; }
-            set { willFlag = value; }
-        }
+        public bool WillFlag { get; set; }
+        public string WillTopic { get; set; }
+        public string WillMessage { get; set; }
+        public string Username { get; set; }
 
-        /// <summary>
-        /// Will topic
-        /// </summary>
-        public string WillTopic
-        {
-            get { return willTopic; }
-            set { willTopic = value; }
-        }
+        public string Password { get; set; }
+        public bool CleanSession { get; set; }
+        public ushort KeepAlivePeriod { get; set; }
 
-        /// <summary>
-        /// Will message
-        /// </summary>
-        public string WillMessage
-        {
-            get { return willMessage; }
-            set { willMessage = value; }
-        }
 
-        /// <summary>
-        /// Username
-        /// </summary>
-        public string Username
-        {
-            get { return username; }
-            set { username = value; }
-        }
-
-        /// <summary>
-        /// Password
-        /// </summary>
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
-
-        /// <summary>
-        /// Clean session flag
-        /// </summary>
-        public bool CleanSession
-        {
-            get { return cleanSession; }
-            set { cleanSession = value; }
-        }
-
-        /// <summary>
-        /// Keep alive period
-        /// </summary>
-        public ushort KeepAlivePeriod
-        {
-            get { return keepAlivePeriod; }
-            set { keepAlivePeriod = value; }
-        }
-
-        #endregion
-
-        // protocol name
-        private string protocolName;
-        // protocol version
-        private byte protocolVersion;
-        // client identifier
-        private string clientId;
-        // will retain flag
         protected bool willRetain;
-        // will quality of service level
         protected byte willQosLevel;
-        // will flag
-        private bool willFlag;
-        // will topic
-        private string willTopic;
-        // will message
-        private string willMessage;
-        // username
-        private string username;
-        // password
-        private string password;
-        // clean session flag
-        private bool cleanSession;
-        // keep alive period (in sec)
-        private ushort keepAlivePeriod;
 
         /// <summary>
         /// Constructor
@@ -256,19 +151,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         {
             type = MQTT_MSG_CONNECT_TYPE;
 
-            this.clientId = clientId;
-            this.username = username;
-            this.password = password;
+            ClientId = clientId;
+            Username = username;
+            Password = password;
             this.willRetain = willRetain;
             this.willQosLevel = willQosLevel;
-            this.willFlag = willFlag;
-            this.willTopic = willTopic;
-            this.willMessage = willMessage;
-            this.cleanSession = cleanSession;
-            this.keepAlivePeriod = keepAlivePeriod;
+            WillFlag = willFlag;
+            WillTopic = willTopic;
+            WillMessage = willMessage;
+            CleanSession = cleanSession;
+            KeepAlivePeriod = keepAlivePeriod;
             // [v.3.1.1] added new protocol name and version
-            this.protocolVersion = protocolVersion;
-            protocolName = (this.protocolVersion == PROTOCOL_VERSION_V3_1_1) ? PROTOCOL_NAME_V3_1_1 : PROTOCOL_NAME_V3_1;
+            ProtocolVersion = protocolVersion;
+            ProtocolName = (ProtocolVersion == PROTOCOL_VERSION_V3_1_1) ? PROTOCOL_NAME_V3_1_1 : PROTOCOL_NAME_V3_1;
         }
 
         /// <summary>
@@ -311,19 +206,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             protNameUtf8 = new byte[protNameUtf8Length];
             Array.Copy(buffer, index, protNameUtf8, 0, protNameUtf8Length);
             index += protNameUtf8Length;
-            msg.protocolName = new string(Encoding.UTF8.GetChars(protNameUtf8));
+            msg.ProtocolName = new string(Encoding.UTF8.GetChars(protNameUtf8));
 
             // [v3.1.1] wrong protocol name
-            if (!msg.protocolName.Equals(PROTOCOL_NAME_V3_1) && !msg.protocolName.Equals(PROTOCOL_NAME_V3_1_1))
+            if (!msg.ProtocolName.Equals(PROTOCOL_NAME_V3_1) && !msg.ProtocolName.Equals(PROTOCOL_NAME_V3_1_1))
                 throw new MqttClientException(MqttClientErrorCode.InvalidProtocolName);
 
             // protocol version
-            msg.protocolVersion = buffer[index];
+            msg.ProtocolVersion = buffer[index];
             index += PROTOCOL_VERSION_SIZE;
 
             // connect flags
             // [v3.1.1] check lsb (reserved) must be 0
-            if ((msg.protocolVersion == PROTOCOL_VERSION_V3_1_1) &&
+            if ((msg.ProtocolVersion == PROTOCOL_VERSION_V3_1_1) &&
                 ((buffer[index] & RESERVED_FLAG_MASK) != 0x00))
                 throw new MqttClientException(MqttClientErrorCode.InvalidConnectFlags);
 
@@ -331,13 +226,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             isPasswordFlag = (buffer[index] & PASSWORD_FLAG_MASK) != 0x00;
             msg.willRetain = (buffer[index] & WILL_RETAIN_FLAG_MASK) != 0x00;
             msg.willQosLevel = (byte)((buffer[index] & WILL_QOS_FLAG_MASK) >> WILL_QOS_FLAG_OFFSET);
-            msg.willFlag = (buffer[index] & WILL_FLAG_MASK) != 0x00;
-            msg.cleanSession = (buffer[index] & CLEAN_SESSION_FLAG_MASK) != 0x00;
+            msg.WillFlag = (buffer[index] & WILL_FLAG_MASK) != 0x00;
+            msg.CleanSession = (buffer[index] & CLEAN_SESSION_FLAG_MASK) != 0x00;
             index += CONNECT_FLAGS_SIZE;
 
             // keep alive timer
-            msg.keepAlivePeriod = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.keepAlivePeriod |= buffer[index++];
+            msg.KeepAlivePeriod = (ushort)((buffer[index++] << 8) & 0xFF00);
+            msg.KeepAlivePeriod |= buffer[index++];
 
             // client identifier [v3.1.1] it may be zero bytes long (empty string)
             clientIdUtf8Length = ((buffer[index++] << 8) & 0xFF00);
@@ -345,27 +240,27 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             clientIdUtf8 = new byte[clientIdUtf8Length];
             Array.Copy(buffer, index, clientIdUtf8, 0, clientIdUtf8Length);
             index += clientIdUtf8Length;
-            msg.clientId = new string(Encoding.UTF8.GetChars(clientIdUtf8));
+            msg.ClientId = new string(Encoding.UTF8.GetChars(clientIdUtf8));
             // [v3.1.1] if client identifier is zero bytes long, clean session must be true
-            if ((msg.protocolVersion == PROTOCOL_VERSION_V3_1_1) && (clientIdUtf8Length == 0) && (!msg.cleanSession))
+            if ((msg.ProtocolVersion == PROTOCOL_VERSION_V3_1_1) && (clientIdUtf8Length == 0) && (!msg.CleanSession))
                 throw new MqttClientException(MqttClientErrorCode.InvalidClientId);
 
             // will topic and will message
-            if (msg.willFlag)
+            if (msg.WillFlag)
             {
                 willTopicUtf8Length = ((buffer[index++] << 8) & 0xFF00);
                 willTopicUtf8Length |= buffer[index++];
                 willTopicUtf8 = new byte[willTopicUtf8Length];
                 Array.Copy(buffer, index, willTopicUtf8, 0, willTopicUtf8Length);
                 index += willTopicUtf8Length;
-                msg.willTopic = new string(Encoding.UTF8.GetChars(willTopicUtf8));
+                msg.WillTopic = new string(Encoding.UTF8.GetChars(willTopicUtf8));
 
                 willMessageUtf8Length = ((buffer[index++] << 8) & 0xFF00);
                 willMessageUtf8Length |= buffer[index++];
                 willMessageUtf8 = new byte[willMessageUtf8Length];
                 Array.Copy(buffer, index, willMessageUtf8, 0, willMessageUtf8Length);
                 index += willMessageUtf8Length;
-                msg.willMessage = new string(Encoding.UTF8.GetChars(willMessageUtf8));
+                msg.WillMessage = new string(Encoding.UTF8.GetChars(willMessageUtf8));
             }
 
             // username
@@ -376,7 +271,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 usernameUtf8 = new byte[usernameUtf8Length];
                 Array.Copy(buffer, index, usernameUtf8, 0, usernameUtf8Length);
                 index += usernameUtf8Length;
-                msg.username = new string(Encoding.UTF8.GetChars(usernameUtf8));
+                msg.Username = new string(Encoding.UTF8.GetChars(usernameUtf8));
             }
 
             // password
@@ -387,7 +282,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 passwordUtf8 = new byte[passwordUtf8Length];
                 Array.Copy(buffer, index, passwordUtf8, 0, passwordUtf8Length);
                 index += passwordUtf8Length;
-                msg.password = new string(Encoding.UTF8.GetChars(passwordUtf8));
+                msg.Password = new string(Encoding.UTF8.GetChars(passwordUtf8));
             }
 
             return msg;
@@ -402,30 +297,30 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             byte[] buffer;
             int index = 0;
 
-            byte[] clientIdUtf8 = Encoding.UTF8.GetBytes(clientId);
-            byte[] willTopicUtf8 = (willFlag && (willTopic != null)) ? Encoding.UTF8.GetBytes(willTopic) : null;
-            byte[] willMessageUtf8 = (willFlag && (willMessage != null)) ? Encoding.UTF8.GetBytes(willMessage) : null;
-            byte[] usernameUtf8 = ((username != null) && (username.Length > 0)) ? Encoding.UTF8.GetBytes(username) : null;
-            byte[] passwordUtf8 = ((password != null) && (password.Length > 0)) ? Encoding.UTF8.GetBytes(password) : null;
+            byte[] clientIdUtf8 = Encoding.UTF8.GetBytes(ClientId);
+            byte[] willTopicUtf8 = (WillFlag && (WillTopic != null)) ? Encoding.UTF8.GetBytes(WillTopic) : null;
+            byte[] willMessageUtf8 = (WillFlag && (WillMessage != null)) ? Encoding.UTF8.GetBytes(WillMessage) : null;
+            byte[] usernameUtf8 = ((Username != null) && (Username.Length > 0)) ? Encoding.UTF8.GetBytes(Username) : null;
+            byte[] passwordUtf8 = ((Password != null) && (Password.Length > 0)) ? Encoding.UTF8.GetBytes(Password) : null;
 
             // [v3.1.1]
-            if (this.protocolVersion == PROTOCOL_VERSION_V3_1_1)
+            if (ProtocolVersion == PROTOCOL_VERSION_V3_1_1)
             {
                 // will flag set, will topic and will message MUST be present
-                if (willFlag && ((willQosLevel >= 0x03) ||
+                if (WillFlag && ((willQosLevel >= 0x03) ||
                                        (willTopicUtf8 == null) || (willMessageUtf8 == null) ||
                                        ((willTopicUtf8 != null) && (willTopicUtf8.Length == 0)) ||
                                        ((willMessageUtf8 != null) && (willMessageUtf8.Length == 0))))
                     throw new MqttClientException(MqttClientErrorCode.WillWrong);
                 // willflag not set, retain must be 0 and will topic and message MUST NOT be present
-                else if (!willFlag && ((willRetain) ||
+                else if (!WillFlag && ((willRetain) ||
                                             (willTopicUtf8 != null) || (willMessageUtf8 != null) ||
                                             ((willTopicUtf8 != null) && (willTopicUtf8.Length != 0)) ||
                                             ((willMessageUtf8 != null) && (willMessageUtf8.Length != 0))))
                     throw new MqttClientException(MqttClientErrorCode.WillWrong);
             }
 
-            if (keepAlivePeriod > MAX_KEEP_ALIVE)
+            if (KeepAlivePeriod > MAX_KEEP_ALIVE)
                 throw new MqttClientException(MqttClientErrorCode.KeepAliveWrong);
 
             // check on will QoS Level
@@ -435,7 +330,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // protocol name field size
             // MQTT version 3.1
-            if (this.protocolVersion == PROTOCOL_VERSION_V3_1)
+            if (ProtocolVersion == PROTOCOL_VERSION_V3_1)
             {
                 varHeaderSize += (PROTOCOL_NAME_LEN_SIZE + PROTOCOL_NAME_V3_1_SIZE);
             }
@@ -488,7 +383,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // protocol name
             buffer[index++] = 0; // MSB protocol name size
             // MQTT version 3.1
-            if (this.protocolVersion == PROTOCOL_VERSION_V3_1)
+            if (ProtocolVersion == PROTOCOL_VERSION_V3_1)
             {
                 buffer[index++] = PROTOCOL_NAME_V3_1_SIZE; // LSB protocol name size
                 Array.Copy(Encoding.UTF8.GetBytes(PROTOCOL_NAME_V3_1), 0, buffer, index, PROTOCOL_NAME_V3_1_SIZE);
@@ -512,15 +407,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             connectFlags |= (passwordUtf8 != null) ? (byte)(1 << PASSWORD_FLAG_OFFSET) : (byte)0x00;
             connectFlags |= (willRetain) ? (byte)(1 << WILL_RETAIN_FLAG_OFFSET) : (byte)0x00;
             // only if will flag is set, we have to use will QoS level (otherwise is MUST be 0)
-            if (willFlag)
+            if (WillFlag)
                 connectFlags |= (byte)(willQosLevel << WILL_QOS_FLAG_OFFSET);
-            connectFlags |= (willFlag) ? (byte)(1 << WILL_FLAG_OFFSET) : (byte)0x00;
-            connectFlags |= (cleanSession) ? (byte)(1 << CLEAN_SESSION_FLAG_OFFSET) : (byte)0x00;
+            connectFlags |= (WillFlag) ? (byte)(1 << WILL_FLAG_OFFSET) : (byte)0x00;
+            connectFlags |= (CleanSession) ? (byte)(1 << CLEAN_SESSION_FLAG_OFFSET) : (byte)0x00;
             buffer[index++] = connectFlags;
 
             // keep alive period
-            buffer[index++] = (byte)((keepAlivePeriod >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(keepAlivePeriod & 0x00FF); // LSB
+            buffer[index++] = (byte)((KeepAlivePeriod >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(KeepAlivePeriod & 0x00FF); // LSB
 
             // client identifier
             buffer[index++] = (byte)((clientIdUtf8.Length >> 8) & 0x00FF); // MSB
@@ -529,7 +424,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             index += clientIdUtf8.Length;
 
             // will topic
-            if (willFlag && (willTopicUtf8 != null))
+            if (WillFlag && (willTopicUtf8 != null))
             {
                 buffer[index++] = (byte)((willTopicUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(willTopicUtf8.Length & 0x00FF); // LSB
@@ -538,7 +433,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // will message
-            if (willFlag && (willMessageUtf8 != null))
+            if (WillFlag && (willMessageUtf8 != null))
             {
                 buffer[index++] = (byte)((willMessageUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(willMessageUtf8.Length & 0x00FF); // LSB
@@ -573,7 +468,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return GetTraceString(
                 "CONNECT",
                 new object[] { "protocolName", "protocolVersion", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" },
-                new object[] { protocolName, protocolVersion, clientId, willFlag, willRetain, willQosLevel, willTopic, willMessage, username, password, cleanSession, keepAlivePeriod });
+                new object[] { ProtocolName, ProtocolVersion, ClientId, WillFlag, willRetain, willQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
 #else
             return base.ToString();
 #endif

@@ -23,9 +23,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgDisconnect : MqttMsgBase
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgDisconnect()
         {
             type = MQTT_MSG_DISCONNECT_TYPE;

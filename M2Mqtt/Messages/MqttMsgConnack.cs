@@ -48,50 +48,20 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
         #endregion
 
-        #region Properties...
 
         // [v3.1.1] session present flag
         /// <summary>
         /// Session present flag
         /// </summary>
-        public bool SessionPresent
-        {
-            get { return sessionPresent; }
-            set { sessionPresent = value; }
-        }
+        public bool SessionPresent { get; set; }
 
-        /// <summary>
-        /// Return Code
-        /// </summary>
-        public byte ReturnCode
-        {
-            get { return returnCode; }
-            set { returnCode = value; }
-        }
+        public byte ReturnCode { get; set; }
 
-        #endregion
-
-        // [v3.1.1] session present flag
-        private bool sessionPresent;
-
-        // return code for CONNACK message
-        private byte returnCode;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgConnack()
         {
             type = MQTT_MSG_CONNACK_TYPE;
         }
 
-        /// <summary>
-        /// Parse bytes for a CONNACK message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>CONNACK message instance</returns>
         public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
         {
             byte[] buffer;
@@ -113,10 +83,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
             {
                 // [v3.1.1] ... set session present flag ...
-                msg.sessionPresent = (buffer[CONN_ACK_FLAGS_BYTE_OFFSET] & SESSION_PRESENT_FLAG_MASK) != 0x00;
+                msg.SessionPresent = (buffer[CONN_ACK_FLAGS_BYTE_OFFSET] & SESSION_PRESENT_FLAG_MASK) != 0x00;
             }
             // ...and set return code from broker
-            msg.returnCode = buffer[CONN_RETURN_CODE_BYTE_OFFSET];
+            msg.ReturnCode = buffer[CONN_RETURN_CODE_BYTE_OFFSET];
 
             return msg;
         }
@@ -165,13 +135,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
                 // [v3.1.1] session present flag
-                buffer[index++] = sessionPresent ? (byte)(1 << SESSION_PRESENT_FLAG_OFFSET) : (byte)0x00;
+                buffer[index++] = SessionPresent ? (byte)(1 << SESSION_PRESENT_FLAG_OFFSET) : (byte)0x00;
             else
                 // topic name compression response (reserved values. not used);
                 buffer[index++] = 0x00;
 
             // connect return code
-            buffer[index++] = returnCode;
+            buffer[index++] = ReturnCode;
 
             return buffer;
         }
@@ -182,7 +152,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return GetTraceString(
                 "CONNACK",
                 new object[] { "returnCode" },
-                new object[] { returnCode });
+                new object[] { ReturnCode });
 #else
             return base.ToString();
 #endif

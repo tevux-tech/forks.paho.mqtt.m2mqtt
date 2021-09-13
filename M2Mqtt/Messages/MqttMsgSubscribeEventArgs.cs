@@ -23,55 +23,17 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgSubscribeEventArgs : EventArgs
     {
-        #region Properties...
+        public ushort MessageId { get; internal set; }
 
-        /// <summary>
-        /// Message identifier
-        /// </summary>
-        public ushort MessageId
-        {
-            get { return messageId; }
-            internal set { messageId = value; }
-        }
+        public string[] TopicsToSubscribe { get; internal set; }
 
-        /// <summary>
-        /// Topics requested to subscribe
-        /// </summary>
-        public string[] Topics
-        {
-            get { return topics; }
-            internal set { topics = value; }
-        }
+        public byte[] QoSLevels { get; internal set; }
 
-        /// <summary>
-        /// List of QOS Levels requested
-        /// </summary>
-        public byte[] QoSLevels
-        {
-            get { return qosLevels; }
-            internal set { qosLevels = value; }
-        }
-
-        #endregion
-
-        // message identifier
-        ushort messageId;
-        // topics requested to subscribe
-        string[] topics;
-        // QoS levels requested
-        byte[] qosLevels;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="messageId">Message identifier for subscribe topics request</param>
-        /// <param name="topics">Topics requested to subscribe</param>
-        /// <param name="qosLevels">List of QOS Levels requested</param>
         public MqttMsgSubscribeEventArgs(ushort messageId, string[] topics, byte[] qosLevels)
         {
-            this.messageId = messageId;
-            this.topics = topics;
-            this.qosLevels = qosLevels;
+            MessageId = messageId;
+            TopicsToSubscribe = topics;
+            QoSLevels = qosLevels;
         }
     }
 }

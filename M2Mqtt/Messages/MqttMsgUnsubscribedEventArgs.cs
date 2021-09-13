@@ -23,29 +23,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgUnsubscribedEventArgs : EventArgs
     {
-        #region Properties...
+        public ushort MessageId { get; internal set; }
 
-        /// <summary>
-        /// Message identifier
-        /// </summary>
-        public ushort MessageId
-        {
-            get { return messageId; }
-            internal set { messageId = value; }
-        }
-
-        #endregion
-
-        // message identifier
-        ushort messageId;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="messageId">Message identifier for unsubscribed topic</param>
         public MqttMsgUnsubscribedEventArgs(ushort messageId)
         {
-            this.messageId = messageId;
+            MessageId = messageId;
         }
     }
 }

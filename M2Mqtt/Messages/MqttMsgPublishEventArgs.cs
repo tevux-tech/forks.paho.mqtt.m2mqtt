@@ -23,85 +23,24 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// </summary>
     public class MqttMsgPublishEventArgs : EventArgs
     {
-        #region Properties...
 
-        /// <summary>
-        /// Message topic
-        /// </summary>
-        public string Topic
+        public string Topic { get; internal set; }
+
+        public byte[] Message { get; internal set; }
+
+        public bool DupFlag { get; set; }
+
+        public byte QosLevel { get; internal set; }
+
+        public bool Retain { get; internal set; }
+
+        public MqttMsgPublishEventArgs(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain)
         {
-            get { return topic; }
-            internal set { topic = value; }
-        }
-
-        /// <summary>
-        /// Message data
-        /// </summary>
-        public byte[] Message
-        {
-            get { return message; }
-            internal set { message = value; }
-        }
-
-        /// <summary>
-        /// Duplicate message flag
-        /// </summary>
-        public bool DupFlag
-        {
-            get { return dupFlag; }
-            set { dupFlag = value; }
-        }
-
-        /// <summary>
-        /// Quality of Service level
-        /// </summary>
-        public byte QosLevel
-        {
-            get { return qosLevel; }
-            internal set { qosLevel = value; }
-        }
-
-        /// <summary>
-        /// Retain message flag
-        /// </summary>
-        public bool Retain
-        {
-            get { return retain; }
-            internal set { retain = value; }
-        }
-
-        #endregion
-
-        // message topic
-        private string topic;
-        // message data
-        private byte[] message;
-        // duplicate delivery
-        private bool dupFlag;
-        // quality of service level
-        private byte qosLevel;
-        // retain flag
-        private bool retain;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="topic">Message topic</param>
-        /// <param name="message">Message data</param>
-        /// <param name="dupFlag">Duplicate delivery flag</param>
-        /// <param name="qosLevel">Quality of Service level</param>
-        /// <param name="retain">Retain flag</param>
-        public MqttMsgPublishEventArgs(string topic,
-            byte[] message,
-            bool dupFlag,
-            byte qosLevel,
-            bool retain)
-        {
-            this.topic = topic;
-            this.message = message;
-            this.dupFlag = dupFlag;
-            this.qosLevel = qosLevel;
-            this.retain = retain;
+            Topic = topic;
+            Message = message;
+            DupFlag = dupFlag;
+            QosLevel = qosLevel;
+            Retain = retain;
         }
     }
 }

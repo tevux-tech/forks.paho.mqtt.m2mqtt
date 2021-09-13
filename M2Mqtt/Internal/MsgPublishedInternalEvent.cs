@@ -23,31 +23,12 @@ namespace uPLibrary.Networking.M2Mqtt.Internal
     /// </summary>
     public class MsgPublishedInternalEvent : MsgInternalEvent
     {
-        #region Properties...
 
-        /// <summary>
-        /// Message published (or failed due to retries)
-        /// </summary>
-        public bool IsPublished
+        public bool IsPublished { get; internal set; }
+
+        public MsgPublishedInternalEvent(MqttMsgBase msg, bool isPublished) : base(msg)
         {
-            get { return isPublished; }
-            internal set { isPublished = value; }
-        }
-
-        #endregion
-
-        // published flag
-        bool isPublished;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="msg">Message published</param>
-        /// <param name="isPublished">Publish flag</param>
-        public MsgPublishedInternalEvent(MqttMsgBase msg, bool isPublished)
-            : base(msg)
-        {
-            this.isPublished = isPublished;
+            IsPublished = isPublished;
         }
     }
 }
