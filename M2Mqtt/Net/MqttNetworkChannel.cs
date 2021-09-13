@@ -218,8 +218,8 @@ namespace uPLibrary.Networking.M2Mqtt
                 // check if there is a client certificate to add to the collection, otherwise it's null (as empty)
                 if (clientCert != null)
                     clientCertificates = new X509CertificateCollection(new X509Certificate[] { clientCert });
-#if (NETSTANDARD1_6 || NETCOREAPP3_1)
 
+#if NETCOREAPP3_1
                 if (alpnProtocols.Count > 0)
                 {
                     sslStream = new SslStream(netStream, false);
@@ -240,16 +240,10 @@ namespace uPLibrary.Networking.M2Mqtt
                 }
                 else
                 {
-                    sslStream.AuthenticateAsClientAsync(remoteHostName,
-                        clientCertificates,
-                        MqttSslUtility.ToSslPlatformEnum(sslProtocol),
-                        false).Wait();
+                    sslStream.AuthenticateAsClientAsync(remoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
                 }
 #else
-                this.sslStream.AuthenticateAsClient(this.remoteHostName,
-                    clientCertificates,
-                    MqttSslUtility.ToSslPlatformEnum(this.sslProtocol),
-                    false);
+                 sslStream.AuthenticateAsClientAsync(remoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
 #endif
 
             }
