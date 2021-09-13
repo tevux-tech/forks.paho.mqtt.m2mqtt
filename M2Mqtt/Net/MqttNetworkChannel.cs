@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -33,49 +33,33 @@ namespace uPLibrary.Networking.M2Mqtt
         private readonly RemoteCertificateValidationCallback userCertificateValidationCallback;
         private readonly LocalCertificateSelectionCallback userCertificateSelectionCallback;
 
-        // remote host information
-        private string remoteHostName;
-        private IPAddress remoteIpAddress;
-        private int remotePort;
-
         // socket for communication
-        private Socket socket;
+        private Socket _socket;
         // using SSL
-        private bool secure;
+        private bool _secure;
 
         // CA certificate (on client)
-        private X509Certificate caCert;
+        private X509Certificate _caCert;
         // Server certificate (on broker)
-        private X509Certificate serverCert;
+        private X509Certificate _serverCert;
         // client certificate (on client)
-        private X509Certificate clientCert;
+        private X509Certificate _clientCert;
 
         // SSL/TLS protocol version
-        private MqttSslProtocols sslProtocol;
+        private MqttSslProtocols _sslProtocol;
 
-        /// <summary>
-        /// Remote host name
-        /// </summary>
-        public string RemoteHostName { get { return remoteHostName; } }
-
-        /// <summary>
-        /// Remote IP address
-        /// </summary>
-        public IPAddress RemoteIpAddress { get { return remoteIpAddress; } }
-
-        /// <summary>
-        /// Remote port
-        /// </summary>
-        public int RemotePort { get { return remotePort; } }
+        public string RemoteHostName { get; private set; }
+        public IPAddress RemoteIpAddress { get; private set; }
+        public int RemotePort { get; private set; }
 
         // SSL stream
-        private SslStream sslStream;
-        private NetworkStream netStream;
+        private SslStream _sslStream;
+        private NetworkStream _netStream;
 
         /// <summary>
         /// List of Protocol for ALPN
         /// </summary>
-        private List<string> alpnProtocols = new List<string>();
+        private List<string> _alpnProtocols = new List<string>();
 
 
         /// <summary>
@@ -85,10 +69,10 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             get
             {
-                if (secure)
-                    return netStream.DataAvailable;
+                if (_secure)
+                    return _netStream.DataAvailable;
                 else
-                    return (socket.Available > 0);
+                    return (_socket.Available > 0);
             }
         }
 
@@ -96,9 +80,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// Constructor
         /// </summary>
         /// <param name="socket">Socket opened with the client</param>
-        public MqttNetworkChannel(Socket socket)
-            : this(socket, false, null, MqttSslProtocols.None, null, null)
-
+        public MqttNetworkChannel(Socket socket) : this(socket, false, null, MqttSslProtocols.None, null, null)
         {
 
         }
@@ -112,14 +94,12 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
         /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
-        public MqttNetworkChannel(Socket socket, bool secure, X509Certificate serverCert, MqttSslProtocols sslProtocol,
-            RemoteCertificateValidationCallback userCertificateValidationCallback,
-            LocalCertificateSelectionCallback userCertificateSelectionCallback)
+        public MqttNetworkChannel(Socket socket, bool secure, X509Certificate serverCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback)
         {
-            this.socket = socket;
-            this.secure = secure;
-            this.serverCert = serverCert;
-            this.sslProtocol = sslProtocol;
+            _socket = socket;
+            _secure = secure;
+            _serverCert = serverCert;
+            _sslProtocol = sslProtocol;
             this.userCertificateValidationCallback = userCertificateValidationCallback;
             this.userCertificateSelectionCallback = userCertificateSelectionCallback;
         }
@@ -129,8 +109,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         /// <param name="remoteHostName">Remote Host name</param>
         /// <param name="remotePort">Remote port</param>
-        public MqttNetworkChannel(string remoteHostName, int remotePort)
-            : this(remoteHostName, remotePort, false, null, null, MqttSslProtocols.None, null, null)
+        public MqttNetworkChannel(string remoteHostName, int remotePort) : this(remoteHostName, remotePort, false, null, null, MqttSslProtocols.None, null, null)
         {
         }
 
@@ -146,10 +125,7 @@ namespace uPLibrary.Networking.M2Mqtt
 
         /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
-        public MqttNetworkChannel(string remoteHostName, int remotePort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
-            RemoteCertificateValidationCallback userCertificateValidationCallback,
-            LocalCertificateSelectionCallback userCertificateSelectionCallback,
-            List<string> alpnProtocols = null)
+        public MqttNetworkChannel(string remoteHostName, int remotePort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> alpnProtocols = null)
         {
             IPAddress remoteIpAddress = null;
             try
@@ -181,19 +157,19 @@ namespace uPLibrary.Networking.M2Mqtt
                 }
             }
 
-            this.remoteHostName = remoteHostName;
-            this.remoteIpAddress = remoteIpAddress;
-            this.remotePort = remotePort;
-            this.secure = secure;
-            this.caCert = caCert;
-            this.clientCert = clientCert;
-            this.sslProtocol = sslProtocol;
+            RemoteHostName = remoteHostName;
+            RemoteIpAddress = remoteIpAddress;
+            RemotePort = remotePort;
+            _secure = secure;
+            _caCert = caCert;
+            _clientCert = clientCert;
+            _sslProtocol = sslProtocol;
             this.userCertificateValidationCallback = userCertificateValidationCallback;
             this.userCertificateSelectionCallback = userCertificateSelectionCallback;
 
             if (alpnProtocols != null)
             {
-                this.alpnProtocols = alpnProtocols;
+                _alpnProtocols = alpnProtocols;
             }
         }
 
@@ -202,50 +178,49 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         public void Connect()
         {
-            socket = new Socket(remoteIpAddress.GetAddressFamily(), SocketType.Stream, ProtocolType.Tcp);
+            _socket = new Socket(RemoteIpAddress.GetAddressFamily(), SocketType.Stream, ProtocolType.Tcp);
             // try connection to the broker
-            socket.Connect(remoteHostName, remotePort);
+            _socket.Connect(RemoteHostName, RemotePort);
 
             // secure channel requested
-            if (secure)
+            if (_secure)
             {
                 // create SSL stream
-                netStream = new NetworkStream(socket);
-                sslStream = new SslStream(netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
+                _netStream = new NetworkStream(_socket);
+                _sslStream = new SslStream(_netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
 
                 // server authentication (SSL/TLS handshake)
                 X509CertificateCollection clientCertificates = null;
                 // check if there is a client certificate to add to the collection, otherwise it's null (as empty)
-                if (clientCert != null)
-                    clientCertificates = new X509CertificateCollection(new X509Certificate[] { clientCert });
+                if (_clientCert != null)
+                    clientCertificates = new X509CertificateCollection(new X509Certificate[] { _clientCert });
 
 #if NETCOREAPP3_1
-                if (alpnProtocols.Count > 0)
+                if (_alpnProtocols.Count > 0)
                 {
-                    sslStream = new SslStream(netStream, false);
+                    _sslStream = new SslStream(_netStream, false);
                     SslClientAuthenticationOptions authOptions = new SslClientAuthenticationOptions();
                     List<SslApplicationProtocol> sslProtocolList = new List<SslApplicationProtocol>();
-                    foreach (string alpnProtocol in alpnProtocols)
+                    foreach (string alpnProtocol in _alpnProtocols)
                     {
                         sslProtocolList.Add(new SslApplicationProtocol(alpnProtocol));
                     }
                     authOptions.ApplicationProtocols = sslProtocolList;
-                    authOptions.EnabledSslProtocols = MqttSslUtility.ToSslPlatformEnum(sslProtocol);
-                    authOptions.TargetHost = remoteHostName;
+                    authOptions.EnabledSslProtocols = MqttSslUtility.ToSslPlatformEnum(_sslProtocol);
+                    authOptions.TargetHost = RemoteHostName;
                     authOptions.AllowRenegotiation = false;
                     authOptions.ClientCertificates = clientCertificates;
                     authOptions.EncryptionPolicy = EncryptionPolicy.RequireEncryption;
 
-                    sslStream.AuthenticateAsClientAsync(authOptions).Wait();
+                    _sslStream.AuthenticateAsClientAsync(authOptions).Wait();
                 }
                 else
                 {
-                    sslStream.AuthenticateAsClientAsync(remoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
+                    _sslStream.AuthenticateAsClientAsync(RemoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
                 }
 #else
-                 sslStream.AuthenticateAsClientAsync(remoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
+                 _sslStream.AuthenticateAsClientAsync(RemoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
 #endif
-
             }
         }
 
@@ -256,14 +231,14 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Number of byte sent</returns>
         public int Send(byte[] buffer)
         {
-            if (secure)
+            if (_secure)
             {
-                sslStream.Write(buffer, 0, buffer.Length);
-                sslStream.Flush();
+                _sslStream.Write(buffer, 0, buffer.Length);
+                _sslStream.Flush();
                 return buffer.Length;
             }
             else
-                return socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
+                return _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
         }
 
         /// <summary>
@@ -273,7 +248,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Number of bytes received</returns>
         public int Receive(byte[] buffer)
         {
-            if (secure)
+            if (_secure)
             {
                 // read all data needed (until fill buffer)
                 int idx = 0, read = 0;
@@ -281,7 +256,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
-                    read = sslStream.Read(buffer, idx, buffer.Length - idx);
+                    read = _sslStream.Read(buffer, idx, buffer.Length - idx);
                     if (read == 0)
                         return 0;
                     idx += read;
@@ -296,7 +271,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
-                    read = socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
+                    read = _socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
                     if (read == 0)
                         return 0;
                     idx += read;
@@ -314,7 +289,7 @@ namespace uPLibrary.Networking.M2Mqtt
         public int Receive(byte[] buffer, int timeout)
         {
             // check data availability (timeout is in microseconds)
-            if (socket.Poll(timeout * 1000, SelectMode.SelectRead))
+            if (_socket.Poll(timeout * 1000, SelectMode.SelectRead))
             {
                 return Receive(buffer);
             }
@@ -329,23 +304,23 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         public void Close()
         {
-            if (secure)
+            if (_secure)
             {
-                netStream.Flush();
-                sslStream.Flush();
+                _netStream.Flush();
+                _sslStream.Flush();
 
             }
 
             try
             {
-                socket.Shutdown(SocketShutdown.Both);
+                _socket.Shutdown(SocketShutdown.Both);
             }
             catch
             {
                 // An error occurred when attempting to access the socket or socket has been closed
                 // Refer to: https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.shutdown(v=vs.110).aspx
             }
-            socket.Dispose();
+            _socket.Dispose();
         }
 
         /// <summary>
@@ -354,11 +329,11 @@ namespace uPLibrary.Networking.M2Mqtt
         public void Accept()
         {
             // secure channel requested
-            if (secure)
+            if (_secure)
             {
-                netStream = new NetworkStream(socket);
-                sslStream = new SslStream(netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
-                sslStream.AuthenticateAsServerAsync(serverCert, false, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
+                _netStream = new NetworkStream(_socket);
+                _sslStream = new SslStream(_netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
+                _sslStream.AuthenticateAsServerAsync(_serverCert, false, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
             }
 
             return;
