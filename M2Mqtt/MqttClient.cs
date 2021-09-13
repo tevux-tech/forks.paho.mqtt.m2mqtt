@@ -21,10 +21,8 @@ using System.Linq;
 
 using System;
 using System.Net;
-#if !(WINDOWS_APP || WINDOWS_PHONE_APP)
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
-#endif
 using System.Threading;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
@@ -33,14 +31,8 @@ using uPLibrary.Networking.M2Mqtt.Utility;
 using uPLibrary.Networking.M2Mqtt.Internal;
 
 using System.Collections.Generic;
-#if (SSL && !(WINDOWS_APP || WINDOWS_PHONE_APP))
 using System.Security.Authentication;
 using System.Net.Security;
-#endif
-
-#if (WINDOWS_APP || WINDOWS_PHONE_APP)
-using Windows.Networking.Sockets;
-#endif
 
 using System.Collections;
 
@@ -245,7 +237,6 @@ namespace uPLibrary.Networking.M2Mqtt
             get { return this.settings; }
         }
 
-#if !(WINDOWS_APP || WINDOWS_PHONE_APP) 
         /// <summary>
         /// Constructor
         /// </summary>
@@ -270,18 +261,13 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             this.Init(brokerIpAddress.ToString(), brokerPort, secure, caCert, clientCert, sslProtocol, null, null);
         }
-#endif
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="brokerHostName">Broker Host Name or IP Address</param>
         public MqttClient(string brokerHostName) :
-#if !(WINDOWS_APP || WINDOWS_PHONE_APP)
             this(brokerHostName, MqttSettings.MQTT_BROKER_DEFAULT_PORT, false, null, null, MqttSslProtocols.None)
-#else
-            this(brokerHostName, MqttSettings.MQTT_BROKER_DEFAULT_PORT, false, MqttSslProtocols.None)
-#endif
         {
         }
 
@@ -292,13 +278,9 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <param name="brokerPort">Broker port</param>
         /// <param name="secure">Using secure connection</param>
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
-#if !(WINDOWS_APP || WINDOWS_PHONE_APP)
         /// <param name="caCert">CA certificate for secure connection</param>
         /// <param name="clientCert">Client certificate</param>
         public MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
-#else
-        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol)            
-#endif
         {
             this.Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, null, null);
         }
@@ -1595,13 +1577,11 @@ namespace uPLibrary.Networking.M2Mqtt
                                 (ex.ErrorCode == MqttClientErrorCode.InvalidProtocolName) ||
                                 (ex.ErrorCode == MqttClientErrorCode.InvalidConnectFlags));
                     }
-#if !(WINDOWS_APP || WINDOWS_PHONE_APP)
                     else if ((e.GetType() == typeof(IOException)) || (e.GetType() == typeof(SocketException)) ||
                              ((e.InnerException != null) && (e.InnerException.GetType() == typeof(SocketException)))) // added for SSL/TLS incoming connection that use SslStream that wraps SocketException
                     {
                         close = true;
                     }
-#endif
 
                     if (close)
                     {
