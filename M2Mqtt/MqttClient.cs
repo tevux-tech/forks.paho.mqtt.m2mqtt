@@ -661,9 +661,7 @@ namespace uPLibrary.Networking.M2Mqtt
             }
             catch (Exception e)
             {
-#if TRACE
                 MqttUtility.Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-#endif
 
                 // client must close connection
                 this.OnConnectionClosing();
@@ -981,9 +979,7 @@ namespace uPLibrary.Networking.M2Mqtt
             }
             catch (Exception e)
             {
-#if TRACE
                 MqttUtility.Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-#endif
 
                 throw new MqttCommunicationException(e);
             }
@@ -995,9 +991,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <param name="msg">Message</param>
         private void Send(MqttMsgBase msg)
         {
-#if TRACE
             MqttUtility.Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
-#endif
             this.Send(msg.GetBytes((byte)this.ProtocolVersion));
         }
 
@@ -1037,9 +1031,7 @@ namespace uPLibrary.Networking.M2Mqtt
                     if (((SocketException)e).SocketErrorCode == SocketError.ConnectionReset)
                         this.IsConnected = false;
                 }
-#if TRACE
                 MqttUtility.Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-#endif
 
                 throw new MqttCommunicationException(e);
             }
@@ -1079,9 +1071,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>MQTT message response</returns>
         private MqttMsgBase SendReceive(MqttMsgBase msg, int timeout)
         {
-#if TRACE
             MqttUtility.Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
-#endif
             return this.SendReceive(msg.GetBytes((byte)this.ProtocolVersion), timeout);
         }
 
@@ -1178,9 +1168,7 @@ namespace uPLibrary.Networking.M2Mqtt
                         // enqueue message and unlock send thread
                         this.inflightQueue.Enqueue(msgContext);
 
-#if TRACE
                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "enqueued {0}", msg);
-#endif
 
                         // PUBLISH message
                         if (msg.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE)
@@ -1294,9 +1282,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 lock (this.internalQueue)
                 {
                     this.internalQueue.Enqueue(msg);
-#if TRACE
                     MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "enqueued {0}", msg);
-#endif
                     this.inflightWaitHandle.Set();
                 }
             }
@@ -1335,9 +1321,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
 #if BROKER
                                 MqttMsgConnect connect = MqttMsgConnect.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", connect);
-#endif
 
                                 // raise message received event
                                 this.OnInternalEvent(new MsgInternalEvent(connect));
@@ -1353,9 +1338,9 @@ namespace uPLibrary.Networking.M2Mqtt
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 #else
                                 this.msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", this.msgReceived);
-#endif
+
                                 this.syncEndReceiving.Set();
                                 break;
 #endif
@@ -1365,9 +1350,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
 #if BROKER
                                 this.msgReceived = MqttMsgPingReq.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", this.msgReceived);
-#endif
 
                                 MqttMsgPingResp pingresp = new MqttMsgPingResp();
                                 this.Send(pingresp);
@@ -1384,9 +1368,9 @@ namespace uPLibrary.Networking.M2Mqtt
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 #else
                                 this.msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", this.msgReceived);
-#endif
+
                                 this.syncEndReceiving.Set();
                                 break;
 #endif
@@ -1396,9 +1380,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
 #if BROKER
                                 MqttMsgSubscribe subscribe = MqttMsgSubscribe.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", subscribe);
-#endif
 
                                 // raise message received event
                                 this.OnInternalEvent(new MsgInternalEvent(subscribe));
@@ -1416,9 +1399,8 @@ namespace uPLibrary.Networking.M2Mqtt
 #else
                                 // enqueue SUBACK message received (for QoS Level 1) into the internal queue
                                 MqttMsgSuback suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", suback);
-#endif
 
                                 // enqueue SUBACK message into the internal queue
                                 this.EnqueueInternal(suback);
@@ -1430,9 +1412,8 @@ namespace uPLibrary.Networking.M2Mqtt
                             case MqttMsgBase.MQTT_MSG_PUBLISH_TYPE:
 
                                 MqttMsgPublish publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", publish);
-#endif
 
                                 // enqueue PUBLISH message to acknowledge into the inflight queue
                                 this.EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
@@ -1444,9 +1425,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
                                 // enqueue PUBACK message received (for QoS Level 1) into the internal queue
                                 MqttMsgPuback puback = MqttMsgPuback.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", puback);
-#endif
 
                                 // enqueue PUBACK message into the internal queue
                                 this.EnqueueInternal(puback);
@@ -1458,9 +1438,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
                                 // enqueue PUBREC message received (for QoS Level 2) into the internal queue
                                 MqttMsgPubrec pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrec);
-#endif
 
                                 // enqueue PUBREC message into the internal queue
                                 this.EnqueueInternal(pubrec);
@@ -1472,9 +1451,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
                                 // enqueue PUBREL message received (for QoS Level 2) into the internal queue
                                 MqttMsgPubrel pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrel);
-#endif
 
                                 // enqueue PUBREL message into the internal queue
                                 this.EnqueueInternal(pubrel);
@@ -1486,9 +1464,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
                                 // enqueue PUBCOMP message received (for QoS Level 2) into the internal queue
                                 MqttMsgPubcomp pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
-#endif
 
                                 // enqueue PUBCOMP message into the internal queue
                                 this.EnqueueInternal(pubcomp);
@@ -1500,9 +1477,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
 #if BROKER
                                 MqttMsgUnsubscribe unsubscribe = MqttMsgUnsubscribe.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsubscribe);
-#endif
 
                                 // raise message received event
                                 this.OnInternalEvent(new MsgInternalEvent(unsubscribe));
@@ -1520,9 +1496,8 @@ namespace uPLibrary.Networking.M2Mqtt
 #else
                                 // enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
                                 MqttMsgUnsuback unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsuback);
-#endif
 
                                 // enqueue UNSUBACK message into the internal queue
                                 this.EnqueueInternal(unsuback);
@@ -1535,9 +1510,8 @@ namespace uPLibrary.Networking.M2Mqtt
 
 #if BROKER
                                 MqttMsgDisconnect disconnect = MqttMsgDisconnect.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
-#if TRACE
+
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", disconnect);
-#endif
 
                                 // raise message received event
                                 this.OnInternalEvent(new MsgInternalEvent(disconnect));
@@ -1563,9 +1537,9 @@ namespace uPLibrary.Networking.M2Mqtt
                 }
                 catch (Exception e)
                 {
-#if TRACE
+
                     MqttUtility.Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-#endif
+
                     this.exReceiving = new MqttCommunicationException(e);
 
                     bool close = false;
@@ -1878,9 +1852,9 @@ namespace uPLibrary.Networking.M2Mqtt
                                             this.OnInternalEvent(internalEvent);
                                         }
 
-#if TRACE
+
                                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "processed {0}", msgInflight);
-#endif
+
                                         break;
 
                                     case MqttMsgState.QueuedQos1:
@@ -1929,9 +1903,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                             // notify published message from broker and acknowledged
                                             this.OnInternalEvent(internalEvent);
 
-#if TRACE
                                             MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "processed {0}", msgInflight);
-#endif
                                         }
                                         break;
 
@@ -2000,9 +1972,8 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.internalQueue.Dequeue();
                                                         acknowledge = true;
                                                         msgReceivedProcessed = true;
-#if TRACE
+
                                                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
-#endif
                                                     }
 
                                                     // if PUBACK received, confirm published with flag
@@ -2022,9 +1993,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.session.InflightMessages.Remove(msgContext.Key);
                                                     }
 
-#if TRACE
                                                     MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "processed {0}", msgInflight);
-#endif
                                                 }
                                             }
 
@@ -2105,9 +2074,8 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.internalQueue.Dequeue();
                                                         acknowledge = true;
                                                         msgReceivedProcessed = true;
-#if TRACE
+
                                                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
-#endif
                                                     }
 
                                                     MqttMsgPubrel pubrel = new MqttMsgPubrel();
@@ -2195,9 +2163,8 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         // received message processed
                                                         this.internalQueue.Dequeue();
                                                         msgReceivedProcessed = true;
-#if TRACE
+
                                                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
-#endif
                                                     }
 
                                                     MqttMsgPubcomp pubcomp = new MqttMsgPubcomp();
@@ -2217,9 +2184,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.session.InflightMessages.Remove(msgContext.Key);
                                                     }
 
-#if TRACE
                                                     MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "processed {0}", msgInflight);
-#endif
                                                 }
                                                 else
                                                 {
@@ -2259,9 +2224,8 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.internalQueue.Dequeue();
                                                         acknowledge = true;
                                                         msgReceivedProcessed = true;
-#if TRACE
+
                                                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
-#endif
                                                     }
 
                                                     internalEvent = new MsgPublishedInternalEvent(msgReceived, true);
@@ -2276,9 +2240,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.session.InflightMessages.Remove(msgContext.Key);
                                                     }
 
-#if TRACE
                                                     MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "processed {0}", msgInflight);
-#endif
                                                 }
                                             }
                                             // it is a PUBREC message
@@ -2294,9 +2256,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         this.internalQueue.Dequeue();
                                                         acknowledge = true;
                                                         msgReceivedProcessed = true;
-#if TRACE
                                                         MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
-#endif
 
                                                         // re-enqueue message
                                                         this.inflightQueue.Enqueue(msgContext);
@@ -2403,9 +2363,8 @@ namespace uPLibrary.Networking.M2Mqtt
                             if ((msgReceived != null) && !msgReceivedProcessed)
                             {
                                 this.internalQueue.Dequeue();
-#if TRACE
+
                                 MqttUtility.Trace.WriteLine(TraceLevel.Queuing, "dequeued {0} orphan", msgReceived);
-#endif
                             }
                         }
                     }
@@ -2418,9 +2377,7 @@ namespace uPLibrary.Networking.M2Mqtt
                     // re-enqueue message
                     this.inflightQueue.Enqueue(msgContext);
 
-#if TRACE
                 MqttUtility.Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-#endif
 
                 // raise disconnection client event
                 this.OnConnectionClosing();
