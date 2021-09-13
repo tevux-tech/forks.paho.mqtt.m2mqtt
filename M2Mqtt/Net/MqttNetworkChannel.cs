@@ -333,19 +333,11 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             if (secure)
             {
-#if (NETSTANDARD1_6 || NETCOREAPP3_1)
                 netStream.Flush();
-#else
-                this.netStream.Close();
-#endif
-
-#if (NETSTANDARD1_6 || NETCOREAPP3_1)
                 sslStream.Flush();
-#else
-                this.sslStream.Close();
-#endif
+
             }
-#if (NETSTANDARD1_6 || NETCOREAPP3_1)
+
             try
             {
                 socket.Shutdown(SocketShutdown.Both);
@@ -356,10 +348,6 @@ namespace uPLibrary.Networking.M2Mqtt
                 // Refer to: https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.shutdown(v=vs.110).aspx
             }
             socket.Dispose();
-#else
-            this.socket.Close();
-#endif
-
         }
 
         /// <summary>
@@ -370,15 +358,9 @@ namespace uPLibrary.Networking.M2Mqtt
             // secure channel requested
             if (secure)
             {
-
                 netStream = new NetworkStream(socket);
                 sslStream = new SslStream(netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
-
-#if (NETSTANDARD1_6 || NETCOREAPP3_1)
                 sslStream.AuthenticateAsServerAsync(serverCert, false, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
-#else
-                this.sslStream.AuthenticateAsServer(this.serverCert, false, MqttSslUtility.ToSslPlatformEnum(this.sslProtocol), false);
-#endif
             }
 
             return;
