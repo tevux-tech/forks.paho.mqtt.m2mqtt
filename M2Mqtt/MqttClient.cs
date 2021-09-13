@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -31,19 +31,11 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Session;
 using uPLibrary.Networking.M2Mqtt.Utility;
 using uPLibrary.Networking.M2Mqtt.Internal;
-// if .Net Micro Framework
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
-using Microsoft.SPOT;
-#if SSL
-using Microsoft.SPOT.Net.Security;
-#endif
-// else other frameworks (.Net, .Net Compact, Mono, Windows Phone) 
-#else
+
 using System.Collections.Generic;
 #if (SSL && !(WINDOWS_APP || WINDOWS_PHONE_APP))
 using System.Security.Authentication;
 using System.Net.Security;
-#endif
 #endif
 
 #if (WINDOWS_APP || WINDOWS_PHONE_APP)
@@ -172,7 +164,7 @@ namespace uPLibrary.Networking.M2Mqtt
 
         // event for peer/client disconnection
         public event ConnectionClosedEventHandler ConnectionClosed;
-        
+
         // channel to communicate over the network
         private IMqttNetworkChannel channel;
 
@@ -276,11 +268,7 @@ namespace uPLibrary.Networking.M2Mqtt
         [Obsolete("Use this ctor MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert) insted")]
         public MqttClient(IPAddress brokerIpAddress, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
         {
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
             this.Init(brokerIpAddress.ToString(), brokerPort, secure, caCert, clientCert, sslProtocol, null, null);
-#else
-            this.Init(brokerIpAddress.ToString(), brokerPort, secure, caCert, clientCert, sslProtocol);
-#endif
         }
 #endif
 
@@ -307,22 +295,15 @@ namespace uPLibrary.Networking.M2Mqtt
 #if !(WINDOWS_APP || WINDOWS_PHONE_APP)
         /// <param name="caCert">CA certificate for secure connection</param>
         /// <param name="clientCert">Client certificate</param>
-        public MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)            
+        public MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
 #else
         public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol)            
 #endif
         {
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
             this.Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, null, null);
-#elif (WINDOWS_APP || WINDOWS_PHONE_APP)
-            this.Init(brokerHostName, brokerPort, secure, sslProtocol);
-#else
-            this.Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol);
-#endif
         }
 
 
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
 
         /// <summary>
         /// Constructor
@@ -349,8 +330,8 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
         /// <param name="userCertificateValidationCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateSelectionCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
-        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol, 
-            RemoteCertificateValidationCallback userCertificateValidationCallback, 
+        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol,
+            RemoteCertificateValidationCallback userCertificateValidationCallback,
             LocalCertificateSelectionCallback userCertificateSelectionCallback)
             : this(brokerHostName, brokerPort, secure, null, null, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback)
         {
@@ -375,7 +356,6 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             this.Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, ALPNProtocols);
         }
-#endif
 
 #if BROKER
         /// <summary>
@@ -422,7 +402,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <param name="caCert">CA certificate for secure connection</param>
         /// <param name="clientCert">Client certificate</param>
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
         /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
         /// <param name="alpnProtocols">list of protocols for ALPN</param>
@@ -431,11 +410,7 @@ namespace uPLibrary.Networking.M2Mqtt
             RemoteCertificateValidationCallback userCertificateValidationCallback,
             LocalCertificateSelectionCallback userCertificateSelectionCallback,
             List<string> alpnProtocols = null)
-#elif (WINDOWS_APP || WINDOWS_PHONE_APP)
-        private void Init(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol)
-#else
-        private void Init(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
-#endif
+
         {
             // set default MQTT protocol version (default is 3.1.1)
             this.ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
@@ -472,13 +447,8 @@ namespace uPLibrary.Networking.M2Mqtt
             this.session = null;
 
             // create network channel
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
+
             this.channel = new MqttNetworkChannel(this.brokerHostName, this.brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);
-#elif (WINDOWS_APP || WINDOWS_PHONE_APP)
-            this.channel = new MqttNetworkChannel(this.brokerHostName, this.brokerPort, secure, sslProtocol);
-#else
-            this.channel = new MqttNetworkChannel(this.brokerHostName, this.brokerPort, secure, caCert, clientCert, sslProtocol);
-#endif
         }
 
         /// <summary>
@@ -576,7 +546,7 @@ namespace uPLibrary.Networking.M2Mqtt
             this.isConnectionClosing = false;
             // start thread for receiving messages from broker
             Fx.StartThread(this.ReceiveThread);
-            
+
             MqttMsgConnack connack = null;
             try
             {
@@ -587,7 +557,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 this.isRunning = false;
                 throw;
             }
-		
+
             // if connection accepted, start keep alive timer and 
             if (connack.ReturnCode == MqttMsgConnack.CONN_ACCEPTED)
             {
@@ -613,7 +583,7 @@ namespace uPLibrary.Networking.M2Mqtt
 
                 // start thread for raising received message event from broker
                 Fx.StartThread(this.DispatchEventThread);
-                
+
                 // start thread for handling inflight messages queue to broker asynchronously (publish and acknowledge)
                 Fx.StartThread(this.ProcessInflightThread);
 
@@ -1079,14 +1049,12 @@ namespace uPLibrary.Networking.M2Mqtt
             }
             catch (Exception e)
             {
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
                 if (typeof(SocketException) == e.GetType())
                 {
                     // connection reset by broker
                     if (((SocketException)e).SocketErrorCode == SocketError.ConnectionReset)
                         this.IsConnected = false;
                 }
-#endif
 #if TRACE
                 MqttUtility.Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
 #endif
@@ -1094,13 +1062,8 @@ namespace uPLibrary.Networking.M2Mqtt
                 throw new MqttCommunicationException(e);
             }
 
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-            // wait for answer from broker
-            if (this.syncEndReceiving.WaitOne(timeout, false))
-#else
             // wait for answer from broker
             if (this.syncEndReceiving.WaitOne(timeout))
-#endif
             {
                 // message received without exception
                 if (this.exReceiving == null)
@@ -1400,7 +1363,7 @@ namespace uPLibrary.Networking.M2Mqtt
 #else
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 #endif
-                                
+
                             // CONNACK message received
                             case MqttMsgBase.MQTT_MSG_CONNACK_TYPE:
 
@@ -1535,7 +1498,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 this.EnqueueInternal(pubrel);
 
                                 break;
-                                
+
                             // PUBCOMP message received
                             case MqttMsgBase.MQTT_MSG_PUBCOMP_TYPE:
 
@@ -1628,7 +1591,7 @@ namespace uPLibrary.Networking.M2Mqtt
                     {
                         // [v3.1.1] scenarios the receiver MUST close the network connection
                         MqttClientException ex = e as MqttClientException;
-                        close = ((ex.ErrorCode == MqttClientErrorCode.InvalidFlagBits) || 
+                        close = ((ex.ErrorCode == MqttClientErrorCode.InvalidFlagBits) ||
                                 (ex.ErrorCode == MqttClientErrorCode.InvalidProtocolName) ||
                                 (ex.ErrorCode == MqttClientErrorCode.InvalidConnectFlags));
                     }
@@ -1639,7 +1602,7 @@ namespace uPLibrary.Networking.M2Mqtt
                         close = true;
                     }
 #endif
-                    
+
                     if (close)
                     {
                         // wake up thread that will notify connection is closing
@@ -1656,19 +1619,14 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             int delta = 0;
             int wait = this.keepAlivePeriod;
-            
+
             // create event to signal that current thread is end
             this.keepAliveEventEnd = new AutoResetEvent(false);
 
             while (this.isRunning)
             {
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                // waiting...
-                this.keepAliveEvent.WaitOne(wait, false);
-#else
                 // waiting...
                 this.keepAliveEvent.WaitOne(wait);
-#endif
 
                 if (this.isRunning)
                 {
@@ -1682,8 +1640,8 @@ namespace uPLibrary.Networking.M2Mqtt
                         this.OnConnectionClosing();
 #else
                         // ... send keep alive
-						this.Ping();
-						wait = this.keepAlivePeriod;
+                        this.Ping();
+                        wait = this.keepAlivePeriod;
 #endif
                     }
                     else
@@ -1851,7 +1809,7 @@ namespace uPLibrary.Networking.M2Mqtt
                             }
                         }
                     }
-                    
+
                     // all events for received messages dispatched, check if there is closing connection
                     if ((this.eventQueue.Count == 0) && this.isConnectionClosing)
                     {
@@ -1883,13 +1841,8 @@ namespace uPLibrary.Networking.M2Mqtt
             {
                 while (this.isRunning)
                 {
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                    // wait on message queueud to inflight
-                    this.inflightWaitHandle.WaitOne(timeout, false);
-#else
                     // wait on message queueud to inflight
                     this.inflightWaitHandle.WaitOne(timeout);
-#endif
 
                     // it could be unblocked because Close() method is joining
                     if (this.isRunning)
@@ -2084,11 +2037,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     // PUBACK received for PUBLISH message with QoS Level 1, remove from session state
                                                     if ((msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
                                                         (this.session != null) &&
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                                                        (this.session.InflightMessages.Contains(msgContext.Key)))
-#else
                                                         (this.session.InflightMessages.ContainsKey(msgContext.Key)))
-#endif
                                                     {
                                                         this.session.InflightMessages.Remove(msgContext.Key);
                                                     }
@@ -2125,12 +2074,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                         if (msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE)
                                                         {
                                                             // PUBACK not received in time, PUBLISH retries failed, need to remove from session inflight messages too
-                                                            if ((this.session != null) &&
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                                                                (this.session.InflightMessages.Contains(msgContext.Key)))
-#else
-                                                                (this.session.InflightMessages.ContainsKey(msgContext.Key)))
-#endif
+                                                            if ((this.session != null) && (this.session.InflightMessages.ContainsKey(msgContext.Key)))
                                                             {
                                                                 this.session.InflightMessages.Remove(msgContext.Key);
                                                             }
@@ -2225,11 +2169,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     {
                                                         // PUBREC not received in time, PUBLISH retries failed, need to remove from session inflight messages too
                                                         if ((this.session != null) &&
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                                                            (this.session.InflightMessages.Contains(msgContext.Key)))
-#else
                                                             (this.session.InflightMessages.ContainsKey(msgContext.Key)))
-#endif
                                                         {
                                                             this.session.InflightMessages.Remove(msgContext.Key);
                                                         }
@@ -2292,11 +2232,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     // PUBREL received (and PUBCOMP sent) for PUBLISH message with QoS Level 2, remove from session state
                                                     if ((msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
                                                         (this.session != null) &&
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                                                        (this.session.InflightMessages.Contains(msgContext.Key)))
-#else
                                                         (this.session.InflightMessages.ContainsKey(msgContext.Key)))
-#endif
                                                     {
                                                         this.session.InflightMessages.Remove(msgContext.Key);
                                                     }
@@ -2355,11 +2291,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     // PUBCOMP received for PUBLISH message with QoS Level 2, remove from session state
                                                     if ((msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
                                                         (this.session != null) &&
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                                                        (this.session.InflightMessages.Contains(msgContext.Key)))
-#else
                                                         (this.session.InflightMessages.ContainsKey(msgContext.Key)))
-#endif
                                                     {
                                                         this.session.InflightMessages.Remove(msgContext.Key);
                                                     }
@@ -2395,7 +2327,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                             // current message not acknowledged
                                             if (!acknowledge)
                                             {
-                                                delta = Environment.TickCount - msgContext.Timestamp; 
+                                                delta = Environment.TickCount - msgContext.Timestamp;
                                                 // check timeout for receiving PUBCOMP since PUBREL was sent
                                                 if (delta >= this.settings.DelayOnRetry)
                                                 {
@@ -2414,11 +2346,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     {
                                                         // PUBCOMP not received, PUBREL retries failed, need to remove from session inflight messages too
                                                         if ((this.session != null) &&
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-                                                            (this.session.InflightMessages.Contains(msgContext.Key)))
-#else
                                                             (this.session.InflightMessages.ContainsKey(msgContext.Key)))
-#endif
                                                         {
                                                             this.session.InflightMessages.Remove(msgContext.Key);
                                                         }
@@ -2464,7 +2392,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                 if (msgContext.Attempt > 1)
                                                     pubrel.DupFlag = true;
                                             }
-                                            
+
                                             this.Send(pubrel);
 
                                             // update timeout : minimum between delay (based on current message sent) or current timeout

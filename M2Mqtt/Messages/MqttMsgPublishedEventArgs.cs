@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -14,11 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-#if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3)
 using System;
-#else
-using Microsoft.SPOT;
-#endif
 
 namespace uPLibrary.Networking.M2Mqtt.Messages
 {
@@ -59,9 +55,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// Constructor (published message)
         /// </summary>
         /// <param name="messageId">Message identifier published</param>
-        public MqttMsgPublishedEventArgs(ushort messageId) 
-            : this(messageId, true) 
-        { 
+        public MqttMsgPublishedEventArgs(ushort messageId)
+            : this(messageId, true)
+        {
         }
 
         /// <summary>

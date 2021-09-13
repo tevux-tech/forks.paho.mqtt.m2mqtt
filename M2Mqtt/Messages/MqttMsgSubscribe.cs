@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -15,10 +15,7 @@ Contributors:
 */
 
 using System;
-// if NOT .Net Micro Framework
-#if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3)
 using System.Collections.Generic;
-#endif
 using System.Collections;
 using System.Text;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
@@ -56,7 +53,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         string[] topics;
         // QOS levels related to topics
         byte[] qosLevels;
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -64,7 +61,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         {
             this.type = MQTT_MSG_SUBSCRIBE_TYPE;
         }
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -129,15 +126,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // payload contains topics and QoS levels
             // NOTE : before, I don't know how many topics will be in the payload (so use List)
 
-// if .Net Micro Framework
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
-            IList tmpTopics = new ArrayList();
-            IList tmpQosLevels = new ArrayList();
-// else other frameworks (.Net, .Net Compact, Mono, Windows Phone) 
-#else
             IList<String> tmpTopics = new List<String>();
             IList<byte> tmpQosLevels = new List<byte>();
-#endif
+
             do
             {
                 // topic name
@@ -231,7 +222,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 buffer[index] |= this.dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
                 index++;
             }
-            
+
             // encode remaining length
             index = this.encodeRemainingLength(remainingLength, buffer, index);
 
@@ -253,7 +244,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 // requested QoS
                 buffer[index++] = this.qosLevels[topicIdx];
             }
-            
+
             return buffer;
         }
 
