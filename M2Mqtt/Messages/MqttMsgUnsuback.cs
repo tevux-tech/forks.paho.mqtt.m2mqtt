@@ -29,7 +29,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgUnsuback()
         {
-            type = MQTT_MSG_UNSUBACK_TYPE;
+            type = MessageType.UnsubAck;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int index = 0;
 
             // message identifier
-            varHeaderSize += MESSAGE_ID_SIZE;
+            varHeaderSize += MessageIdSize;
 
             remainingLength += (varHeaderSize + payloadSize);
 
@@ -97,9 +97,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_UNSUBACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_UNSUBACK_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.UnsubAck << MSG_TYPE_OFFSET) | MQTT_MSG_UNSUBACK_FLAG_BITS; // [v.3.1.1]
             else
-                buffer[index++] = (byte)(MQTT_MSG_UNSUBACK_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (byte)(MessageType.UnsubAck << MSG_TYPE_OFFSET);
 
             // encode remaining length
             index = encodeRemainingLength(remainingLength, buffer, index);

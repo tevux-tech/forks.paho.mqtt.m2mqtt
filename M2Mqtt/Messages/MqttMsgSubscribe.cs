@@ -59,7 +59,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgSubscribe()
         {
-            type = MQTT_MSG_SUBSCRIBE_TYPE;
+            type = MessageType.Subscribe;
         }
 
         /// <summary>
@@ -69,13 +69,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="qosLevels">List of QOS Levels related to topics</param>
         public MqttMsgSubscribe(string[] topics, byte[] qosLevels)
         {
-            type = MQTT_MSG_SUBSCRIBE_TYPE;
+            type = MessageType.Subscribe;
 
             this.topics = topics;
             this.qosLevels = qosLevels;
 
             // SUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
-            qosLevel = QOS_LEVEL_AT_LEAST_ONCE;
+            qosLevel = QosLevels.AtLeastOnce;
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 throw new MqttClientException(MqttClientErrorCode.TopicsQosLevelsNotMatch);
 
             // message identifier
-            varHeaderSize += MESSAGE_ID_SIZE;
+            varHeaderSize += MessageIdSize;
 
             int topicIdx = 0;
             byte[][] topicsUtf8 = new byte[topics.Length][];
@@ -186,7 +186,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             for (topicIdx = 0; topicIdx < topics.Length; topicIdx++)
             {
                 // check topic length
-                if ((topics[topicIdx].Length < MIN_TOPIC_LENGTH) || (topics[topicIdx].Length > MAX_TOPIC_LENGTH))
+                if ((topics[topicIdx].Length < MinTopicLength) || (topics[topicIdx].Length > MaxTopicLength))
                     throw new MqttClientException(MqttClientErrorCode.TopicLength);
 
                 topicsUtf8[topicIdx] = Encoding.UTF8.GetBytes(topics[topicIdx]);
@@ -214,10 +214,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_SUBSCRIBE_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_SUBSCRIBE_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.Subscribe << MSG_TYPE_OFFSET) | MQTT_MSG_SUBSCRIBE_FLAG_BITS; // [v.3.1.1]
             else
             {
-                buffer[index] = (byte)((MQTT_MSG_SUBSCRIBE_TYPE << MSG_TYPE_OFFSET) |
+                buffer[index] = (byte)((MessageType.Subscribe << MSG_TYPE_OFFSET) |
                                    (qosLevel << QOS_LEVEL_OFFSET));
                 buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
                 index++;

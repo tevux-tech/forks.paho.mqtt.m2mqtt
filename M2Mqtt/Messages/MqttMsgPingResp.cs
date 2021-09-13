@@ -26,7 +26,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     {
         public MqttMsgPingResp()
         {
-            type = MQTT_MSG_PINGRESP_TYPE;
+            type = MessageType.PingResp;
         }
 
         /// <summary>
@@ -64,11 +64,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
             {
-                buffer[index++] = (MQTT_MSG_PINGRESP_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_PINGRESP_FLAG_BITS;
+                buffer[index++] = (MessageType.PingResp << MSG_TYPE_OFFSET) | MQTT_MSG_PINGRESP_FLAG_BITS;
             }
             else
             {
-                buffer[index++] = (MQTT_MSG_PINGRESP_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (MessageType.PingResp << MSG_TYPE_OFFSET);
             }
 
             buffer[index++] = 0x00;

@@ -88,11 +88,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
 
         // SUBSCRIBE QoS level granted failure [v3.1.1]
-        public const byte QOS_LEVEL_GRANTED_FAILURE = 0x80;
+        public const byte QosLevelGrantedFailure = 0x80;
 
-        internal const ushort MAX_TOPIC_LENGTH = 65535;
-        internal const ushort MIN_TOPIC_LENGTH = 1;
-        internal const byte MESSAGE_ID_SIZE = 2;
+        internal const ushort MaxTopicLength = 65535;
+        internal const ushort MinTopicLength = 1;
+        internal const byte MessageIdSize = 2;
 
         #endregion
 

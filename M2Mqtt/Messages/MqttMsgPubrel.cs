@@ -28,9 +28,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgPubrel()
         {
-            type = MQTT_MSG_PUBREL_TYPE;
+            type = MessageType.PubRel;
             // PUBREL message use QoS Level 1 (not "officially" in 3.1.1)
-            qosLevel = QOS_LEVEL_AT_LEAST_ONCE;
+            qosLevel = QosLevels.AtLeastOnce;
         }
 
         public override byte[] GetBytes(byte protocolVersion)
@@ -43,7 +43,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int index = 0;
 
             // message identifier
-            varHeaderSize += MESSAGE_ID_SIZE;
+            varHeaderSize += MessageIdSize;
 
             remainingLength += (varHeaderSize + payloadSize);
 
@@ -64,10 +64,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_PUBREL_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_PUBREL_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.PubRel << MSG_TYPE_OFFSET) | MQTT_MSG_PUBREL_FLAG_BITS; // [v.3.1.1]
             else
             {
-                buffer[index] = (byte)((MQTT_MSG_PUBREL_TYPE << MSG_TYPE_OFFSET) |
+                buffer[index] = (byte)((MessageType.PubRel << MSG_TYPE_OFFSET) |
                                    (qosLevel << QOS_LEVEL_OFFSET));
                 buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
                 index++;

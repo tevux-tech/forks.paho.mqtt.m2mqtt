@@ -25,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     {
         public MqttMsgPuback()
         {
-            type = MQTT_MSG_PUBACK_TYPE;
+            type = MessageType.PubAck;
         }
 
         public override byte[] GetBytes(byte protocolVersion)
@@ -38,7 +38,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int index = 0;
 
             // message identifier
-            varHeaderSize += MESSAGE_ID_SIZE;
+            varHeaderSize += MessageIdSize;
 
             remainingLength += (varHeaderSize + payloadSize);
 
@@ -60,11 +60,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
             {
-                buffer[index++] = (MQTT_MSG_PUBACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_PUBACK_FLAG_BITS;
+                buffer[index++] = (MessageType.PubAck << MSG_TYPE_OFFSET) | MQTT_MSG_PUBACK_FLAG_BITS;
             }
             else
             {
-                buffer[index++] = (MQTT_MSG_PUBACK_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (MessageType.PubAck << MSG_TYPE_OFFSET);
             }
 
             // encode remaining length

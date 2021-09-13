@@ -28,7 +28,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgPingReq()
         {
-            type = MQTT_MSG_PINGREQ_TYPE;
+            type = MessageType.PingReq;
         }
 
         public override byte[] GetBytes(byte protocolVersion)
@@ -38,9 +38,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_PINGREQ_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_PINGREQ_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.PingReq << MSG_TYPE_OFFSET) | MQTT_MSG_PINGREQ_FLAG_BITS; // [v.3.1.1]
             else
-                buffer[index++] = (MQTT_MSG_PINGREQ_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (MessageType.PingReq << MSG_TYPE_OFFSET);
             buffer[index++] = 0x00;
 
             return buffer;

@@ -31,16 +31,16 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
         public MqttMsgPublish()
         {
-            type = MQTT_MSG_PUBLISH_TYPE;
+            type = MessageType.Publish;
         }
 
-        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QOS_LEVEL_AT_MOST_ONCE, false)
+        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QosLevels.AtMostOnce, false)
         {
         }
 
         public MqttMsgPublish(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain) : base()
         {
-            type = MQTT_MSG_PUBLISH_TYPE;
+            type = MessageType.Publish;
 
             Topic = topic;
             Message = message;
@@ -64,11 +64,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 throw new MqttClientException(MqttClientErrorCode.TopicWildcard);
 
             // check topic length
-            if ((Topic.Length < MIN_TOPIC_LENGTH) || (Topic.Length > MAX_TOPIC_LENGTH))
+            if ((Topic.Length < MinTopicLength) || (Topic.Length > MaxTopicLength))
                 throw new MqttClientException(MqttClientErrorCode.TopicLength);
 
             // check wrong QoS level (both bits can't be set 1)
-            if (qosLevel > QOS_LEVEL_EXACTLY_ONCE)
+            if (qosLevel > QosLevels.ExactlyOnce)
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
 
             byte[] topicUtf8 = Encoding.UTF8.GetBytes(Topic);
@@ -77,10 +77,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             varHeaderSize += topicUtf8.Length + 2;
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((qosLevel == QOS_LEVEL_AT_LEAST_ONCE) ||
-                (qosLevel == QOS_LEVEL_EXACTLY_ONCE))
+            if ((qosLevel == QosLevels.AtLeastOnce) ||
+                (qosLevel == QosLevels.ExactlyOnce))
             {
-                varHeaderSize += MESSAGE_ID_SIZE;
+                varHeaderSize += MessageIdSize;
             }
 
             // check on message with zero length
@@ -106,7 +106,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            buffer[index] = (byte)((MQTT_MSG_PUBLISH_TYPE << MSG_TYPE_OFFSET) |
+            buffer[index] = (byte)((MessageType.Publish << MSG_TYPE_OFFSET) |
                                    (qosLevel << QOS_LEVEL_OFFSET));
             buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
             buffer[index] |= retain ? (byte)(1 << RETAIN_FLAG_OFFSET) : (byte)0x00;
@@ -122,8 +122,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             index += topicUtf8.Length;
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((qosLevel == QOS_LEVEL_AT_LEAST_ONCE) ||
-                (qosLevel == QOS_LEVEL_EXACTLY_ONCE))
+            if ((qosLevel == QosLevels.AtLeastOnce) ||
+                (qosLevel == QosLevels.ExactlyOnce))
             {
                 // check message identifier assigned
                 if (messageId == 0)
@@ -176,7 +176,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // read QoS level from fixed header
             msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);
             // check wrong QoS level (both bits can't be set 1)
-            if (msg.qosLevel > QOS_LEVEL_EXACTLY_ONCE)
+            if (msg.qosLevel > QosLevels.ExactlyOnce)
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
             // read DUP flag from fixed header
             msg.dupFlag = (((fixedHeaderFirstByte & DUP_FLAG_MASK) >> DUP_FLAG_OFFSET) == 0x01);
@@ -184,8 +184,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             msg.retain = (((fixedHeaderFirstByte & RETAIN_FLAG_MASK) >> RETAIN_FLAG_OFFSET) == 0x01);
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((msg.qosLevel == QOS_LEVEL_AT_LEAST_ONCE) ||
-                (msg.qosLevel == QOS_LEVEL_EXACTLY_ONCE))
+            if ((msg.qosLevel == QosLevels.AtLeastOnce) ||
+                (msg.qosLevel == QosLevels.ExactlyOnce))
             {
                 // message id
                 msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);

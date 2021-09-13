@@ -25,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     {
         public MqttMsgDisconnect()
         {
-            type = MQTT_MSG_DISCONNECT_TYPE;
+            type = MessageType.Disconnect;
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_DISCONNECT_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_DISCONNECT_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.Disconnect << MSG_TYPE_OFFSET) | MQTT_MSG_DISCONNECT_FLAG_BITS; // [v.3.1.1]
             else
-                buffer[index++] = (MQTT_MSG_DISCONNECT_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (MessageType.Disconnect << MSG_TYPE_OFFSET);
             buffer[index++] = 0x00;
 
             return buffer;

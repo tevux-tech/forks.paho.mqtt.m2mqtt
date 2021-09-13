@@ -45,7 +45,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgSuback()
         {
-            type = MQTT_MSG_SUBACK_TYPE;
+            type = MessageType.SubAck;
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             msg.messageId |= (buffer[index++]);
 
             // payload contains QoS levels granted
-            msg.grantedQosLevels = new byte[remainingLength - MESSAGE_ID_SIZE];
+            msg.grantedQosLevels = new byte[remainingLength - MessageIdSize];
             int qosIdx = 0;
             do
             {
@@ -100,7 +100,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int index = 0;
 
             // message identifier
-            varHeaderSize += MESSAGE_ID_SIZE;
+            varHeaderSize += MessageIdSize;
 
             int grantedQosIdx = 0;
             for (grantedQosIdx = 0; grantedQosIdx < grantedQosLevels.Length; grantedQosIdx++)
@@ -127,9 +127,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_SUBACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_SUBACK_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.SubAck << MSG_TYPE_OFFSET) | MQTT_MSG_SUBACK_FLAG_BITS; // [v.3.1.1]
             else
-                buffer[index++] = (byte)(MQTT_MSG_SUBACK_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (byte)(MessageType.SubAck << MSG_TYPE_OFFSET);
 
             // encode remaining length
             index = encodeRemainingLength(remainingLength, buffer, index);
