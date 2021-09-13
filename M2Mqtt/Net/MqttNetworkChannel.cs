@@ -18,10 +18,8 @@ Contributors:
 #define SSL
 #endif
 
-#if SSL
 using System.Net.Security;
 using System.Security.Authentication;
-#endif
 using System.Net.Sockets;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -74,7 +72,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         public int RemotePort { get { return remotePort; } }
 
-#if SSL
         // SSL stream
         private SslStream sslStream;
         private NetworkStream netStream;
@@ -84,7 +81,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         private List<string> alpnProtocols;
 
-#endif
 
         /// <summary>
         /// Data available on the channel
@@ -93,14 +89,10 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             get
             {
-#if SSL
                 if (secure)
                     return netStream.DataAvailable;
                 else
                     return (socket.Available > 0);
-#else
-                return (this.socket.Available > 0);
-#endif
             }
         }
 
@@ -214,7 +206,6 @@ namespace uPLibrary.Networking.M2Mqtt
             // try connection to the broker
             socket.Connect(remoteHostName, remotePort);
 
-#if SSL
             // secure channel requested
             if (secure)
             {
@@ -262,7 +253,6 @@ namespace uPLibrary.Networking.M2Mqtt
 #endif
 
             }
-#endif
         }
 
         /// <summary>
@@ -272,7 +262,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Number of byte sent</returns>
         public int Send(byte[] buffer)
         {
-#if SSL
             if (secure)
             {
                 sslStream.Write(buffer, 0, buffer.Length);
@@ -281,9 +270,6 @@ namespace uPLibrary.Networking.M2Mqtt
             }
             else
                 return socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
-#else
-            return this.socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
-#endif
         }
 
         /// <summary>
@@ -293,7 +279,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Number of bytes received</returns>
         public int Receive(byte[] buffer)
         {
-#if SSL
             if (secure)
             {
                 // read all data needed (until fill buffer)
@@ -324,20 +309,6 @@ namespace uPLibrary.Networking.M2Mqtt
                 }
                 return buffer.Length;
             }
-#else
-            // read all data needed (until fill buffer)
-            int idx = 0, read = 0;
-            while (idx < buffer.Length)
-            {
-                // fixed scenario with socket closed gracefully by peer/broker and
-                // Read return 0. Avoid infinite loop.
-                read = this.socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
-                if (read == 0)
-                    return 0;
-                idx += read;
-            }
-            return buffer.Length;
-#endif
         }
 
         /// <summary>
@@ -364,7 +335,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         public void Close()
         {
-#if SSL
             if (secure)
             {
 #if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
@@ -393,9 +363,7 @@ namespace uPLibrary.Networking.M2Mqtt
 #else
             this.socket.Close();
 #endif
-#else
-            this.socket.Close();
-#endif
+
         }
 
         /// <summary>
@@ -403,7 +371,6 @@ namespace uPLibrary.Networking.M2Mqtt
         /// </summary>
         public void Accept()
         {
-#if SSL
             // secure channel requested
             if (secure)
             {
@@ -419,9 +386,6 @@ namespace uPLibrary.Networking.M2Mqtt
             }
 
             return;
-#else
-            return;
-#endif
         }
     }
 
