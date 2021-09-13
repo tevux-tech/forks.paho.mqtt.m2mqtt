@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -29,19 +29,19 @@ namespace uPLibrary.Networking.M2Mqtt.Exceptions
         /// <param name="code">Error code</param>
         public MqttClientException(MqttClientErrorCode errorCode)
         {
-            this.errorCode = errorCode;
+            _errorCode = errorCode;
         }
 
         // error code
-        private MqttClientErrorCode errorCode;
+        private MqttClientErrorCode _errorCode;
 
         /// <summary>
         /// Error code
         /// </summary>
         public MqttClientErrorCode ErrorCode
         {
-            get { return errorCode; }
-            set { errorCode = value; }
+            get { return _errorCode; }
+            set { _errorCode = value; }
         }
     }
 

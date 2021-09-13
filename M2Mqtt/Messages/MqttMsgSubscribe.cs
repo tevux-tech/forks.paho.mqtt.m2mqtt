@@ -101,7 +101,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // get remaining length and allocate buffer
-            int remainingLength = MqttMsgBase.decodeRemainingLength(channel);
+            int remainingLength = decodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
@@ -126,7 +126,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // payload contains topics and QoS levels
             // NOTE : before, I don't know how many topics will be in the payload (so use List)
 
-            IList<String> tmpTopics = new List<String>();
+            IList<string> tmpTopics = new List<string>();
             IList<byte> tmpQosLevels = new List<byte>();
 
             do
@@ -137,7 +137,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 topicUtf8 = new byte[topicUtf8Length];
                 Array.Copy(buffer, index, topicUtf8, 0, topicUtf8Length);
                 index += topicUtf8Length;
-                tmpTopics.Add(new String(Encoding.UTF8.GetChars(topicUtf8)));
+                tmpTopics.Add(new string(Encoding.UTF8.GetChars(topicUtf8)));
 
                 // QoS level
                 tmpQosLevels.Add(buffer[index++]);

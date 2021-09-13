@@ -50,7 +50,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // get remaining length and allocate buffer
-            int remainingLength = MqttMsgBase.decodeRemainingLength(channel);
+            int remainingLength = decodeRemainingLength(channel);
             // NOTE : remainingLength must be 0
 
             return msg;

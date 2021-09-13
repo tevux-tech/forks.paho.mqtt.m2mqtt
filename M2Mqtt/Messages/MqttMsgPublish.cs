@@ -203,7 +203,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             MqttMsgPublish msg = new MqttMsgPublish();
 
             // get remaining length and allocate buffer
-            int remainingLength = MqttMsgBase.decodeRemainingLength(channel);
+            int remainingLength = decodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
@@ -215,7 +215,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             topicUtf8 = new byte[topicUtf8Length];
             Array.Copy(buffer, index, topicUtf8, 0, topicUtf8Length);
             index += topicUtf8Length;
-            msg.topic = new String(Encoding.UTF8.GetChars(topicUtf8));
+            msg.topic = new string(Encoding.UTF8.GetChars(topicUtf8));
 
             // read QoS level from fixed header
             msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);

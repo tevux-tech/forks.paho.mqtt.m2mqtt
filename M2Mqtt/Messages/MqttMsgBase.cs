@@ -165,13 +165,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <returns>Index updated</returns>
         protected int encodeRemainingLength(int remainingLength, byte[] buffer, int index)
         {
-            int digit = 0;
             do
             {
-                digit = remainingLength % 128;
+                int digit = remainingLength % 128;
                 remainingLength /= 128;
                 if (remainingLength > 0)
-                    digit = digit | 0x80;
+                {
+                    digit |= 0x80;
+                }
                 buffer[index++] = (byte)digit;
             } while (remainingLength > 0);
             return index;
@@ -186,8 +187,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         {
             int multiplier = 1;
             int value = 0;
-            int digit = 0;
             byte[] nextByte = new byte[1];
+            int digit;
             do
             {
                 // next digit from stream
@@ -253,7 +254,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 return sb.ToString();
             }
 
-            object[] list = value as object[];
+            var list = value as object[];
             if (list != null)
             {
                 StringBuilder sb = new StringBuilder();
