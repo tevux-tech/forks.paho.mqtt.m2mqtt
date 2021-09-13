@@ -14,10 +14,6 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-#if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
-#define SSL
-#endif
-
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Net.Sockets;
@@ -218,7 +214,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 // check if there is a client certificate to add to the collection, otherwise it's null (as empty)
                 if (clientCert != null)
                     clientCertificates = new X509CertificateCollection(new X509Certificate[] { clientCert });
-#if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
+#if (NETSTANDARD1_6 || NETCOREAPP3_1)
 
                 if ((alpnProtocols != null) && (0 < alpnProtocols.Count))
                 {
@@ -337,19 +333,19 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             if (secure)
             {
-#if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
+#if (NETSTANDARD1_6 || NETCOREAPP3_1)
                 netStream.Flush();
 #else
                 this.netStream.Close();
 #endif
 
-#if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
+#if (NETSTANDARD1_6 || NETCOREAPP3_1)
                 sslStream.Flush();
 #else
                 this.sslStream.Close();
 #endif
             }
-#if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
+#if (NETSTANDARD1_6 || NETCOREAPP3_1)
             try
             {
                 socket.Shutdown(SocketShutdown.Both);
@@ -378,7 +374,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 netStream = new NetworkStream(socket);
                 sslStream = new SslStream(netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
 
-#if (NETSTANDARD1_6 || NETSTANDARD2_0 || NETCOREAPP3_1)
+#if (NETSTANDARD1_6 || NETCOREAPP3_1)
                 sslStream.AuthenticateAsServerAsync(serverCert, false, MqttSslUtility.ToSslPlatformEnum(sslProtocol), false).Wait();
 #else
                 this.sslStream.AuthenticateAsServer(this.serverCert, false, MqttSslUtility.ToSslPlatformEnum(this.sslProtocol), false);
