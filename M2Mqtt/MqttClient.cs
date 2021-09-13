@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -394,11 +394,6 @@ namespace uPLibrary.Networking.M2Mqtt
         {
             // set default MQTT protocol version (default is 3.1.1)
             ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
-#if !SSL
-            // check security parameters
-            if (secure)
-                throw new ArgumentException("Library compiled without SSL support");
-#endif
 
             _brokerHostName = brokerHostName;
             _brokerPort = brokerPort;
