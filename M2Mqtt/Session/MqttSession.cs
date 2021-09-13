@@ -47,8 +47,8 @@ namespace uPLibrary.Networking.M2Mqtt.Session
         /// <param name="clientId">Client Id to create session</param>
         public MqttSession(string clientId)
         {
-            this.ClientId = clientId;
-            this.InflightMessages = new Hashtable();
+            ClientId = clientId;
+            InflightMessages = new Hashtable();
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace uPLibrary.Networking.M2Mqtt.Session
         /// </summary>
         public virtual void Clear()
         {
-            this.ClientId = null;
-            this.InflightMessages.Clear();
+            ClientId = null;
+            InflightMessages.Clear();
         }
     }
 }

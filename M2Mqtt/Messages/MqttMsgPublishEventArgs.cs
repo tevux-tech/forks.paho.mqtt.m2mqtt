@@ -30,8 +30,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public string Topic
         {
-            get { return this.topic; }
-            internal set { this.topic = value; }
+            get { return topic; }
+            internal set { topic = value; }
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte[] Message
         {
-            get { return this.message; }
-            internal set { this.message = value; }
+            get { return message; }
+            internal set { message = value; }
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public bool DupFlag
         {
-            get { return this.dupFlag; }
-            set { this.dupFlag = value; }
+            get { return dupFlag; }
+            set { dupFlag = value; }
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte QosLevel
         {
-            get { return this.qosLevel; }
-            internal set { this.qosLevel = value; }
+            get { return qosLevel; }
+            internal set { qosLevel = value; }
         }
 
         /// <summary>
@@ -66,8 +66,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public bool Retain
         {
-            get { return this.retain; }
-            internal set { this.retain = value; }
+            get { return retain; }
+            internal set { retain = value; }
         }
 
         #endregion

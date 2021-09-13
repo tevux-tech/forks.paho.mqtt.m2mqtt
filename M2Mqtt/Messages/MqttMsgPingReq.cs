@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -28,7 +28,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgPingReq()
         {
-            this.type = MQTT_MSG_PINGREQ_TYPE;
+            type = MQTT_MSG_PINGREQ_TYPE;
         }
 
         public override byte[] GetBytes(byte protocolVersion)
@@ -74,7 +74,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "PINGREQ",
                 null,
                 null);

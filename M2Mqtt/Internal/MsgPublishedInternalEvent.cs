@@ -30,8 +30,8 @@ namespace uPLibrary.Networking.M2Mqtt.Internal
         /// </summary>
         public bool IsPublished
         {
-            get { return this.isPublished; }
-            internal set { this.isPublished = value; }
+            get { return isPublished; }
+            internal set { isPublished = value; }
         }
 
         #endregion

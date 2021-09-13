@@ -30,8 +30,8 @@ namespace uPLibrary.Networking.M2Mqtt.Internal
         /// </summary>
         public MqttMsgBase Message
         {
-            get { return this.msg; }
-            set { this.msg = value; }
+            get { return msg; }
+            set { msg = value; }
         }
 
         #endregion

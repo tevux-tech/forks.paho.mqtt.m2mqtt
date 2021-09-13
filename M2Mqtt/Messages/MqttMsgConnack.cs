@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -56,8 +56,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public bool SessionPresent
         {
-            get { return this.sessionPresent; }
-            set { this.sessionPresent = value; }
+            get { return sessionPresent; }
+            set { sessionPresent = value; }
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte ReturnCode
         {
-            get { return this.returnCode; }
-            set { this.returnCode = value; }
+            get { return returnCode; }
+            set { returnCode = value; }
         }
 
         #endregion
@@ -82,7 +82,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgConnack()
         {
-            this.type = MQTT_MSG_CONNACK_TYPE;
+            type = MQTT_MSG_CONNACK_TYPE;
         }
 
         /// <summary>
@@ -159,19 +159,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 buffer[index++] = (MQTT_MSG_CONNACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_CONNACK_FLAG_BITS; // [v.3.1.1]
             else
                 buffer[index++] = (byte)(MQTT_MSG_CONNACK_TYPE << MSG_TYPE_OFFSET);
-            
+
             // encode remaining length
-            index = this.encodeRemainingLength(remainingLength, buffer, index);
+            index = encodeRemainingLength(remainingLength, buffer, index);
 
             if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
                 // [v3.1.1] session present flag
-                buffer[index++] = this.sessionPresent ? (byte)(1 << SESSION_PRESENT_FLAG_OFFSET) : (byte)0x00;
+                buffer[index++] = sessionPresent ? (byte)(1 << SESSION_PRESENT_FLAG_OFFSET) : (byte)0x00;
             else
                 // topic name compression response (reserved values. not used);
                 buffer[index++] = 0x00;
-            
+
             // connect return code
-            buffer[index++] = this.returnCode;
+            buffer[index++] = returnCode;
 
             return buffer;
         }
@@ -179,10 +179,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "CONNACK",
                 new object[] { "returnCode" },
-                new object[] { this.returnCode });
+                new object[] { returnCode });
 #else
             return base.ToString();
 #endif

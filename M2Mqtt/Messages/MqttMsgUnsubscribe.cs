@@ -35,8 +35,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public string[] Topics
         {
-            get { return this.topics; }
-            set { this.topics = value; }
+            get { return topics; }
+            set { topics = value; }
         }
 
         #endregion
@@ -49,7 +49,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgUnsubscribe()
         {
-            this.type = MQTT_MSG_UNSUBSCRIBE_TYPE;
+            type = MQTT_MSG_UNSUBSCRIBE_TYPE;
         }
 
         /// <summary>
@@ -58,12 +58,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="topics">List of topics to unsubscribe</param>
         public MqttMsgUnsubscribe(string[] topics)
         {
-            this.type = MQTT_MSG_UNSUBSCRIBE_TYPE;
+            type = MQTT_MSG_UNSUBSCRIBE_TYPE;
 
             this.topics = topics;
 
             // UNSUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
-            this.qosLevel = QOS_LEVEL_AT_LEAST_ONCE;
+            qosLevel = QOS_LEVEL_AT_LEAST_ONCE;
         }
 
         /// <summary>
@@ -147,22 +147,22 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             int index = 0;
 
             // topics list empty
-            if ((this.topics == null) || (this.topics.Length == 0))
+            if ((topics == null) || (topics.Length == 0))
                 throw new MqttClientException(MqttClientErrorCode.TopicsEmpty);
 
             // message identifier
             varHeaderSize += MESSAGE_ID_SIZE;
 
             int topicIdx = 0;
-            byte[][] topicsUtf8 = new byte[this.topics.Length][];
+            byte[][] topicsUtf8 = new byte[topics.Length][];
 
-            for (topicIdx = 0; topicIdx < this.topics.Length; topicIdx++)
+            for (topicIdx = 0; topicIdx < topics.Length; topicIdx++)
             {
                 // check topic length
-                if ((this.topics[topicIdx].Length < MIN_TOPIC_LENGTH) || (this.topics[topicIdx].Length > MAX_TOPIC_LENGTH))
+                if ((topics[topicIdx].Length < MIN_TOPIC_LENGTH) || (topics[topicIdx].Length > MAX_TOPIC_LENGTH))
                     throw new MqttClientException(MqttClientErrorCode.TopicLength);
 
-                topicsUtf8[topicIdx] = Encoding.UTF8.GetBytes(this.topics[topicIdx]);
+                topicsUtf8[topicIdx] = Encoding.UTF8.GetBytes(topics[topicIdx]);
                 payloadSize += 2; // topic size (MSB, LSB)
                 payloadSize += topicsUtf8[topicIdx].Length;
             }
@@ -190,22 +190,22 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             else
             {
                 buffer[index] = (byte)((MQTT_MSG_UNSUBSCRIBE_TYPE << MSG_TYPE_OFFSET) |
-                                   (this.qosLevel << QOS_LEVEL_OFFSET));
-                buffer[index] |= this.dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
+                                   (qosLevel << QOS_LEVEL_OFFSET));
+                buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
                 index++;
             }
 
             // encode remaining length
-            index = this.encodeRemainingLength(remainingLength, buffer, index);
+            index = encodeRemainingLength(remainingLength, buffer, index);
 
             // check message identifier assigned
-            if (this.messageId == 0)
+            if (messageId == 0)
                 throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
             buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
             buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
 
             topicIdx = 0;
-            for (topicIdx = 0; topicIdx < this.topics.Length; topicIdx++)
+            for (topicIdx = 0; topicIdx < topics.Length; topicIdx++)
             {
                 // topic name
                 buffer[index++] = (byte)((topicsUtf8[topicIdx].Length >> 8) & 0x00FF); // MSB
@@ -220,10 +220,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "UNSUBSCRIBE",
                 new object[] { "messageId", "topics" },
-                new object[] { this.messageId, this.topics });
+                new object[] { messageId, topics });
 #else
             return base.ToString();
 #endif

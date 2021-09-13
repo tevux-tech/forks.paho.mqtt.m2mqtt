@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -96,8 +96,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte Type
         {
-            get { return this.type; }
-            set { this.type = value; }
+            get { return type; }
+            set { type = value; }
         }
 
         /// <summary>
@@ -105,8 +105,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public bool DupFlag
         {
-            get { return this.dupFlag; }
-            set { this.dupFlag = value; }
+            get { return dupFlag; }
+            set { dupFlag = value; }
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte QosLevel
         {
-            get { return this.qosLevel; }
-            set { this.qosLevel = value; }
+            get { return qosLevel; }
+            set { qosLevel = value; }
         }
 
         /// <summary>
@@ -123,8 +123,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public bool Retain
         {
-            get { return this.retain; }
-            set { this.retain = value; }
+            get { return retain; }
+            set { retain = value; }
         }
 
         /// <summary>
@@ -132,8 +132,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public ushort MessageId
         {
-            get { return this.messageId; }
-            set { this.messageId = value; }
+            get { return messageId; }
+            set { messageId = value; }
         }
 
         #endregion
@@ -155,7 +155,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="protocolVersion">Protocol version</param>
         /// <returns>Bytes rapresentation</returns>
         public abstract byte[] GetBytes(byte protocolVersion);
-        
+
         /// <summary>
         /// Encode remaining length and insert it into message buffer
         /// </summary>
@@ -211,7 +211,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(name);
-            
+
             if ((fieldNames != null) && (fieldValues != null))
             {
                 sb.Append("(");
@@ -233,7 +233,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 }
                 sb.Append(")");
             }
-            
+
             return sb.ToString();
         }
 
@@ -260,7 +260,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 sb.Append('[');
                 for (int i = 0; i < list.Length; ++i)
                 {
-                    if (i > 0) sb.Append(',');
+                    if (i > 0)
+                        sb.Append(',');
                     sb.Append(list[i]);
                 }
                 sb.Append(']');

@@ -30,8 +30,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public ushort MessageId
         {
-            get { return this.messageId; }
-            internal set { this.messageId = value; }
+            get { return messageId; }
+            internal set { messageId = value; }
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public bool IsPublished
         {
-            get { return this.isPublished; }
-            internal set { this.isPublished = value; }
+            get { return isPublished; }
+            internal set { isPublished = value; }
         }
 
         #endregion

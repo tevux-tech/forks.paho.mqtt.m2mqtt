@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -29,7 +29,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgUnsuback()
         {
-            this.type = MQTT_MSG_UNSUBACK_TYPE;
+            type = MQTT_MSG_UNSUBACK_TYPE;
         }
 
         /// <summary>
@@ -100,13 +100,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 buffer[index++] = (MQTT_MSG_UNSUBACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_UNSUBACK_FLAG_BITS; // [v.3.1.1]
             else
                 buffer[index++] = (byte)(MQTT_MSG_UNSUBACK_TYPE << MSG_TYPE_OFFSET);
-            
+
             // encode remaining length
-            index = this.encodeRemainingLength(remainingLength, buffer, index);
+            index = encodeRemainingLength(remainingLength, buffer, index);
 
             // message id
-            buffer[index++] = (byte)((this.messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(this.messageId & 0x00FF); // LSB
+            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(messageId & 0x00FF); // LSB
 
             return buffer;
         }
@@ -114,10 +114,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "UNSUBACK",
                 new object[] { "messageId" },
-                new object[] { this.messageId });
+                new object[] { messageId });
 #else
             return base.ToString();
 #endif

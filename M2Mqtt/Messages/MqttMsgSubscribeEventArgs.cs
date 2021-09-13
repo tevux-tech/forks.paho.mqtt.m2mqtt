@@ -30,8 +30,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public ushort MessageId
         {
-            get { return this.messageId; }
-            internal set { this.messageId = value; }
+            get { return messageId; }
+            internal set { messageId = value; }
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public string[] Topics
         {
-            get { return this.topics; }
-            internal set { this.topics = value; }
+            get { return topics; }
+            internal set { topics = value; }
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte[] QoSLevels
         {
-            get { return this.qosLevels; }
-            internal set { this.qosLevels = value; }
+            get { return qosLevels; }
+            internal set { qosLevels = value; }
         }
 
         #endregion

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -31,8 +31,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public byte[] GrantedQoSLevels
         {
-            get { return this.grantedQosLevels; }
-            set { this.grantedQosLevels = value; }
+            get { return grantedQosLevels; }
+            set { grantedQosLevels = value; }
         }
 
         #endregion
@@ -45,7 +45,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgSuback()
         {
-            this.type = MQTT_MSG_SUBACK_TYPE;
+            type = MQTT_MSG_SUBACK_TYPE;
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             varHeaderSize += MESSAGE_ID_SIZE;
 
             int grantedQosIdx = 0;
-            for (grantedQosIdx = 0; grantedQosIdx < this.grantedQosLevels.Length; grantedQosIdx++)
+            for (grantedQosIdx = 0; grantedQosIdx < grantedQosLevels.Length; grantedQosIdx++)
             {
                 payloadSize++;
             }
@@ -130,18 +130,18 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 buffer[index++] = (MQTT_MSG_SUBACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_SUBACK_FLAG_BITS; // [v.3.1.1]
             else
                 buffer[index++] = (byte)(MQTT_MSG_SUBACK_TYPE << MSG_TYPE_OFFSET);
-            
+
             // encode remaining length
-            index = this.encodeRemainingLength(remainingLength, buffer, index);
+            index = encodeRemainingLength(remainingLength, buffer, index);
 
             // message id
-            buffer[index++] = (byte)((this.messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(this.messageId & 0x00FF); // LSB
+            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(messageId & 0x00FF); // LSB
 
             // payload contains QoS levels granted
-            for (grantedQosIdx = 0; grantedQosIdx < this.grantedQosLevels.Length; grantedQosIdx++)
+            for (grantedQosIdx = 0; grantedQosIdx < grantedQosLevels.Length; grantedQosIdx++)
             {
-                buffer[index++] = this.grantedQosLevels[grantedQosIdx];
+                buffer[index++] = grantedQosLevels[grantedQosIdx];
             }
 
             return buffer;
@@ -150,10 +150,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "SUBACK",
                 new object[] { "messageId", "grantedQosLevels" },
-                new object[] { this.messageId, this.grantedQosLevels });
+                new object[] { messageId, grantedQosLevels });
 #else
             return base.ToString();
 #endif

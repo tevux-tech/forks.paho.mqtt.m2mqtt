@@ -40,8 +40,8 @@ namespace uPLibrary.Networking.M2Mqtt.Exceptions
         /// </summary>
         public MqttClientErrorCode ErrorCode
         {
-            get { return this.errorCode; }
-            set { this.errorCode = value; }
+            get { return errorCode; }
+            set { errorCode = value; }
         }
     }
 

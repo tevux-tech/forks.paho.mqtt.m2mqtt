@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -29,7 +29,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgPingResp()
         {
-            this.type = MQTT_MSG_PINGRESP_TYPE;
+            type = MQTT_MSG_PINGRESP_TYPE;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // already know remaininglength is zero (MQTT specification),
             // so it isn't necessary to read other data from socket
             int remainingLength = MqttMsgBase.decodeRemainingLength(channel);
-            
+
             return msg;
         }
 
@@ -75,7 +75,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "PINGRESP",
                 null,
                 null);

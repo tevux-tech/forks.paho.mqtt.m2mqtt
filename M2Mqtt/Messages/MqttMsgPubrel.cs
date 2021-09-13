@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -28,9 +28,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgPubrel()
         {
-            this.type = MQTT_MSG_PUBREL_TYPE;
+            type = MQTT_MSG_PUBREL_TYPE;
             // PUBREL message use QoS Level 1 (not "officially" in 3.1.1)
-            this.qosLevel = QOS_LEVEL_AT_LEAST_ONCE;
+            qosLevel = QOS_LEVEL_AT_LEAST_ONCE;
         }
 
         public override byte[] GetBytes(byte protocolVersion)
@@ -68,17 +68,17 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             else
             {
                 buffer[index] = (byte)((MQTT_MSG_PUBREL_TYPE << MSG_TYPE_OFFSET) |
-                                   (this.qosLevel << QOS_LEVEL_OFFSET));
-                buffer[index] |= this.dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
+                                   (qosLevel << QOS_LEVEL_OFFSET));
+                buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
                 index++;
             }
-            
+
             // encode remaining length
-            index = this.encodeRemainingLength(remainingLength, buffer, index);
+            index = encodeRemainingLength(remainingLength, buffer, index);
 
             // get next message identifier
-            buffer[index++] = (byte)((this.messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(this.messageId & 0x00FF); // LSB 
+            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
 
             return buffer;
         }
@@ -130,10 +130,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public override string ToString()
         {
 #if TRACE
-            return this.GetTraceString(
+            return GetTraceString(
                 "PUBREL",
                 new object[] { "messageId" },
-                new object[] { this.messageId });
+                new object[] { messageId });
 #else
             return base.ToString();
 #endif

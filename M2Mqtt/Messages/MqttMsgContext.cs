@@ -54,7 +54,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public string Key 
         {
-            get { return this.Flow + "_" + this.Message.MessageId; }
+            get { return Flow + "_" + Message.MessageId; }
         }
     }
 
