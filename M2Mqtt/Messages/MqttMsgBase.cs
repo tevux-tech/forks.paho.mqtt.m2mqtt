@@ -43,21 +43,24 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         internal const byte RETAIN_FLAG_OFFSET = 0x00;
         internal const byte RETAIN_FLAG_SIZE = 0x01;
 
-        // MQTT message types
-        internal const byte MQTT_MSG_CONNECT_TYPE = 0x01;
-        internal const byte MQTT_MSG_CONNACK_TYPE = 0x02;
-        internal const byte MQTT_MSG_PUBLISH_TYPE = 0x03;
-        internal const byte MQTT_MSG_PUBACK_TYPE = 0x04;
-        internal const byte MQTT_MSG_PUBREC_TYPE = 0x05;
-        internal const byte MQTT_MSG_PUBREL_TYPE = 0x06;
-        internal const byte MQTT_MSG_PUBCOMP_TYPE = 0x07;
-        internal const byte MQTT_MSG_SUBSCRIBE_TYPE = 0x08;
-        internal const byte MQTT_MSG_SUBACK_TYPE = 0x09;
-        internal const byte MQTT_MSG_UNSUBSCRIBE_TYPE = 0x0A;
-        internal const byte MQTT_MSG_UNSUBACK_TYPE = 0x0B;
-        internal const byte MQTT_MSG_PINGREQ_TYPE = 0x0C;
-        internal const byte MQTT_MSG_PINGRESP_TYPE = 0x0D;
-        internal const byte MQTT_MSG_DISCONNECT_TYPE = 0x0E;
+        public class MessageType
+        {
+            public const byte Connect = 0x01;
+            public const byte ConAck = 0x02;
+            public const byte Publish = 0x03;
+            public const byte PubAck = 0x04;
+            public const byte PubRec = 0x05;
+            public const byte PubRel = 0x06;
+            public const byte PubComp = 0x07;
+            public const byte Subscribe = 0x08;
+            public const byte SubAck = 0x09;
+            public const byte Unsubscribe = 0x0A;
+            public const byte UnsubAck = 0x0B;
+            public const byte PingReq = 0x0C;
+            public const byte PingResp = 0x0D;
+            public const byte Disconnect = 0x0E;
+        }
+
 
         // [v3.1.1] MQTT flag bits
         internal const byte MQTT_MSG_CONNECT_FLAG_BITS = 0x00;
@@ -76,9 +79,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         internal const byte MQTT_MSG_DISCONNECT_FLAG_BITS = 0x00;
 
         // QOS levels
-        public const byte QOS_LEVEL_AT_MOST_ONCE = 0x00;
-        public const byte QOS_LEVEL_AT_LEAST_ONCE = 0x01;
-        public const byte QOS_LEVEL_EXACTLY_ONCE = 0x02;
+        public class QosLevels
+        {
+            public const byte AtMostOnce = 0x00;
+            public const byte AtLeastOnce = 0x01;
+            public const byte ExactlyOnce = 0x02;
+        }
+
 
         // SUBSCRIBE QoS level granted failure [v3.1.1]
         public const byte QOS_LEVEL_GRANTED_FAILURE = 0x80;

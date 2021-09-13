@@ -110,7 +110,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         public MqttMsgConnect()
         {
-            type = MQTT_MSG_CONNECT_TYPE;
+            type = MessageType.Connect;
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         /// <param name="clientId">Client identifier</param>
         public MqttMsgConnect(string clientId) :
-            this(clientId, null, null, false, QOS_LEVEL_AT_LEAST_ONCE, false, null, null, true, KEEP_ALIVE_PERIOD_DEFAULT, PROTOCOL_VERSION_V3_1_1)
+            this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KEEP_ALIVE_PERIOD_DEFAULT, PROTOCOL_VERSION_V3_1_1)
         {
         }
 
@@ -149,7 +149,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             byte protocolVersion
             )
         {
-            type = MQTT_MSG_CONNECT_TYPE;
+            type = MessageType.Connect;
 
             ClientId = clientId;
             Username = username;
@@ -324,9 +324,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 throw new MqttClientException(MqttClientErrorCode.KeepAliveWrong);
 
             // check on will QoS Level
-            if ((willQosLevel < QOS_LEVEL_AT_MOST_ONCE) ||
-                (willQosLevel > QOS_LEVEL_EXACTLY_ONCE))
+            if ((willQosLevel < QosLevels.AtMostOnce) || (willQosLevel > QosLevels.ExactlyOnce))
+            {
                 throw new MqttClientException(MqttClientErrorCode.WillWrong);
+            }
 
             // protocol name field size
             // MQTT version 3.1
@@ -375,7 +376,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            buffer[index++] = (MQTT_MSG_CONNECT_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_CONNECT_FLAG_BITS; // [v.3.1.1]
+            buffer[index++] = (MessageType.Connect << MSG_TYPE_OFFSET) | MQTT_MSG_CONNECT_FLAG_BITS; // [v.3.1.1]
 
             // encode remaining length
             index = encodeRemainingLength(remainingLength, buffer, index);

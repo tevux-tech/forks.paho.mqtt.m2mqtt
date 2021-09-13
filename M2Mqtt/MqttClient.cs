@@ -340,7 +340,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Return code of CONNACK message from broker</returns>
         public byte Connect(string clientId)
         {
-            return Connect(clientId, null, null, false, MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE, false, null, null, true, MqttMsgConnect.KEEP_ALIVE_PERIOD_DEFAULT);
+            return Connect(clientId, null, null, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KEEP_ALIVE_PERIOD_DEFAULT);
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace uPLibrary.Networking.M2Mqtt
             string username,
             string password)
         {
-            return Connect(clientId, username, password, false, MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE, false, null, null, true, MqttMsgConnect.KEEP_ALIVE_PERIOD_DEFAULT);
+            return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KEEP_ALIVE_PERIOD_DEFAULT);
         }
 
         /// <summary>
@@ -372,7 +372,7 @@ namespace uPLibrary.Networking.M2Mqtt
             bool cleanSession,
             ushort keepAlivePeriod)
         {
-            return Connect(clientId, username, password, false, MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE, false, null, null, cleanSession, keepAlivePeriod);
+            return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, cleanSession, keepAlivePeriod);
         }
 
         /// <summary>
@@ -587,7 +587,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Message Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message)
         {
-            return Publish(topic, message, MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE, false);
+            return Publish(topic, message, MqttMsgBase.QosLevels.AtMostOnce, false);
         }
 
         /// <summary>
@@ -811,8 +811,8 @@ namespace uPLibrary.Networking.M2Mqtt
             bool enqueue = true;
 
             // if it is a PUBLISH message with QoS Level 2
-            if ((msg.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
-                (msg.QosLevel == MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE))
+            if ((msg.Type == MqttMsgBase.MessageType.Publish) &&
+                (msg.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce))
             {
                 lock (_inflightQueue)
                 {
@@ -848,19 +848,19 @@ namespace uPLibrary.Networking.M2Mqtt
                 switch (msg.QosLevel)
                 {
                     // QoS Level 0
-                    case MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE:
+                    case MqttMsgBase.QosLevels.AtMostOnce:
 
                         state = MqttMsgState.QueuedQos0;
                         break;
 
                     // QoS Level 1
-                    case MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE:
+                    case MqttMsgBase.QosLevels.AtLeastOnce:
 
                         state = MqttMsgState.QueuedQos1;
                         break;
 
                     // QoS Level 2
-                    case MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE:
+                    case MqttMsgBase.QosLevels.ExactlyOnce:
 
                         state = MqttMsgState.QueuedQos2;
                         break;
@@ -868,9 +868,9 @@ namespace uPLibrary.Networking.M2Mqtt
 
                 // [v3.1.1] SUBSCRIBE and UNSUBSCRIBE aren't "officially" QOS = 1
                 //          so QueuedQos1 state isn't valid for them
-                if (msg.Type == MqttMsgBase.MQTT_MSG_SUBSCRIBE_TYPE)
+                if (msg.Type == MqttMsgBase.MessageType.Subscribe)
                     state = MqttMsgState.SendSubscribe;
-                else if (msg.Type == MqttMsgBase.MQTT_MSG_UNSUBSCRIBE_TYPE)
+                else if (msg.Type == MqttMsgBase.MessageType.Unsubscribe)
                     state = MqttMsgState.SendUnsubscribe;
 
                 // queue message context
@@ -895,19 +895,19 @@ namespace uPLibrary.Networking.M2Mqtt
                         Trace.WriteLine(TraceLevel.Queuing, "enqueued {0}", msg);
 
                         // PUBLISH message
-                        if (msg.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE)
+                        if (msg.Type == MqttMsgBase.MessageType.Publish)
                         {
                             // to publish and QoS level 1 or 2
                             if ((msgContext.Flow == MqttMsgFlow.ToPublish) &&
-                                ((msg.QosLevel == MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE) ||
-                                 (msg.QosLevel == MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE)))
+                                ((msg.QosLevel == MqttMsgBase.QosLevels.AtLeastOnce) ||
+                                 (msg.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce)))
                             {
                                 if (_session != null)
                                     _session.InflightMessages.Add(msgContext.Key, msgContext);
                             }
                             // to acknowledge and QoS level 2
                             else if ((msgContext.Flow == MqttMsgFlow.ToAcknowledge) &&
-                                     (msg.QosLevel == MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE))
+                                     (msg.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce))
                             {
                                 if (_session != null)
                                     _session.InflightMessages.Add(msgContext.Key, msgContext);
@@ -932,7 +932,7 @@ namespace uPLibrary.Networking.M2Mqtt
             bool enqueue = true;
 
             // if it is a PUBREL message (for QoS Level 2)
-            if (msg.Type == MqttMsgBase.MQTT_MSG_PUBREL_TYPE)
+            if (msg.Type == MqttMsgBase.MessageType.PubRel)
             {
                 lock (_inflightQueue)
                 {
@@ -961,7 +961,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 }
             }
             // if it is a PUBCOMP message (for QoS Level 2)
-            else if (msg.Type == MqttMsgBase.MQTT_MSG_PUBCOMP_TYPE)
+            else if (msg.Type == MqttMsgBase.MessageType.PubComp)
             {
                 lock (_inflightQueue)
                 {
@@ -982,7 +982,7 @@ namespace uPLibrary.Networking.M2Mqtt
                 }
             }
             // if it is a PUBREC message (for QoS Level 2)
-            else if (msg.Type == MqttMsgBase.MQTT_MSG_PUBREC_TYPE)
+            else if (msg.Type == MqttMsgBase.MessageType.PubRec)
             {
                 lock (_inflightQueue)
                 {
@@ -1038,11 +1038,11 @@ namespace uPLibrary.Networking.M2Mqtt
                         switch (msgType)
                         {
                             // CONNECT message received
-                            case MqttMsgBase.MQTT_MSG_CONNECT_TYPE:
+                            case MqttMsgBase.MessageType.Connect:
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                             // CONNACK message received
-                            case MqttMsgBase.MQTT_MSG_CONNACK_TYPE:
+                            case MqttMsgBase.MessageType.ConAck:
 
                                 _msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
 
@@ -1052,13 +1052,13 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // PINGREQ message received
-                            case MqttMsgBase.MQTT_MSG_PINGREQ_TYPE:
+                            case MqttMsgBase.MessageType.PingReq:
 
 
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                             // PINGRESP message received
-                            case MqttMsgBase.MQTT_MSG_PINGRESP_TYPE:
+                            case MqttMsgBase.MessageType.PingResp:
 
                                 _msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
 
@@ -1068,11 +1068,11 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // SUBSCRIBE message received
-                            case MqttMsgBase.MQTT_MSG_SUBSCRIBE_TYPE:
+                            case MqttMsgBase.MessageType.Subscribe:
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                             // SUBACK message received
-                            case MqttMsgBase.MQTT_MSG_SUBACK_TYPE:
+                            case MqttMsgBase.MessageType.SubAck:
                                 // enqueue SUBACK message received (for QoS Level 1) into the internal queue
                                 MqttMsgSuback suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
 
@@ -1084,7 +1084,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // PUBLISH message received
-                            case MqttMsgBase.MQTT_MSG_PUBLISH_TYPE:
+                            case MqttMsgBase.MessageType.Publish:
 
                                 MqttMsgPublish publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
 
@@ -1096,7 +1096,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // PUBACK message received
-                            case MqttMsgBase.MQTT_MSG_PUBACK_TYPE:
+                            case MqttMsgBase.MessageType.PubAck:
 
                                 // enqueue PUBACK message received (for QoS Level 1) into the internal queue
                                 MqttMsgPuback puback = MqttMsgPuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
@@ -1109,7 +1109,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // PUBREC message received
-                            case MqttMsgBase.MQTT_MSG_PUBREC_TYPE:
+                            case MqttMsgBase.MessageType.PubRec:
 
                                 // enqueue PUBREC message received (for QoS Level 2) into the internal queue
                                 MqttMsgPubrec pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
@@ -1122,7 +1122,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // PUBREL message received
-                            case MqttMsgBase.MQTT_MSG_PUBREL_TYPE:
+                            case MqttMsgBase.MessageType.PubRel:
 
                                 // enqueue PUBREL message received (for QoS Level 2) into the internal queue
                                 MqttMsgPubrel pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
@@ -1135,7 +1135,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // PUBCOMP message received
-                            case MqttMsgBase.MQTT_MSG_PUBCOMP_TYPE:
+                            case MqttMsgBase.MessageType.PubComp:
 
                                 // enqueue PUBCOMP message received (for QoS Level 2) into the internal queue
                                 MqttMsgPubcomp pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
@@ -1148,11 +1148,11 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // UNSUBSCRIBE message received
-                            case MqttMsgBase.MQTT_MSG_UNSUBSCRIBE_TYPE:
+                            case MqttMsgBase.MessageType.Unsubscribe:
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                             // UNSUBACK message received
-                            case MqttMsgBase.MQTT_MSG_UNSUBACK_TYPE:
+                            case MqttMsgBase.MessageType.UnsubAck:
                                 // enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
                                 MqttMsgUnsuback unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
 
@@ -1164,7 +1164,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                 break;
 
                             // DISCONNECT message received
-                            case MqttMsgBase.MQTT_MSG_DISCONNECT_TYPE:
+                            case MqttMsgBase.MessageType.Disconnect:
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                             default:
@@ -1282,24 +1282,22 @@ namespace uPLibrary.Networking.M2Mqtt
                         {
                             switch (msg.Type)
                             {
-                                // CONNECT message received
-                                case MqttMsgBase.MQTT_MSG_CONNECT_TYPE:
-
+                                case MqttMsgBase.MessageType.Connect:
                                     throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                                 // SUBSCRIBE message received
-                                case MqttMsgBase.MQTT_MSG_SUBSCRIBE_TYPE:
+                                case MqttMsgBase.MessageType.Subscribe:
                                     throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                                 // SUBACK message received
-                                case MqttMsgBase.MQTT_MSG_SUBACK_TYPE:
+                                case MqttMsgBase.MessageType.SubAck:
 
                                     // raise subscribed topic event (SUBACK message received)
                                     OnMqttMsgSubscribed((MqttMsgSuback)msg);
                                     break;
 
                                 // PUBLISH message received
-                                case MqttMsgBase.MQTT_MSG_PUBLISH_TYPE:
+                                case MqttMsgBase.MessageType.Publish:
 
                                     // PUBLISH message received in a published internal event, no publish succeeded
                                     if (internalEvent.GetType() == typeof(MsgPublishedInternalEvent))
@@ -1310,7 +1308,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                     break;
 
                                 // PUBACK message received
-                                case MqttMsgBase.MQTT_MSG_PUBACK_TYPE:
+                                case MqttMsgBase.MessageType.PubAck:
 
                                     // raise published message event
                                     // (PUBACK received for QoS Level 1)
@@ -1318,7 +1316,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                     break;
 
                                 // PUBREL message received
-                                case MqttMsgBase.MQTT_MSG_PUBREL_TYPE:
+                                case MqttMsgBase.MessageType.PubRel:
 
                                     // raise message received event 
                                     // (PUBREL received for QoS Level 2)
@@ -1326,7 +1324,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                     break;
 
                                 // PUBCOMP message received
-                                case MqttMsgBase.MQTT_MSG_PUBCOMP_TYPE:
+                                case MqttMsgBase.MessageType.PubComp:
 
                                     // raise published message event
                                     // (PUBCOMP received for QoS Level 2)
@@ -1334,18 +1332,18 @@ namespace uPLibrary.Networking.M2Mqtt
                                     break;
 
                                 // UNSUBSCRIBE message received from client
-                                case MqttMsgBase.MQTT_MSG_UNSUBSCRIBE_TYPE:
+                                case MqttMsgBase.MessageType.Unsubscribe:
                                     throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
                                 // UNSUBACK message received
-                                case MqttMsgBase.MQTT_MSG_UNSUBACK_TYPE:
+                                case MqttMsgBase.MessageType.UnsubAck:
 
                                     // raise unsubscribed topic event
                                     OnMqttMsgUnsubscribed(msg.MessageId);
                                     break;
 
                                 // DISCONNECT message received from client
-                                case MqttMsgBase.MQTT_MSG_DISCONNECT_TYPE:
+                                case MqttMsgBase.MessageType.Disconnect:
                                     throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
                             }
                         }
@@ -1455,7 +1453,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                             msgContext.Timestamp = Environment.TickCount;
                                             msgContext.Attempt++;
 
-                                            if (msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE)
+                                            if (msgInflight.Type == MqttMsgBase.MessageType.Publish)
                                             {
                                                 // PUBLISH message to send, wait for PUBACK
                                                 msgContext.State = MqttMsgState.WaitForPuback;
@@ -1463,10 +1461,10 @@ namespace uPLibrary.Networking.M2Mqtt
                                                 if (msgContext.Attempt > 1)
                                                     msgInflight.DupFlag = true;
                                             }
-                                            else if (msgInflight.Type == MqttMsgBase.MQTT_MSG_SUBSCRIBE_TYPE)
+                                            else if (msgInflight.Type == MqttMsgBase.MessageType.Subscribe)
                                                 // SUBSCRIBE message to send, wait for SUBACK
                                                 msgContext.State = MqttMsgState.WaitForSuback;
-                                            else if (msgInflight.Type == MqttMsgBase.MQTT_MSG_UNSUBSCRIBE_TYPE)
+                                            else if (msgInflight.Type == MqttMsgBase.MessageType.Unsubscribe)
                                                 // UNSUBSCRIBE message to send, wait for UNSUBACK
                                                 msgContext.State = MqttMsgState.WaitForUnsuback;
 
@@ -1549,9 +1547,9 @@ namespace uPLibrary.Networking.M2Mqtt
                                             if (msgReceived != null)
                                             {
                                                 // PUBACK message or SUBACK/UNSUBACK message for the current message
-                                                if (((msgReceived.Type == MqttMsgBase.MQTT_MSG_PUBACK_TYPE) && (msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) && (msgReceived.MessageId == msgInflight.MessageId)) ||
-                                                    ((msgReceived.Type == MqttMsgBase.MQTT_MSG_SUBACK_TYPE) && (msgInflight.Type == MqttMsgBase.MQTT_MSG_SUBSCRIBE_TYPE) && (msgReceived.MessageId == msgInflight.MessageId)) ||
-                                                    ((msgReceived.Type == MqttMsgBase.MQTT_MSG_UNSUBACK_TYPE) && (msgInflight.Type == MqttMsgBase.MQTT_MSG_UNSUBSCRIBE_TYPE) && (msgReceived.MessageId == msgInflight.MessageId)))
+                                                if (((msgReceived.Type == MqttMsgBase.MessageType.PubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Publish) && (msgReceived.MessageId == msgInflight.MessageId)) ||
+                                                    ((msgReceived.Type == MqttMsgBase.MessageType.SubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Subscribe) && (msgReceived.MessageId == msgInflight.MessageId)) ||
+                                                    ((msgReceived.Type == MqttMsgBase.MessageType.UnsubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Unsubscribe) && (msgReceived.MessageId == msgInflight.MessageId)))
                                                 {
                                                     lock (_internalQueue)
                                                     {
@@ -1564,7 +1562,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     }
 
                                                     // if PUBACK received, confirm published with flag
-                                                    if (msgReceived.Type == MqttMsgBase.MQTT_MSG_PUBACK_TYPE)
+                                                    if (msgReceived.Type == MqttMsgBase.MessageType.PubAck)
                                                         internalEvent = new MsgPublishedInternalEvent(msgReceived, true);
                                                     else
                                                         internalEvent = new MsgInternalEvent(msgReceived);
@@ -1573,7 +1571,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     OnInternalEvent(internalEvent);
 
                                                     // PUBACK received for PUBLISH message with QoS Level 1, remove from session state
-                                                    if ((msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
+                                                    if ((msgInflight.Type == MqttMsgBase.MessageType.Publish) &&
                                                         (_session != null) &&
                                                         (_session.InflightMessages.ContainsKey(msgContext.Key)))
                                                     {
@@ -1607,7 +1605,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     else
                                                     {
                                                         // if PUBACK for a PUBLISH message not received after retries, raise event for not published
-                                                        if (msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE)
+                                                        if (msgInflight.Type == MqttMsgBase.MessageType.Publish)
                                                         {
                                                             // PUBACK not received in time, PUBLISH retries failed, need to remove from session inflight messages too
                                                             if ((_session != null) && (_session.InflightMessages.ContainsKey(msgContext.Key)))
@@ -1650,7 +1648,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                             }
 
                                             // it is a PUBREC message
-                                            if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MQTT_MSG_PUBREC_TYPE))
+                                            if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MessageType.PubRec))
                                             {
                                                 // PUBREC message for the current PUBLISH message, send PUBREL, wait for PUBCOMP
                                                 if (msgReceived.MessageId == msgInflight.MessageId)
@@ -1740,7 +1738,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                             }
 
                                             // it is a PUBREL message
-                                            if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MQTT_MSG_PUBREL_TYPE))
+                                            if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MessageType.PubRel))
                                             {
                                                 // PUBREL message for the current message, send PUBCOMP
                                                 if (msgReceived.MessageId == msgInflight.MessageId)
@@ -1764,7 +1762,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     OnInternalEvent(internalEvent);
 
                                                     // PUBREL received (and PUBCOMP sent) for PUBLISH message with QoS Level 2, remove from session state
-                                                    if ((msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
+                                                    if ((msgInflight.Type == MqttMsgBase.MessageType.Publish) &&
                                                         (_session != null) &&
                                                         _session.InflightMessages.ContainsKey(msgContext.Key))
                                                     {
@@ -1800,7 +1798,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                             }
 
                                             // it is a PUBCOMP message
-                                            if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MQTT_MSG_PUBCOMP_TYPE))
+                                            if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MessageType.PubComp))
                                             {
                                                 // PUBCOMP message for the current message
                                                 if (msgReceived.MessageId == msgInflight.MessageId)
@@ -1820,7 +1818,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                     OnInternalEvent(internalEvent);
 
                                                     // PUBCOMP received for PUBLISH message with QoS Level 2, remove from session state
-                                                    if ((msgInflight.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
+                                                    if ((msgInflight.Type == MqttMsgBase.MessageType.Publish) &&
                                                         (_session != null) &&
                                                         (_session.InflightMessages.ContainsKey(msgContext.Key)))
                                                     {
@@ -1831,7 +1829,7 @@ namespace uPLibrary.Networking.M2Mqtt
                                                 }
                                             }
                                             // it is a PUBREC message
-                                            else if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MQTT_MSG_PUBREC_TYPE))
+                                            else if ((msgReceived != null) && (msgReceived.Type == MqttMsgBase.MessageType.PubRec))
                                             {
                                                 // another PUBREC message for the current message due to a retransmitted PUBLISH
                                                 // I'm in waiting for PUBCOMP, so I can discard this PUBREC
@@ -1989,18 +1987,18 @@ namespace uPLibrary.Networking.M2Mqtt
                             _inflightQueue.Enqueue(msgContext);
 
                             // if it is a PUBLISH message to publish
-                            if ((msgContext.Message.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
+                            if ((msgContext.Message.Type == MqttMsgBase.MessageType.Publish) &&
                                 (msgContext.Flow == MqttMsgFlow.ToPublish))
                             {
                                 // it's QoS 1 and we haven't received PUBACK
-                                if ((msgContext.Message.QosLevel == MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE) &&
+                                if ((msgContext.Message.QosLevel == MqttMsgBase.QosLevels.AtLeastOnce) &&
                                     (msgContext.State == MqttMsgState.WaitForPuback))
                                 {
                                     // we haven't received PUBACK, we need to resend PUBLISH message
                                     msgContext.State = MqttMsgState.QueuedQos1;
                                 }
                                 // it's QoS 2
-                                else if (msgContext.Message.QosLevel == MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE)
+                                else if (msgContext.Message.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce)
                                 {
                                     // we haven't received PUBREC, we need to resend PUBLISH message
                                     if (msgContext.State == MqttMsgState.WaitForPubrec)
@@ -2069,7 +2067,7 @@ namespace uPLibrary.Networking.M2Mqtt
             internal bool Find(object item)
             {
                 MqttMsgContext msgCtx = (MqttMsgContext)item;
-                return ((msgCtx.Message.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
+                return ((msgCtx.Message.Type == MqttMsgBase.MessageType.Publish) &&
                         (msgCtx.Message.MessageId == MessageId) &&
                         msgCtx.Flow == Flow);
 

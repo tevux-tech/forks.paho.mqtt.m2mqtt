@@ -59,7 +59,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
         public MqttMsgConnack()
         {
-            type = MQTT_MSG_CONNACK_TYPE;
+            type = MessageType.ConAck;
         }
 
         public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
@@ -126,9 +126,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // first fixed header byte
             if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-                buffer[index++] = (MQTT_MSG_CONNACK_TYPE << MSG_TYPE_OFFSET) | MQTT_MSG_CONNACK_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.ConAck << MSG_TYPE_OFFSET) | MQTT_MSG_CONNACK_FLAG_BITS; // [v.3.1.1]
             else
-                buffer[index++] = (byte)(MQTT_MSG_CONNACK_TYPE << MSG_TYPE_OFFSET);
+                buffer[index++] = (byte)(MessageType.ConAck << MSG_TYPE_OFFSET);
 
             // encode remaining length
             index = encodeRemainingLength(remainingLength, buffer, index);
