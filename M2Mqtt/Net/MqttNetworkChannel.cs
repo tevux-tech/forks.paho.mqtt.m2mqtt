@@ -75,7 +75,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <summary>
         /// List of Protocol for ALPN
         /// </summary>
-        private List<string> alpnProtocols;
+        private List<string> alpnProtocols = new List<string>();
 
 
         /// <summary>
@@ -190,7 +190,11 @@ namespace uPLibrary.Networking.M2Mqtt
             this.sslProtocol = sslProtocol;
             this.userCertificateValidationCallback = userCertificateValidationCallback;
             this.userCertificateSelectionCallback = userCertificateSelectionCallback;
-            this.alpnProtocols = alpnProtocols;
+
+            if (alpnProtocols != null)
+            {
+                this.alpnProtocols = alpnProtocols;
+            }
         }
 
         /// <summary>
@@ -216,7 +220,7 @@ namespace uPLibrary.Networking.M2Mqtt
                     clientCertificates = new X509CertificateCollection(new X509Certificate[] { clientCert });
 #if (NETSTANDARD1_6 || NETCOREAPP3_1)
 
-                if ((alpnProtocols != null) && (0 < alpnProtocols.Count))
+                if (alpnProtocols.Count > 0)
                 {
                     sslStream = new SslStream(netStream, false);
                     SslClientAuthenticationOptions authOptions = new SslClientAuthenticationOptions();
