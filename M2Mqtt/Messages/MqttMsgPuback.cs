@@ -24,7 +24,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public MqttMsgPuback() {
             type = MessageType.PubAck;
         }
-
         public override byte[] GetBytes(byte protocolVersion) {
             var fixedHeaderSize = 0;
             var varHeaderSize = 0;
@@ -98,10 +97,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "PUBACK",
-                new object[] { "messageId" },
-                new object[] { messageId });
+            return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { messageId });
 #else
             return base.ToString();
 #endif

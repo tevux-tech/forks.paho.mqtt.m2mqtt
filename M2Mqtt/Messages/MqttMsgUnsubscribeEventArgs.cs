@@ -20,9 +20,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Event Args class for unsubscribe request on topics
     /// </summary>
     public class MqttMsgUnsubscribeEventArgs : EventArgs {
-
         public ushort MessageId { get; internal set; }
-
         public string[] TopicsToUnsubscribe { get; internal set; }
 
         public MqttMsgUnsubscribeEventArgs(ushort messageId, string[] topicsToUnsubscribe) {

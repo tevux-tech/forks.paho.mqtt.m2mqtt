@@ -41,13 +41,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        /// <summary>
-        /// Parse bytes for a UNSUBSCRIBE message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>UNSUBSCRIBE message instance</returns>
         public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -190,10 +183,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "UNSUBSCRIBE",
-                new object[] { "messageId", "topics" },
-                new object[] { messageId, TopicsToUnsubscribe });
+            return GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { messageId, TopicsToUnsubscribe });
 #else
             return base.ToString();
 #endif

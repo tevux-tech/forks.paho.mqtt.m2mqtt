@@ -22,9 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgSubscribeEventArgs : EventArgs {
         public ushort MessageId { get; internal set; }
-
         public string[] TopicsToSubscribe { get; internal set; }
-
         public byte[] QoSLevels { get; internal set; }
 
         public MqttMsgSubscribeEventArgs(ushort messageId, string[] topics, byte[] qosLevels) {

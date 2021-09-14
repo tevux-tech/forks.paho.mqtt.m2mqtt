@@ -70,13 +70,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        /// <summary>
-        /// Parse bytes for a PUBCOMP message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>PUBCOMP message instance</returns>
         public static MqttMsgPubcomp Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -105,10 +98,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "PUBCOMP",
-                new object[] { "messageId" },
-                new object[] { messageId });
+            return GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { messageId });
 #else
             return base.ToString();
 #endif

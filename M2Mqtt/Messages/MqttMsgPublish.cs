@@ -102,8 +102,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            buffer[index] = (byte)((MessageType.Publish << MSG_TYPE_OFFSET) |
-                                   (qosLevel << QOS_LEVEL_OFFSET));
+            buffer[index] = (byte)((MessageType.Publish << MSG_TYPE_OFFSET) | (qosLevel << QOS_LEVEL_OFFSET));
             buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
             buffer[index] |= retain ? (byte)(1 << RETAIN_FLAG_OFFSET) : (byte)0x00;
             index++;
@@ -118,8 +117,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index += topicUtf8.Length;
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((qosLevel == QosLevels.AtLeastOnce) ||
-                (qosLevel == QosLevels.ExactlyOnce)) {
+            if ((qosLevel == QosLevels.AtLeastOnce) || (qosLevel == QosLevels.ExactlyOnce)) {
                 // check message identifier assigned
                 if (messageId == 0) {
                     throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
@@ -139,13 +137,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        /// <summary>
-        /// Parse bytes for a PUBLISH message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>PUBLISH message instance</returns>
         public static MqttMsgPublish Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -214,10 +205,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "PUBLISH",
-                new object[] { "messageId", "topic", "message" },
-                new object[] { messageId, Topic, Message });
+            return GetTraceString("PUBLISH", new object[] { "messageId", "topic", "message" }, new object[] { messageId, Topic, Message });
 #else
             return base.ToString();
 #endif

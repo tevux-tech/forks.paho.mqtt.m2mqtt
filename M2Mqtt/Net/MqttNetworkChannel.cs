@@ -30,9 +30,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         private readonly RemoteCertificateValidationCallback userCertificateValidationCallback;
         private readonly LocalCertificateSelectionCallback userCertificateSelectionCallback;
 
-        // socket for communication
         private Socket _socket;
-        // using SSL
         private bool _secure;
 
         // CA certificate (on client)
@@ -73,23 +71,10 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="socket">Socket opened with the client</param>
         public MqttNetworkChannel(Socket socket) : this(socket, false, null, MqttSslProtocols.None, null, null) {
 
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="socket">Socket opened with the client</param>
-        /// <param name="secure">Secure connection (SSL/TLS)</param>
-        /// <param name="serverCert">Server X509 certificate for secure connection</param>
-        /// <param name="sslProtocol">SSL/TLS protocol version</param>
-        /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
-        /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
         public MqttNetworkChannel(Socket socket, bool secure, X509Certificate serverCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback) {
             _socket = socket;
             _secure = secure;
@@ -99,26 +84,9 @@ namespace uPLibrary.Networking.M2Mqtt {
             this.userCertificateSelectionCallback = userCertificateSelectionCallback;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="remoteHostName">Remote Host name</param>
-        /// <param name="remotePort">Remote port</param>
         public MqttNetworkChannel(string remoteHostName, int remotePort) : this(remoteHostName, remotePort, false, null, null, MqttSslProtocols.None, null, null) {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="remoteHostName">Remote Host name</param>
-        /// <param name="remotePort">Remote port</param>
-        /// <param name="secure">Using SSL</param>
-        /// <param name="caCert">CA certificate</param>
-        /// <param name="clientCert">Client certificate</param>
-        /// <param name="sslProtocol">SSL/TLS protocol version</param>
-
-        /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
-        /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
         public MqttNetworkChannel(string remoteHostName, int remotePort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> alpnProtocols = null) {
             IPAddress remoteIpAddress = null;
             try {

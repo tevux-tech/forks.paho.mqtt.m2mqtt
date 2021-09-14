@@ -24,60 +24,25 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for SUBSCRIBE message from client to broker
     /// </summary>
     public class MqttMsgSubscribe : MqttMsgBase {
-        #region Properties...
 
-        /// <summary>
-        /// List of topics to subscribe
-        /// </summary>
-        public string[] Topics {
-            get { return topics; }
-            set { topics = value; }
-        }
+        public string[] Topics { get; set; }
 
-        /// <summary>
-        /// List of QOS Levels related to topics
-        /// </summary>
-        public byte[] QoSLevels {
-            get { return qosLevels; }
-            set { qosLevels = value; }
-        }
+        public byte[] QoSLevels { get; set; }
 
-        #endregion
-
-        // topics to subscribe
-        string[] topics;
-        // QOS levels related to topics
-        byte[] qosLevels;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgSubscribe() {
             type = MessageType.Subscribe;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="topics">List of topics to subscribe</param>
-        /// <param name="qosLevels">List of QOS Levels related to topics</param>
         public MqttMsgSubscribe(string[] topics, byte[] qosLevels) {
             type = MessageType.Subscribe;
 
-            this.topics = topics;
-            this.qosLevels = qosLevels;
+            Topics = topics;
+            QoSLevels = qosLevels;
 
             // SUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        /// <summary>
-        /// Parse bytes for a SUBSCRIBE message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>SUBSCRIBE message instance</returns>
         public static MqttMsgSubscribe Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -135,11 +100,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             } while (index < remainingLength);
 
             // copy from list to array
-            msg.topics = new string[tmpTopics.Count];
-            msg.qosLevels = new byte[tmpQosLevels.Count];
+            msg.Topics = new string[tmpTopics.Count];
+            msg.QoSLevels = new byte[tmpQosLevels.Count];
             for (var i = 0; i < tmpTopics.Count; i++) {
-                msg.topics[i] = (string)tmpTopics[i];
-                msg.qosLevels[i] = (byte)tmpQosLevels[i];
+                msg.Topics[i] = (string)tmpTopics[i];
+                msg.QoSLevels[i] = (byte)tmpQosLevels[i];
             }
 
             return msg;
@@ -154,17 +119,17 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var index = 0;
 
             // topics list empty
-            if ((topics == null) || (topics.Length == 0)) {
+            if ((Topics == null) || (Topics.Length == 0)) {
                 throw new MqttClientException(MqttClientErrorCode.TopicsEmpty);
             }
 
             // qos levels list empty
-            if ((qosLevels == null) || (qosLevels.Length == 0)) {
+            if ((QoSLevels == null) || (QoSLevels.Length == 0)) {
                 throw new MqttClientException(MqttClientErrorCode.QosLevelsEmpty);
             }
 
             // topics and qos levels lists length don't match
-            if (topics.Length != qosLevels.Length) {
+            if (Topics.Length != QoSLevels.Length) {
                 throw new MqttClientException(MqttClientErrorCode.TopicsQosLevelsNotMatch);
             }
 
@@ -172,15 +137,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             varHeaderSize += MessageIdSize;
 
             var topicIdx = 0;
-            var topicsUtf8 = new byte[topics.Length][];
+            var topicsUtf8 = new byte[Topics.Length][];
 
-            for (topicIdx = 0; topicIdx < topics.Length; topicIdx++) {
+            for (topicIdx = 0; topicIdx < Topics.Length; topicIdx++) {
                 // check topic length
-                if ((topics[topicIdx].Length < MinTopicLength) || (topics[topicIdx].Length > MaxTopicLength)) {
+                if ((Topics[topicIdx].Length < MinTopicLength) || (Topics[topicIdx].Length > MaxTopicLength)) {
                     throw new MqttClientException(MqttClientErrorCode.TopicLength);
                 }
 
-                topicsUtf8[topicIdx] = Encoding.UTF8.GetBytes(topics[topicIdx]);
+                topicsUtf8[topicIdx] = Encoding.UTF8.GetBytes(Topics[topicIdx]);
                 payloadSize += 2; // topic size (MSB, LSB)
                 payloadSize += topicsUtf8[topicIdx].Length;
                 payloadSize++; // byte for QoS
@@ -225,7 +190,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
 
             topicIdx = 0;
-            for (topicIdx = 0; topicIdx < topics.Length; topicIdx++) {
+            for (topicIdx = 0; topicIdx < Topics.Length; topicIdx++) {
                 // topic name
                 buffer[index++] = (byte)((topicsUtf8[topicIdx].Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(topicsUtf8[topicIdx].Length & 0x00FF); // LSB
@@ -233,7 +198,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 index += topicsUtf8[topicIdx].Length;
 
                 // requested QoS
-                buffer[index++] = qosLevels[topicIdx];
+                buffer[index++] = QoSLevels[topicIdx];
             }
 
             return buffer;
@@ -241,10 +206,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "SUBSCRIBE",
-                new object[] { "messageId", "topics", "qosLevels" },
-                new object[] { messageId, topics, qosLevels });
+            return GetTraceString("SUBSCRIBE", new object[] { "messageId", "topics", "qosLevels" }, new object[] { messageId, Topics, QoSLevels });
 #else
             return base.ToString();
 #endif

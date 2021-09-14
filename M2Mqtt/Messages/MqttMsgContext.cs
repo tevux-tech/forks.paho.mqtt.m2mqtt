@@ -15,23 +15,9 @@ Contributors:
 */
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
-    /// <summary>
-    /// Context for MQTT message
-    /// </summary>
     public class MqttMsgContext {
-        /// <summary>
-        /// MQTT message
-        /// </summary>
         public MqttMsgBase Message { get; set; }
-
-        /// <summary>
-        /// MQTT message state
-        /// </summary>
         public MqttMsgState State { get; set; }
-
-        /// <summary>
-        /// Flow of the message
-        /// </summary>
         public MqttMsgFlow Flow { get; set; }
 
         /// <summary>

@@ -21,20 +21,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for UNSUBACK message from broker to client
     /// </summary>
     public class MqttMsgUnsuback : MqttMsgBase {
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgUnsuback() {
             type = MessageType.UnsubAck;
         }
 
-        /// <summary>
-        /// Parse bytes for a UNSUBACK message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>UNSUBACK message instance</returns>
         public static MqttMsgUnsuback Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -108,10 +98,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "UNSUBACK",
-                new object[] { "messageId" },
-                new object[] { messageId });
+            return GetTraceString("UNSUBACK", new object[] { "messageId" }, new object[] { messageId });
 #else
             return base.ToString();
 #endif

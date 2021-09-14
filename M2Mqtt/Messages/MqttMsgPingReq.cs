@@ -21,9 +21,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for PINGREQ message from client to broker
     /// </summary>
     public class MqttMsgPingReq : MqttMsgBase {
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgPingReq() {
             type = MessageType.PingReq;
         }
@@ -45,13 +42,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        /// <summary>
-        /// Parse bytes for a PINGREQ message
-        /// </summary>
-        /// <param name="fixedHeaderFirstByte">First fixed header byte</param>
-        /// <param name="protocolVersion">Protocol Version</param>
-        /// <param name="channel">Channel connected to the broker</param>
-        /// <returns>PINGREQ message instance</returns>
         public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             var msg = new MqttMsgPingReq();
 
@@ -71,10 +61,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString(
-                "PINGREQ",
-                null,
-                null);
+            return GetTraceString("PINGREQ", null, null);
 #else
             return base.ToString();
 #endif

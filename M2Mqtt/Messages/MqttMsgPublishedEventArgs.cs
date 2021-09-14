@@ -22,10 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgPublishedEventArgs : EventArgs {
         public ushort MessageId { get; internal set; }
-
         public bool IsPublished { get; internal set; }
-
-
         public MqttMsgPublishedEventArgs(ushort messageId) : this(messageId, true) {
         }
 
