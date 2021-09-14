@@ -22,21 +22,23 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public abstract class MqttMsgBase {
         // mask, offset and size for fixed header fields
-        internal const byte MSG_TYPE_MASK = 0xF0;
-        internal const byte MSG_TYPE_OFFSET = 0x04;
-        internal const byte MSG_TYPE_SIZE = 0x04;
-        internal const byte MSG_FLAG_BITS_MASK = 0x0F;      // [v3.1.1]
-        internal const byte MSG_FLAG_BITS_OFFSET = 0x00;    // [v3.1.1]
-        internal const byte MSG_FLAG_BITS_SIZE = 0x04;      // [v3.1.1]
-        internal const byte DUP_FLAG_MASK = 0x08;
-        internal const byte DUP_FLAG_OFFSET = 0x03;
-        internal const byte DUP_FLAG_SIZE = 0x01;
-        internal const byte QOS_LEVEL_MASK = 0x06;
-        internal const byte QOS_LEVEL_OFFSET = 0x01;
-        internal const byte QOS_LEVEL_SIZE = 0x02;
-        internal const byte RETAIN_FLAG_MASK = 0x01;
-        internal const byte RETAIN_FLAG_OFFSET = 0x00;
-        internal const byte RETAIN_FLAG_SIZE = 0x01;
+        public class FixedHeader {
+            public const byte TypeMask = 0xF0;
+            public const byte TypeOffset = 0x04;
+            public const byte TypeSize = 0x04;
+            public const byte FlagBitsMask = 0x0F;      // [v3.1.1]
+            public const byte FlagBitsOffset = 0x00;    // [v3.1.1]
+            public const byte FlagBitsSize = 0x04;      // [v3.1.1]
+            public const byte DuplicateFlagMask = 0x08;
+            public const byte DuplicateFlagOffset = 0x03;
+            public const byte DuplicateFlagSize = 0x01;
+            public const byte QosLevelMask = 0x06;
+            public const byte QosLevelOffset = 0x01;
+            public const byte QosLevelSize = 0x02;
+            public const byte RetainFlagMask = 0x01;
+            public const byte RetainFlagOffset = 0x00;
+            public const byte RetainFlagSize = 0x01;
+        }
 
         public class MessageType {
             public const byte Connect = 0x01;
@@ -56,7 +58,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public class MessageFlags {
-            // [v3.1.1] MQTT flag bits
+            // [v3.1.1] MQTT flag bits. See section 2.2.2.
             public const byte Connect = 0x00;
             public const byte ConAck = 0x00;
             public const byte Publish = 0x00; // just defined as 0x00 but depends on publish props (dup, qos, retain) 

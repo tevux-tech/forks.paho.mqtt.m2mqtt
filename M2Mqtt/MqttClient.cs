@@ -785,7 +785,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                     if (readBytes > 0) {
                         // extract message type from received byte
-                        msgType = (byte)((fixedHeaderFirstByte[0] & MqttMsgBase.MSG_TYPE_MASK) >> MqttMsgBase.MSG_TYPE_OFFSET);
+                        msgType = (byte)((fixedHeaderFirstByte[0] & MqttMsgBase.FixedHeader.TypeMask) >> MqttMsgBase.FixedHeader.TypeOffset);
 
                         switch (msgType) {
                             // CONNECT message received

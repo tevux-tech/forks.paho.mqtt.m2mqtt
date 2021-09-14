@@ -54,10 +54,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PubComp << MSG_TYPE_OFFSET) | MessageFlags.PubComp;
+                buffer[index++] = (MessageType.PubComp << FixedHeader.TypeOffset) | MessageFlags.PubComp;
             }
             else {
-                buffer[index++] = (MessageType.PubComp << MSG_TYPE_OFFSET);
+                buffer[index++] = (MessageType.PubComp << FixedHeader.TypeOffset);
             }
 
             // encode remaining length
@@ -77,7 +77,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MessageFlags.PubComp) {
+                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PubComp) {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
                 }
             }

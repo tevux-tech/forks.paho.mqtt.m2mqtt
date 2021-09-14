@@ -102,9 +102,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            buffer[index] = (byte)((MessageType.Publish << MSG_TYPE_OFFSET) | (qosLevel << QOS_LEVEL_OFFSET));
-            buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
-            buffer[index] |= retain ? (byte)(1 << RETAIN_FLAG_OFFSET) : (byte)0x00;
+            buffer[index] = (byte)((MessageType.Publish << FixedHeader.TypeOffset) | (qosLevel << FixedHeader.QosLevelOffset));
+            buffer[index] |= dupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
+            buffer[index] |= retain ? (byte)(1 << FixedHeader.RetainFlagOffset) : (byte)0x00;
             index++;
 
             // encode remaining length
@@ -160,15 +160,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             msg.Topic = new string(Encoding.UTF8.GetChars(topicUtf8));
 
             // read QoS level from fixed header
-            msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);
+            msg.qosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
             // check wrong QoS level (both bits can't be set 1)
             if (msg.qosLevel > QosLevels.ExactlyOnce) {
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
             }
             // read DUP flag from fixed header
-            msg.dupFlag = (((fixedHeaderFirstByte & DUP_FLAG_MASK) >> DUP_FLAG_OFFSET) == 0x01);
+            msg.dupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
             // read retain flag from fixed header
-            msg.retain = (((fixedHeaderFirstByte & RETAIN_FLAG_MASK) >> RETAIN_FLAG_OFFSET) == 0x01);
+            msg.retain = (((fixedHeaderFirstByte & FixedHeader.RetainFlagMask) >> FixedHeader.RetainFlagOffset) == 0x01);
 
             // message id is valid only with QOS level 1 or QOS level 2
             if ((msg.qosLevel == QosLevels.AtLeastOnce) ||

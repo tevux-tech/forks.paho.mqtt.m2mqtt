@@ -59,12 +59,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PubRel << MSG_TYPE_OFFSET) | MessageFlags.PubRel; // [v.3.1.1]
+                buffer[index++] = (MessageType.PubRel << FixedHeader.TypeOffset) | MessageFlags.PubRel; // [v.3.1.1]
             }
             else {
-                buffer[index] = (byte)((MessageType.PubRel << MSG_TYPE_OFFSET) |
-                                   (qosLevel << QOS_LEVEL_OFFSET));
-                buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
+                buffer[index] = (byte)((MessageType.PubRel << FixedHeader.TypeOffset) |
+                                   (qosLevel << FixedHeader.QosLevelOffset));
+                buffer[index] |= dupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
                 index++;
             }
 
@@ -85,7 +85,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MessageFlags.PubRel) {
+                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PubRel) {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
                 }
             }
@@ -101,9 +101,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 // only 3.1.0
 
                 // read QoS level from fixed header (would be QoS Level 1)
-                msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);
+                msg.qosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
                 // read DUP flag from fixed header
-                msg.dupFlag = (((fixedHeaderFirstByte & DUP_FLAG_MASK) >> DUP_FLAG_OFFSET) == 0x01);
+                msg.dupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
             }
 
             // message id

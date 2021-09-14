@@ -50,7 +50,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MessageFlags.Unsubscribe) {
+                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Unsubscribe) {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
                 }
             }
@@ -66,9 +66,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 // only 3.1.0
 
                 // read QoS level from fixed header
-                msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);
+                msg.qosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
                 // read DUP flag from fixed header
-                msg.dupFlag = (((fixedHeaderFirstByte & DUP_FLAG_MASK) >> DUP_FLAG_OFFSET) == 0x01);
+                msg.dupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
                 // retain flag not used
                 msg.retain = false;
             }
@@ -149,12 +149,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.Unsubscribe << MSG_TYPE_OFFSET) | MessageFlags.Unsubscribe; // [v.3.1.1]
+                buffer[index++] = (MessageType.Unsubscribe << FixedHeader.TypeOffset) | MessageFlags.Unsubscribe; // [v.3.1.1]
             }
             else {
-                buffer[index] = (byte)((MessageType.Unsubscribe << MSG_TYPE_OFFSET) |
-                                   (qosLevel << QOS_LEVEL_OFFSET));
-                buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
+                buffer[index] = (byte)((MessageType.Unsubscribe << FixedHeader.TypeOffset) |
+                                   (qosLevel << FixedHeader.QosLevelOffset));
+                buffer[index] |= dupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
                 index++;
             }
 
