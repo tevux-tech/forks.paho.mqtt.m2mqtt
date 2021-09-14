@@ -16,13 +16,11 @@ Contributors:
 
 using System.Diagnostics;
 
-namespace uPLibrary.Networking.M2Mqtt.Utility
-{
+namespace uPLibrary.Networking.M2Mqtt.Utility {
     /// <summary>
     /// Tracing levels
     /// </summary>
-    public enum TraceLevel
-    {
+    public enum TraceLevel {
         Error = 0x01,
         Warning = 0x02,
         Information = 0x04,
@@ -37,48 +35,37 @@ namespace uPLibrary.Networking.M2Mqtt.Utility
     /// <summary>
     /// Tracing class
     /// </summary>
-    public static class Trace
-    {
+    public static class Trace {
         public static TraceLevel TraceLevel = TraceLevel.Error;
         public static WriteTrace TraceListener = delegate { };
 
         [Conditional("DEBUG")]
-        public static void Debug(string format, params object[] args)
-        {
-            if (TraceListener != null)
-            {
+        public static void Debug(string format, params object[] args) {
+            if (TraceListener != null) {
                 TraceListener(format, args);
             }
         }
 
-        public static void WriteLine(TraceLevel level, string format)
-        {
-            if (TraceListener != null && (level & TraceLevel) > 0)
-            {
+        public static void WriteLine(TraceLevel level, string format) {
+            if (TraceListener != null && (level & TraceLevel) > 0) {
                 TraceListener(format);
             }
         }
 
-        public static void WriteLine(TraceLevel level, string format, object arg1)
-        {
-            if (TraceListener != null && (level & TraceLevel) > 0)
-            {
+        public static void WriteLine(TraceLevel level, string format, object arg1) {
+            if (TraceListener != null && (level & TraceLevel) > 0) {
                 TraceListener(format, arg1);
             }
         }
 
-        public static void WriteLine(TraceLevel level, string format, object arg1, object arg2)
-        {
-            if (TraceListener != null && (level & TraceLevel) > 0)
-            {
+        public static void WriteLine(TraceLevel level, string format, object arg1, object arg2) {
+            if (TraceListener != null && (level & TraceLevel) > 0) {
                 TraceListener(format, arg1, arg2);
             }
         }
 
-        public static void WriteLine(TraceLevel level, string format, object arg1, object arg2, object arg3)
-        {
-            if (TraceListener != null && (level & TraceLevel) > 0)
-            {
+        public static void WriteLine(TraceLevel level, string format, object arg1, object arg2, object arg3) {
+            if (TraceListener != null && (level & TraceLevel) > 0) {
                 TraceListener(format, arg1, arg2, arg3);
             }
         }

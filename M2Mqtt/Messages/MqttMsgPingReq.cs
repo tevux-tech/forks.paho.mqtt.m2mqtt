@@ -16,25 +16,21 @@ Contributors:
 
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PINGREQ message from client to broker
     /// </summary>
-    public class MqttMsgPingReq : MqttMsgBase
-    {
+    public class MqttMsgPingReq : MqttMsgBase {
         /// <summary>
         /// Constructor
         /// </summary>
-        public MqttMsgPingReq()
-        {
+        public MqttMsgPingReq() {
             type = MessageType.PingReq;
         }
 
-        public override byte[] GetBytes(byte protocolVersion)
-        {
-            byte[] buffer = new byte[2];
-            int index = 0;
+        public override byte[] GetBytes(byte protocolVersion) {
+            var buffer = new byte[2];
+            var index = 0;
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
@@ -53,12 +49,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="protocolVersion">Protocol Version</param>
         /// <param name="channel">Channel connected to the broker</param>
         /// <returns>PINGREQ message instance</returns>
-        public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
-        {
-            MqttMsgPingReq msg = new MqttMsgPingReq();
+        public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+            var msg = new MqttMsgPingReq();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
                 if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_PINGREQ_FLAG_BITS)
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
@@ -66,13 +60,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // already know remaininglength is zero (MQTT specification),
             // so it isn't necessary to read other data from socket
-            int remainingLength = decodeRemainingLength(channel);
+            var remainingLength = DecodeRemainingLength(channel);
 
             return msg;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
 #if TRACE
             return GetTraceString(
                 "PINGREQ",

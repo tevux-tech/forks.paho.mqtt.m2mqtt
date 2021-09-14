@@ -18,13 +18,11 @@ using System;
 using System.Text;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for CONNECT message from client to broker
     /// </summary>
-    public class MqttMsgConnect : MqttMsgBase
-    {
+    public class MqttMsgConnect : MqttMsgBase {
         #region Constants...
 
         // protocol name supported
@@ -77,8 +75,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         public byte ProtocolVersion { get; set; }
         public string ClientId { get; set; }
 
-        public bool WillRetain
-        {
+        public bool WillRetain {
             get { return willRetain; }
             set { willRetain = value; }
         }
@@ -86,8 +83,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <summary>
         /// Will QOS level
         /// </summary>
-        public byte WillQosLevel
-        {
+        public byte WillQosLevel {
             get { return willQosLevel; }
             set { willQosLevel = value; }
         }
@@ -108,8 +104,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <summary>
         /// Constructor
         /// </summary>
-        public MqttMsgConnect()
-        {
+        public MqttMsgConnect() {
             type = MessageType.Connect;
         }
 
@@ -118,8 +113,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// </summary>
         /// <param name="clientId">Client identifier</param>
         public MqttMsgConnect(string clientId) :
-            this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KEEP_ALIVE_PERIOD_DEFAULT, PROTOCOL_VERSION_V3_1_1)
-        {
+            this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KEEP_ALIVE_PERIOD_DEFAULT, PROTOCOL_VERSION_V3_1_1) {
         }
 
         /// <summary>
@@ -147,8 +141,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             bool cleanSession,
             ushort keepAlivePeriod,
             byte protocolVersion
-            )
-        {
+            ) {
             type = MessageType.Connect;
 
             ClientId = clientId;
@@ -173,10 +166,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="protocolVersion">Protocol Version</param>
         /// <param name="channel">Channel connected to the broker</param>
         /// <returns>CONNECT message instance</returns>
-        public static MqttMsgConnect Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
-        {
+        public static MqttMsgConnect Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
-            int index = 0;
+            var index = 0;
             int protNameUtf8Length;
             byte[] protNameUtf8;
             bool isUsernameFlag;
@@ -191,10 +183,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             byte[] usernameUtf8;
             int passwordUtf8Length;
             byte[] passwordUtf8;
-            MqttMsgConnect msg = new MqttMsgConnect();
+            var msg = new MqttMsgConnect();
 
             // get remaining length and allocate buffer
-            int remainingLength = decodeRemainingLength(channel);
+            var remainingLength = DecodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
@@ -246,8 +238,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 throw new MqttClientException(MqttClientErrorCode.InvalidClientId);
 
             // will topic and will message
-            if (msg.WillFlag)
-            {
+            if (msg.WillFlag) {
                 willTopicUtf8Length = ((buffer[index++] << 8) & 0xFF00);
                 willTopicUtf8Length |= buffer[index++];
                 willTopicUtf8 = new byte[willTopicUtf8Length];
@@ -264,8 +255,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // username
-            if (isUsernameFlag)
-            {
+            if (isUsernameFlag) {
                 usernameUtf8Length = ((buffer[index++] << 8) & 0xFF00);
                 usernameUtf8Length |= buffer[index++];
                 usernameUtf8 = new byte[usernameUtf8Length];
@@ -275,8 +265,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // password
-            if (isPasswordFlag)
-            {
+            if (isPasswordFlag) {
                 passwordUtf8Length = ((buffer[index++] << 8) & 0xFF00);
                 passwordUtf8Length |= buffer[index++];
                 passwordUtf8 = new byte[passwordUtf8Length];
@@ -288,24 +277,22 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return msg;
         }
 
-        public override byte[] GetBytes(byte protocolVersion)
-        {
-            int fixedHeaderSize = 0;
-            int varHeaderSize = 0;
-            int payloadSize = 0;
-            int remainingLength = 0;
+        public override byte[] GetBytes(byte protocolVersion) {
+            var fixedHeaderSize = 0;
+            var varHeaderSize = 0;
+            var payloadSize = 0;
+            var remainingLength = 0;
             byte[] buffer;
-            int index = 0;
+            var index = 0;
 
-            byte[] clientIdUtf8 = Encoding.UTF8.GetBytes(ClientId);
-            byte[] willTopicUtf8 = (WillFlag && (WillTopic != null)) ? Encoding.UTF8.GetBytes(WillTopic) : null;
-            byte[] willMessageUtf8 = (WillFlag && (WillMessage != null)) ? Encoding.UTF8.GetBytes(WillMessage) : null;
-            byte[] usernameUtf8 = ((Username != null) && (Username.Length > 0)) ? Encoding.UTF8.GetBytes(Username) : null;
-            byte[] passwordUtf8 = ((Password != null) && (Password.Length > 0)) ? Encoding.UTF8.GetBytes(Password) : null;
+            var clientIdUtf8 = Encoding.UTF8.GetBytes(ClientId);
+            var willTopicUtf8 = (WillFlag && (WillTopic != null)) ? Encoding.UTF8.GetBytes(WillTopic) : null;
+            var willMessageUtf8 = (WillFlag && (WillMessage != null)) ? Encoding.UTF8.GetBytes(WillMessage) : null;
+            var usernameUtf8 = ((Username != null) && (Username.Length > 0)) ? Encoding.UTF8.GetBytes(Username) : null;
+            var passwordUtf8 = ((Password != null) && (Password.Length > 0)) ? Encoding.UTF8.GetBytes(Password) : null;
 
             // [v3.1.1]
-            if (ProtocolVersion == PROTOCOL_VERSION_V3_1_1)
-            {
+            if (ProtocolVersion == PROTOCOL_VERSION_V3_1_1) {
                 // will flag set, will topic and will message MUST be present
                 if (WillFlag && ((willQosLevel >= 0x03) ||
                                        (willTopicUtf8 == null) || (willMessageUtf8 == null) ||
@@ -324,20 +311,17 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 throw new MqttClientException(MqttClientErrorCode.KeepAliveWrong);
 
             // check on will QoS Level
-            if ((willQosLevel < QosLevels.AtMostOnce) || (willQosLevel > QosLevels.ExactlyOnce))
-            {
+            if ((willQosLevel < QosLevels.AtMostOnce) || (willQosLevel > QosLevels.ExactlyOnce)) {
                 throw new MqttClientException(MqttClientErrorCode.WillWrong);
             }
 
             // protocol name field size
             // MQTT version 3.1
-            if (ProtocolVersion == PROTOCOL_VERSION_V3_1)
-            {
+            if (ProtocolVersion == PROTOCOL_VERSION_V3_1) {
                 varHeaderSize += (PROTOCOL_NAME_LEN_SIZE + PROTOCOL_NAME_V3_1_SIZE);
             }
             // MQTT version 3.1.1
-            else
-            {
+            else {
                 varHeaderSize += (PROTOCOL_NAME_LEN_SIZE + PROTOCOL_NAME_V3_1_1_SIZE);
             }
             // protocol level field size
@@ -363,11 +347,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first byte of fixed header
             fixedHeaderSize = 1;
 
-            int temp = remainingLength;
+            var temp = remainingLength;
             // increase fixed header size based on remaining length
             // (each remaining length byte can encode until 128)
-            do
-            {
+            do {
                 fixedHeaderSize++;
                 temp = temp / 128;
             } while (temp > 0);
@@ -379,13 +362,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             buffer[index++] = (MessageType.Connect << MSG_TYPE_OFFSET) | MQTT_MSG_CONNECT_FLAG_BITS; // [v.3.1.1]
 
             // encode remaining length
-            index = encodeRemainingLength(remainingLength, buffer, index);
+            index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // protocol name
             buffer[index++] = 0; // MSB protocol name size
             // MQTT version 3.1
-            if (ProtocolVersion == PROTOCOL_VERSION_V3_1)
-            {
+            if (ProtocolVersion == PROTOCOL_VERSION_V3_1) {
                 buffer[index++] = PROTOCOL_NAME_V3_1_SIZE; // LSB protocol name size
                 Array.Copy(Encoding.UTF8.GetBytes(PROTOCOL_NAME_V3_1), 0, buffer, index, PROTOCOL_NAME_V3_1_SIZE);
                 index += PROTOCOL_NAME_V3_1_SIZE;
@@ -393,8 +375,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 buffer[index++] = PROTOCOL_VERSION_V3_1;
             }
             // MQTT version 3.1.1
-            else
-            {
+            else {
                 buffer[index++] = PROTOCOL_NAME_V3_1_1_SIZE; // LSB protocol name size
                 Array.Copy(Encoding.UTF8.GetBytes(PROTOCOL_NAME_V3_1_1), 0, buffer, index, PROTOCOL_NAME_V3_1_1_SIZE);
                 index += PROTOCOL_NAME_V3_1_1_SIZE;
@@ -425,8 +406,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             index += clientIdUtf8.Length;
 
             // will topic
-            if (WillFlag && (willTopicUtf8 != null))
-            {
+            if (WillFlag && (willTopicUtf8 != null)) {
                 buffer[index++] = (byte)((willTopicUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(willTopicUtf8.Length & 0x00FF); // LSB
                 Array.Copy(willTopicUtf8, 0, buffer, index, willTopicUtf8.Length);
@@ -434,8 +414,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // will message
-            if (WillFlag && (willMessageUtf8 != null))
-            {
+            if (WillFlag && (willMessageUtf8 != null)) {
                 buffer[index++] = (byte)((willMessageUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(willMessageUtf8.Length & 0x00FF); // LSB
                 Array.Copy(willMessageUtf8, 0, buffer, index, willMessageUtf8.Length);
@@ -443,8 +422,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // username
-            if (usernameUtf8 != null)
-            {
+            if (usernameUtf8 != null) {
                 buffer[index++] = (byte)((usernameUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(usernameUtf8.Length & 0x00FF); // LSB
                 Array.Copy(usernameUtf8, 0, buffer, index, usernameUtf8.Length);
@@ -452,8 +430,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // password
-            if (passwordUtf8 != null)
-            {
+            if (passwordUtf8 != null) {
                 buffer[index++] = (byte)((passwordUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(passwordUtf8.Length & 0x00FF); // LSB
                 Array.Copy(passwordUtf8, 0, buffer, index, passwordUtf8.Length);
@@ -463,8 +440,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return buffer;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
 #if TRACE
             return GetTraceString(
                 "CONNECT",

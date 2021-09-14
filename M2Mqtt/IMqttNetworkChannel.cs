@@ -14,16 +14,11 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
-using System.Text;
-
-namespace uPLibrary.Networking.M2Mqtt
-{
+namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
     /// Interface for channel under MQTT library
     /// </summary>
-    public interface IMqttNetworkChannel
-    {
+    public interface IMqttNetworkChannel {
         /// <summary>
         /// Data available on channel
         /// </summary>
@@ -60,7 +55,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// Connect to remote server
         /// </summary>
         void Connect();
-        
+
         /// <summary>
         /// Accept client connection
         /// </summary>

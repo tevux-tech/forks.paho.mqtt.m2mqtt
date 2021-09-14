@@ -18,28 +18,23 @@ using System;
 using System.Text;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBLISH message from client to broker
     /// </summary>
-    public class MqttMsgPublish : MqttMsgBase
-    {
+    public class MqttMsgPublish : MqttMsgBase {
         public string Topic { get; set; }
 
         public byte[] Message { get; set; }
 
-        public MqttMsgPublish()
-        {
+        public MqttMsgPublish() {
             type = MessageType.Publish;
         }
 
-        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QosLevels.AtMostOnce, false)
-        {
+        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QosLevels.AtMostOnce, false) {
         }
 
-        public MqttMsgPublish(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain) : base()
-        {
+        public MqttMsgPublish(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain) : base() {
             type = MessageType.Publish;
 
             Topic = topic;
@@ -50,14 +45,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             messageId = 0;
         }
 
-        public override byte[] GetBytes(byte protocolVersion)
-        {
-            int fixedHeaderSize = 0;
-            int varHeaderSize = 0;
-            int payloadSize = 0;
-            int remainingLength = 0;
+        public override byte[] GetBytes(byte protocolVersion) {
+            var fixedHeaderSize = 0;
+            var varHeaderSize = 0;
+            var payloadSize = 0;
+            var remainingLength = 0;
             byte[] buffer;
-            int index = 0;
+            var index = 0;
 
             // topic can't contain wildcards
             if ((Topic.IndexOf('#') != -1) || (Topic.IndexOf('+') != -1))
@@ -71,15 +65,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             if (qosLevel > QosLevels.ExactlyOnce)
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
 
-            byte[] topicUtf8 = Encoding.UTF8.GetBytes(Topic);
+            var topicUtf8 = Encoding.UTF8.GetBytes(Topic);
 
             // topic name
             varHeaderSize += topicUtf8.Length + 2;
 
             // message id is valid only with QOS level 1 or QOS level 2
             if ((qosLevel == QosLevels.AtLeastOnce) ||
-                (qosLevel == QosLevels.ExactlyOnce))
-            {
+                (qosLevel == QosLevels.ExactlyOnce)) {
                 varHeaderSize += MessageIdSize;
             }
 
@@ -93,11 +86,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first byte of fixed header
             fixedHeaderSize = 1;
 
-            int temp = remainingLength;
+            var temp = remainingLength;
             // increase fixed header size based on remaining length
             // (each remaining length byte can encode until 128)
-            do
-            {
+            do {
                 fixedHeaderSize++;
                 temp = temp / 128;
             } while (temp > 0);
@@ -113,7 +105,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             index++;
 
             // encode remaining length
-            index = encodeRemainingLength(remainingLength, buffer, index);
+            index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // topic name
             buffer[index++] = (byte)((topicUtf8.Length >> 8) & 0x00FF); // MSB
@@ -123,8 +115,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // message id is valid only with QOS level 1 or QOS level 2
             if ((qosLevel == QosLevels.AtLeastOnce) ||
-                (qosLevel == QosLevels.ExactlyOnce))
-            {
+                (qosLevel == QosLevels.ExactlyOnce)) {
                 // check message identifier assigned
                 if (messageId == 0)
                     throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
@@ -133,8 +124,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // check on message with zero length
-            if (Message != null)
-            {
+            if (Message != null) {
                 // message data
                 Array.Copy(Message, 0, buffer, index, Message.Length);
                 index += Message.Length;
@@ -150,20 +140,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="protocolVersion">Protocol Version</param>
         /// <param name="channel">Channel connected to the broker</param>
         /// <returns>PUBLISH message instance</returns>
-        public static MqttMsgPublish Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
-        {
+        public static MqttMsgPublish Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
-            int index = 0;
+            var index = 0;
             byte[] topicUtf8;
             int topicUtf8Length;
-            MqttMsgPublish msg = new MqttMsgPublish();
+            var msg = new MqttMsgPublish();
 
             // get remaining length and allocate buffer
-            int remainingLength = decodeRemainingLength(channel);
+            var remainingLength = DecodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
-            int received = channel.Receive(buffer);
+            var received = channel.Receive(buffer);
 
             // topic name
             topicUtf8Length = ((buffer[index++] << 8) & 0xFF00);
@@ -185,17 +174,16 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // message id is valid only with QOS level 1 or QOS level 2
             if ((msg.qosLevel == QosLevels.AtLeastOnce) ||
-                (msg.qosLevel == QosLevels.ExactlyOnce))
-            {
+                (msg.qosLevel == QosLevels.ExactlyOnce)) {
                 // message id
                 msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
                 msg.messageId |= (buffer[index++]);
             }
 
             // get payload with message data
-            int messageSize = remainingLength - index;
-            int remaining = messageSize;
-            int messageOffset = 0;
+            var messageSize = remainingLength - index;
+            var remaining = messageSize;
+            var messageOffset = 0;
             msg.Message = new byte[messageSize];
 
             // BUG FIX 26/07/2013 : receiving large payload
@@ -206,8 +194,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             messageOffset += (received - index);
 
             // if payload isn't finished
-            while (remaining > 0)
-            {
+            while (remaining > 0) {
                 // receive other payload data
                 received = channel.Receive(buffer);
                 Array.Copy(buffer, 0, msg.Message, messageOffset, received);
@@ -218,8 +205,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return msg;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
 #if TRACE
             return GetTraceString(
                 "PUBLISH",

@@ -16,13 +16,11 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Event Args class for CONNECT message received from client
     /// </summary>
-    public class MqttMsgConnectEventArgs : EventArgs
-    {
+    public class MqttMsgConnectEventArgs : EventArgs {
         /// <summary>
         /// Message received from client
         /// </summary>
@@ -32,8 +30,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// Constructor
         /// </summary>
         /// <param name="msg">CONNECT message received from client</param>
-        public MqttMsgConnectEventArgs(MqttMsgConnect connect)
-        {
+        public MqttMsgConnectEventArgs(MqttMsgConnect connect) {
             Message = connect;
         }
     }

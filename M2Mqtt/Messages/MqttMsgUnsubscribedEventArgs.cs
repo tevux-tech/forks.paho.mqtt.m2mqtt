@@ -16,17 +16,14 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Event Args class for unsubscribed topic
     /// </summary>
-    public class MqttMsgUnsubscribedEventArgs : EventArgs
-    {
+    public class MqttMsgUnsubscribedEventArgs : EventArgs {
         public ushort MessageId { get; internal set; }
 
-        public MqttMsgUnsubscribedEventArgs(ushort messageId)
-        {
+        public MqttMsgUnsubscribedEventArgs(ushort messageId) {
             MessageId = messageId;
         }
     }

@@ -14,18 +14,13 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
 using System.Text;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Base class for all MQTT messages
     /// </summary>
-    public abstract class MqttMsgBase
-    {
-        #region Constants...
-
+    public abstract class MqttMsgBase {
         // mask, offset and size for fixed header fields
         internal const byte MSG_TYPE_MASK = 0xF0;
         internal const byte MSG_TYPE_OFFSET = 0x04;
@@ -43,8 +38,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         internal const byte RETAIN_FLAG_OFFSET = 0x00;
         internal const byte RETAIN_FLAG_SIZE = 0x01;
 
-        public class MessageType
-        {
+        public class MessageType {
             public const byte Connect = 0x01;
             public const byte ConAck = 0x02;
             public const byte Publish = 0x03;
@@ -79,8 +73,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         internal const byte MQTT_MSG_DISCONNECT_FLAG_BITS = 0x00;
 
         // QOS levels
-        public class QosLevels
-        {
+        public class QosLevels {
             public const byte AtMostOnce = 0x00;
             public const byte AtLeastOnce = 0x01;
             public const byte ExactlyOnce = 0x02;
@@ -94,116 +87,77 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         internal const ushort MinTopicLength = 1;
         internal const byte MessageIdSize = 2;
 
-        #endregion
-
-        #region Properties...
-
-        /// <summary>
-        /// Message type
-        /// </summary>
-        public byte Type
-        {
+        public byte Type {
             get { return type; }
             set { type = value; }
         }
 
-        /// <summary>
-        /// Duplicate message flag
-        /// </summary>
-        public bool DupFlag
-        {
+        public bool DupFlag {
             get { return dupFlag; }
             set { dupFlag = value; }
         }
 
-        /// <summary>
-        /// Quality of Service level
-        /// </summary>
-        public byte QosLevel
-        {
+        public byte QosLevel {
             get { return qosLevel; }
             set { qosLevel = value; }
         }
 
-        /// <summary>
-        /// Retain message flag
-        /// </summary>
-        public bool Retain
-        {
+        public bool Retain {
             get { return retain; }
             set { retain = value; }
         }
 
-        /// <summary>
-        /// Message identifier for the message
-        /// </summary>
-        public ushort MessageId
-        {
+        public ushort MessageId {
             get { return messageId; }
             set { messageId = value; }
         }
 
-        #endregion
 
-        // message type
         protected byte type;
-        // duplicate delivery
         protected bool dupFlag;
-        // quality of service level
         protected byte qosLevel;
-        // retain flag
         protected bool retain;
-        // message identifier
         protected ushort messageId;
 
         /// <summary>
         /// Returns message bytes rapresentation
         /// </summary>
-        /// <param name="protocolVersion">Protocol version</param>
-        /// <returns>Bytes rapresentation</returns>
         public abstract byte[] GetBytes(byte protocolVersion);
 
         /// <summary>
         /// Encode remaining length and insert it into message buffer
         /// </summary>
-        /// <param name="remainingLength">Remaining length value to encode</param>
-        /// <param name="buffer">Message buffer for inserting encoded value</param>
         /// <param name="index">Index from which insert encoded value into buffer</param>
         /// <returns>Index updated</returns>
-        protected int encodeRemainingLength(int remainingLength, byte[] buffer, int index)
-        {
-            do
-            {
-                int digit = remainingLength % 128;
+        protected int EncodeRemainingLength(int remainingLength, byte[] buffer, int index) {
+            do {
+                var digit = remainingLength % 128;
                 remainingLength /= 128;
-                if (remainingLength > 0)
-                {
+                if (remainingLength > 0) {
                     digit |= 0x80;
                 }
                 buffer[index++] = (byte)digit;
             } while (remainingLength > 0);
+
             return index;
         }
 
         /// <summary>
         /// Decode remaining length reading bytes from socket
         /// </summary>
-        /// <param name="channel">Channel from reading bytes</param>
-        /// <returns>Decoded remaining length</returns>
-        protected static int decodeRemainingLength(IMqttNetworkChannel channel)
-        {
-            int multiplier = 1;
-            int value = 0;
-            byte[] nextByte = new byte[1];
+        protected static int DecodeRemainingLength(IMqttNetworkChannel channel) {
+            var multiplier = 1;
+            var value = 0;
+            var nextByte = new byte[1];
             int digit;
-            do
-            {
+            do {
                 // next digit from stream
                 channel.Receive(nextByte);
                 digit = nextByte[0];
                 value += ((digit & 127) * multiplier);
                 multiplier *= 128;
             } while ((digit & 128) != 0);
+
             return value;
         }
 
@@ -211,25 +165,16 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <summary>
         /// Returns a string representation of the message for tracing
         /// </summary>
-        /// <param name="name">Message name</param>
-        /// <param name="fieldNames">Message fields name</param>
-        /// <param name="fieldValues">Message fields value</param>
-        /// <returns>String representation of the message</returns>
-        protected string GetTraceString(string name, object[] fieldNames, object[] fieldValues)
-        {
-            StringBuilder sb = new StringBuilder();
+        protected string GetTraceString(string name, object[] fieldNames, object[] fieldValues) {
+            var sb = new StringBuilder();
             sb.Append(name);
 
-            if ((fieldNames != null) && (fieldValues != null))
-            {
+            if ((fieldNames != null) && (fieldValues != null)) {
                 sb.Append("(");
-                bool addComma = false;
-                for (int i = 0; i < fieldValues.Length; i++)
-                {
-                    if (fieldValues[i] != null)
-                    {
-                        if (addComma)
-                        {
+                var addComma = false;
+                for (var i = 0; i < fieldValues.Length; i++) {
+                    if (fieldValues[i] != null) {
+                        if (addComma) {
                             sb.Append(",");
                         }
 
@@ -245,15 +190,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return sb.ToString();
         }
 
-        object GetStringObject(object value)
-        {
-            byte[] binary = value as byte[];
-            if (binary != null)
-            {
-                string hexChars = "0123456789ABCDEF";
-                StringBuilder sb = new StringBuilder(binary.Length * 2);
-                for (int i = 0; i < binary.Length; ++i)
-                {
+        object GetStringObject(object value) {
+            var binary = value as byte[];
+            if (binary != null) {
+                var hexChars = "0123456789ABCDEF";
+                var sb = new StringBuilder(binary.Length * 2);
+                for (var i = 0; i < binary.Length; ++i) {
                     sb.Append(hexChars[binary[i] >> 4]);
                     sb.Append(hexChars[binary[i] & 0x0F]);
                 }
@@ -262,12 +204,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             var list = value as object[];
-            if (list != null)
-            {
-                StringBuilder sb = new StringBuilder();
+            if (list != null) {
+                var sb = new StringBuilder();
                 sb.Append('[');
-                for (int i = 0; i < list.Length; ++i)
-                {
+                for (var i = 0; i < list.Length; ++i) {
                     if (i > 0)
                         sb.Append(',');
                     sb.Append(list[i]);

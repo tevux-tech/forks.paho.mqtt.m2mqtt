@@ -17,27 +17,22 @@ Contributors:
 using System;
 // if NOT .Net Micro Framework
 using System.Collections.Generic;
-using System.Collections;
 using System.Text;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for UNSUBSCRIBE message from client to broker
     /// </summary>
-    public class MqttMsgUnsubscribe : MqttMsgBase
-    {
+    public class MqttMsgUnsubscribe : MqttMsgBase {
 
         public string[] TopicsToUnsubscribe { get; set; }
 
-        public MqttMsgUnsubscribe()
-        {
+        public MqttMsgUnsubscribe() {
             type = MessageType.Unsubscribe;
         }
 
-        public MqttMsgUnsubscribe(string[] topicsToUnsubscribe)
-        {
+        public MqttMsgUnsubscribe(string[] topicsToUnsubscribe) {
             type = MessageType.Unsubscribe;
 
             TopicsToUnsubscribe = topicsToUnsubscribe;
@@ -53,30 +48,27 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="protocolVersion">Protocol Version</param>
         /// <param name="channel">Channel connected to the broker</param>
         /// <returns>UNSUBSCRIBE message instance</returns>
-        public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
-        {
+        public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
-            int index = 0;
+            var index = 0;
             byte[] topicUtf8;
             int topicUtf8Length;
-            MqttMsgUnsubscribe msg = new MqttMsgUnsubscribe();
+            var msg = new MqttMsgUnsubscribe();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
                 if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_UNSUBSCRIBE_FLAG_BITS)
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // get remaining length and allocate buffer
-            int remainingLength = decodeRemainingLength(channel);
+            var remainingLength = DecodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
-            int received = channel.Receive(buffer);
+            var received = channel.Receive(buffer);
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1) {
                 // only 3.1.0
 
                 // read QoS level from fixed header
@@ -96,8 +88,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             IList<string> tmpTopics = new List<string>();
 
-            do
-            {
+            do {
                 // topic name
                 topicUtf8Length = ((buffer[index++] << 8) & 0xFF00);
                 topicUtf8Length |= buffer[index++];
@@ -109,22 +100,20 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
             // copy from list to array
             msg.TopicsToUnsubscribe = new string[tmpTopics.Count];
-            for (int i = 0; i < tmpTopics.Count; i++)
-            {
+            for (var i = 0; i < tmpTopics.Count; i++) {
                 msg.TopicsToUnsubscribe[i] = (string)tmpTopics[i];
             }
 
             return msg;
         }
 
-        public override byte[] GetBytes(byte protocolVersion)
-        {
-            int fixedHeaderSize = 0;
-            int varHeaderSize = 0;
-            int payloadSize = 0;
-            int remainingLength = 0;
+        public override byte[] GetBytes(byte protocolVersion) {
+            var fixedHeaderSize = 0;
+            var varHeaderSize = 0;
+            var payloadSize = 0;
+            var remainingLength = 0;
             byte[] buffer;
-            int index = 0;
+            var index = 0;
 
             // topics list empty
             if ((TopicsToUnsubscribe == null) || (TopicsToUnsubscribe.Length == 0))
@@ -133,11 +122,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // message identifier
             varHeaderSize += MessageIdSize;
 
-            int topicIdx = 0;
-            byte[][] topicsUtf8 = new byte[TopicsToUnsubscribe.Length][];
+            var topicIdx = 0;
+            var topicsUtf8 = new byte[TopicsToUnsubscribe.Length][];
 
-            for (topicIdx = 0; topicIdx < TopicsToUnsubscribe.Length; topicIdx++)
-            {
+            for (topicIdx = 0; topicIdx < TopicsToUnsubscribe.Length; topicIdx++) {
                 // check topic length
                 if ((TopicsToUnsubscribe[topicIdx].Length < MinTopicLength) || (TopicsToUnsubscribe[topicIdx].Length > MaxTopicLength))
                     throw new MqttClientException(MqttClientErrorCode.TopicLength);
@@ -152,11 +140,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first byte of fixed header
             fixedHeaderSize = 1;
 
-            int temp = remainingLength;
+            var temp = remainingLength;
             // increase fixed header size based on remaining length
             // (each remaining length byte can encode until 128)
-            do
-            {
+            do {
                 fixedHeaderSize++;
                 temp = temp / 128;
             } while (temp > 0);
@@ -167,8 +154,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
                 buffer[index++] = (MessageType.Unsubscribe << MSG_TYPE_OFFSET) | MQTT_MSG_UNSUBSCRIBE_FLAG_BITS; // [v.3.1.1]
-            else
-            {
+            else {
                 buffer[index] = (byte)((MessageType.Unsubscribe << MSG_TYPE_OFFSET) |
                                    (qosLevel << QOS_LEVEL_OFFSET));
                 buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
@@ -176,7 +162,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // encode remaining length
-            index = encodeRemainingLength(remainingLength, buffer, index);
+            index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // check message identifier assigned
             if (messageId == 0)
@@ -185,8 +171,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
 
             topicIdx = 0;
-            for (topicIdx = 0; topicIdx < TopicsToUnsubscribe.Length; topicIdx++)
-            {
+            for (topicIdx = 0; topicIdx < TopicsToUnsubscribe.Length; topicIdx++) {
                 // topic name
                 buffer[index++] = (byte)((topicsUtf8[topicIdx].Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(topicsUtf8[topicIdx].Length & 0x00FF); // LSB
@@ -197,8 +182,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return buffer;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
 #if TRACE
             return GetTraceString(
                 "UNSUBSCRIBE",

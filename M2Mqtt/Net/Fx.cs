@@ -16,20 +16,16 @@ Contributors:
 
 using System.Threading;
 
-namespace uPLibrary.Networking.M2Mqtt
-{
+namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
     /// Support methods fos specific framework
     /// </summary>
-    public class Fx
-    {
-        public static void StartThread(ThreadStart threadStart)
-        {
+    public class Fx {
+        public static void StartThread(ThreadStart threadStart) {
             new Thread(threadStart).Start();
         }
 
-        public static void SleepThread(int millisecondsTimeout)
-        {
+        public static void SleepThread(int millisecondsTimeout) {
             Thread.Sleep(millisecondsTimeout);
         }
     }

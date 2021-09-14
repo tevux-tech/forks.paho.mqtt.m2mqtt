@@ -14,16 +14,11 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
-using System.Text;
-
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Context for MQTT message
     /// </summary>
-    public class MqttMsgContext
-    {
+    public class MqttMsgContext {
         /// <summary>
         /// MQTT message
         /// </summary>
@@ -52,8 +47,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <summary>
         /// Unique key
         /// </summary>
-        public string Key 
-        {
+        public string Key {
             get { return Flow + "_" + Message.MessageId; }
         }
     }
@@ -61,8 +55,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// <summary>
     /// Flow of the message
     /// </summary>
-    public enum MqttMsgFlow
-    {
+    public enum MqttMsgFlow {
         /// <summary>
         /// To publish to subscribers
         /// </summary>
@@ -77,8 +70,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
     /// <summary>
     /// MQTT message state
     /// </summary>
-    public enum MqttMsgState
-    {
+    public enum MqttMsgState {
         /// <summary>
         /// QOS = 0, Message queued
         /// </summary>
@@ -118,7 +110,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// QOS = 2, start first phase handshake send PUBREC
         /// </summary>
         SendPubrec,
-        
+
         /// <summary>
         /// QOS = 2, start second phase handshake send PUBREL
         /// </summary>

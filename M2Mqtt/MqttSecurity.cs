@@ -14,13 +14,11 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt
-{
+namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
     /// Supported SSL/TLS protocol versions
     /// </summary>
-    public enum MqttSslProtocols
-    {
+    public enum MqttSslProtocols {
         None,
         SSLv3,
         TLSv1_0,

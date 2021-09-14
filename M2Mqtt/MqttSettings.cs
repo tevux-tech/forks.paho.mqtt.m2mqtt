@@ -14,13 +14,11 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt
-{
+namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
     /// Settings class for the MQTT broker
     /// </summary>
-    public class MqttSettings
-    {
+    public class MqttSettings {
         // default port for MQTT protocol
         public const int MQTT_BROKER_DEFAULT_PORT = 1883;
         public const int MQTT_BROKER_DEFAULT_SSL_PORT = 8883;
@@ -70,14 +68,12 @@ namespace uPLibrary.Networking.M2Mqtt
         /// Inflight queue size
         /// </summary>
         public int InflightQueueSize { get; set; }
-        
+
         /// <summary>
         /// Singleton instance of settings
         /// </summary>
-        public static MqttSettings Instance
-        {
-            get
-            {
+        public static MqttSettings Instance {
+            get {
                 if (instance == null)
                     instance = new MqttSettings();
                 return instance;
@@ -90,8 +86,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <summary>
         /// Constructor
         /// </summary>
-        private MqttSettings()
-        {
+        private MqttSettings() {
             Port = MQTT_BROKER_DEFAULT_PORT;
             SslPort = MQTT_BROKER_DEFAULT_SSL_PORT;
             TimeoutOnReceiving = MQTT_DEFAULT_TIMEOUT;

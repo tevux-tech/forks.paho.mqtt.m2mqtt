@@ -16,13 +16,11 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Event Args class for PUBLISH message received from broker
     /// </summary>
-    public class MqttMsgPublishEventArgs : EventArgs
-    {
+    public class MqttMsgPublishEventArgs : EventArgs {
 
         public string Topic { get; internal set; }
 
@@ -34,8 +32,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
         public bool Retain { get; internal set; }
 
-        public MqttMsgPublishEventArgs(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain)
-        {
+        public MqttMsgPublishEventArgs(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain) {
             Topic = topic;
             Message = message;
             DupFlag = dupFlag;

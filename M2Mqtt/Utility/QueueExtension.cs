@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -14,16 +14,13 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
 using System.Collections;
 
-namespace uPLibrary.Networking.M2Mqtt.Utility
-{
+namespace uPLibrary.Networking.M2Mqtt.Utility {
     /// <summary>
     /// Extension class for a Queue
     /// </summary>
-    internal static class QueueExtension
-    {
+    internal static class QueueExtension {
         /// <summary>
         /// Predicate for searching inside a queue
         /// </summary>
@@ -37,10 +34,8 @@ namespace uPLibrary.Networking.M2Mqtt.Utility
         /// <param name="queue">Queue in which to search</param>
         /// <param name="predicate">Predicate to verify to get item</param>
         /// <returns>Item matches the predicate</returns>
-        internal static object Get(this Queue queue, QueuePredicate predicate)
-        {
-            foreach (var item in queue)
-            {
+        internal static object Get(this Queue queue, QueuePredicate predicate) {
+            foreach (var item in queue) {
                 if (predicate(item))
                     return item;
             }

@@ -16,31 +16,27 @@ Contributors:
 
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBREL message from client top broker
     /// </summary>
-    public class MqttMsgPubrel : MqttMsgBase
-    {
+    public class MqttMsgPubrel : MqttMsgBase {
         /// <summary>
         /// Constructor
         /// </summary>
-        public MqttMsgPubrel()
-        {
+        public MqttMsgPubrel() {
             type = MessageType.PubRel;
             // PUBREL message use QoS Level 1 (not "officially" in 3.1.1)
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        public override byte[] GetBytes(byte protocolVersion)
-        {
-            int fixedHeaderSize = 0;
-            int varHeaderSize = 0;
-            int payloadSize = 0;
-            int remainingLength = 0;
+        public override byte[] GetBytes(byte protocolVersion) {
+            var fixedHeaderSize = 0;
+            var varHeaderSize = 0;
+            var payloadSize = 0;
+            var remainingLength = 0;
             byte[] buffer;
-            int index = 0;
+            var index = 0;
 
             // message identifier
             varHeaderSize += MessageIdSize;
@@ -50,11 +46,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first byte of fixed header
             fixedHeaderSize = 1;
 
-            int temp = remainingLength;
+            var temp = remainingLength;
             // increase fixed header size based on remaining length
             // (each remaining length byte can encode until 128)
-            do
-            {
+            do {
                 fixedHeaderSize++;
                 temp = temp / 128;
             } while (temp > 0);
@@ -65,8 +60,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
                 buffer[index++] = (MessageType.PubRel << MSG_TYPE_OFFSET) | MQTT_MSG_PUBREL_FLAG_BITS; // [v.3.1.1]
-            else
-            {
+            else {
                 buffer[index] = (byte)((MessageType.PubRel << MSG_TYPE_OFFSET) |
                                    (qosLevel << QOS_LEVEL_OFFSET));
                 buffer[index] |= dupFlag ? (byte)(1 << DUP_FLAG_OFFSET) : (byte)0x00;
@@ -74,7 +68,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             }
 
             // encode remaining length
-            index = encodeRemainingLength(remainingLength, buffer, index);
+            index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // get next message identifier
             buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
@@ -90,28 +84,25 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         /// <param name="protocolVersion">Protocol Version</param>
         /// <param name="channel">Channel connected to the broker</param>
         /// <returns>PUBREL message instance</returns>
-        public static MqttMsgPubrel Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
-        {
+        public static MqttMsgPubrel Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
-            int index = 0;
-            MqttMsgPubrel msg = new MqttMsgPubrel();
+            var index = 0;
+            var msg = new MqttMsgPubrel();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
                 if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_PUBREL_FLAG_BITS)
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // get remaining length and allocate buffer
-            int remainingLength = decodeRemainingLength(channel);
+            var remainingLength = DecodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
             channel.Receive(buffer);
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1) {
                 // only 3.1.0
 
                 // read QoS level from fixed header (would be QoS Level 1)
@@ -127,8 +118,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return msg;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
 #if TRACE
             return GetTraceString(
                 "PUBREL",

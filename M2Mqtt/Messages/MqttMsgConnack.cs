@@ -14,17 +14,13 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for CONNACK message from broker to client
     /// </summary>
-    public class MqttMsgConnack : MqttMsgBase
-    {
-        #region Constants...
+    public class MqttMsgConnack : MqttMsgBase {
 
         // return codes for CONNACK message
         public const byte CONN_ACCEPTED = 0x00;
@@ -46,9 +42,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
         private const byte CONN_RETURN_CODE_BYTE_OFFSET = 1;
         private const byte CONN_RETURN_CODE_BYTE_SIZE = 1;
 
-        #endregion
-
-
         // [v3.1.1] session present flag
         /// <summary>
         /// Session present flag
@@ -57,31 +50,28 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
 
         public byte ReturnCode { get; set; }
 
-        public MqttMsgConnack()
-        {
+        public MqttMsgConnack() {
             type = MessageType.ConAck;
         }
 
-        public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel)
-        {
+        public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
-            MqttMsgConnack msg = new MqttMsgConnack();
+            var msg = new MqttMsgConnack();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_CONNACK_FLAG_BITS)
+                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_CONNACK_FLAG_BITS) {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
+                }
             }
 
             // get remaining length and allocate buffer
-            int remainingLength = decodeRemainingLength(channel);
+            var remainingLength = DecodeRemainingLength(channel);
             buffer = new byte[remainingLength];
 
             // read bytes from socket...
             channel.Receive(buffer);
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
-            {
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] ... set session present flag ...
                 msg.SessionPresent = (buffer[CONN_ACK_FLAGS_BYTE_OFFSET] & SESSION_PRESENT_FLAG_MASK) != 0x00;
             }
@@ -91,14 +81,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return msg;
         }
 
-        public override byte[] GetBytes(byte ProtocolVersion)
-        {
-            int fixedHeaderSize = 0;
-            int varHeaderSize = 0;
-            int payloadSize = 0;
-            int remainingLength = 0;
+        public override byte[] GetBytes(byte ProtocolVersion) {
+            var fixedHeaderSize = 0;
+            var varHeaderSize = 0;
+            var payloadSize = 0;
+            var remainingLength = 0;
             byte[] buffer;
-            int index = 0;
+            var index = 0;
 
             if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
                 // flags byte and connect return code
@@ -112,11 +101,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             // first byte of fixed header
             fixedHeaderSize = 1;
 
-            int temp = remainingLength;
+            var temp = remainingLength;
             // increase fixed header size based on remaining length
             // (each remaining length byte can encode until 128)
-            do
-            {
+            do {
                 fixedHeaderSize++;
                 temp = temp / 128;
             } while (temp > 0);
@@ -131,7 +119,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
                 buffer[index++] = (byte)(MessageType.ConAck << MSG_TYPE_OFFSET);
 
             // encode remaining length
-            index = encodeRemainingLength(remainingLength, buffer, index);
+            index = EncodeRemainingLength(remainingLength, buffer, index);
 
             if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
                 // [v3.1.1] session present flag
@@ -146,8 +134,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages
             return buffer;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
 #if TRACE
             return GetTraceString(
                 "CONNACK",

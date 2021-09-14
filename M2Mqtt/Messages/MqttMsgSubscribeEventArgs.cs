@@ -16,21 +16,18 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages
-{
+namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Event Args class for subscribe request on topics
     /// </summary>
-    public class MqttMsgSubscribeEventArgs : EventArgs
-    {
+    public class MqttMsgSubscribeEventArgs : EventArgs {
         public ushort MessageId { get; internal set; }
 
         public string[] TopicsToSubscribe { get; internal set; }
 
         public byte[] QoSLevels { get; internal set; }
 
-        public MqttMsgSubscribeEventArgs(ushort messageId, string[] topics, byte[] qosLevels)
-        {
+        public MqttMsgSubscribeEventArgs(ushort messageId, string[] topics, byte[] qosLevels) {
             MessageId = messageId;
             TopicsToSubscribe = topics;
             QoSLevels = qosLevels;
