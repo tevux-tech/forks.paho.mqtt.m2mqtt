@@ -1208,8 +1208,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                                         }
                                         // QoS 1, PUBLISH message received from broker to acknowledge, send PUBACK
                                         else if (msgContext.Flow == MqttMsgFlow.ToAcknowledge) {
-                                            var puback = new MqttMsgPuback();
-                                            puback.MessageId = msgInflight.MessageId;
+                                            var puback = new MqttMsgPuback {
+                                                MessageId = msgInflight.MessageId
+                                            };
 
                                             Send(puback);
 
@@ -1243,8 +1244,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                                         }
                                         // QoS 2, PUBLISH message received from broker to acknowledge, send PUBREC, state change to wait PUBREL
                                         else if (msgContext.Flow == MqttMsgFlow.ToAcknowledge) {
-                                            var pubrec = new MqttMsgPubrec();
-                                            pubrec.MessageId = msgInflight.MessageId;
+                                            var pubrec = new MqttMsgPubrec {
+                                                MessageId = msgInflight.MessageId
+                                            };
 
                                             msgContext.State = MqttMsgState.WaitForPubrel;
 
@@ -1375,8 +1377,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                                                         Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
                                                     }
 
-                                                    var pubrel = new MqttMsgPubrel();
-                                                    pubrel.MessageId = msgInflight.MessageId;
+                                                    var pubrel = new MqttMsgPubrel {
+                                                        MessageId = msgInflight.MessageId
+                                                    };
 
                                                     msgContext.State = MqttMsgState.WaitForPubcomp;
                                                     msgContext.Timestamp = Environment.TickCount;
@@ -1453,8 +1456,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                                                         Trace.WriteLine(TraceLevel.Queuing, "dequeued {0}", msgReceived);
                                                     }
 
-                                                    var pubcomp = new MqttMsgPubcomp();
-                                                    pubcomp.MessageId = msgInflight.MessageId;
+                                                    var pubcomp = new MqttMsgPubcomp {
+                                                        MessageId = msgInflight.MessageId
+                                                    };
 
                                                     Send(pubcomp);
 
@@ -1585,8 +1589,9 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                                         // QoS 2, PUBREL message to send to broker, state change to wait PUBCOMP
                                         if (msgContext.Flow == MqttMsgFlow.ToPublish) {
-                                            var pubrel = new MqttMsgPubrel();
-                                            pubrel.MessageId = msgInflight.MessageId;
+                                            var pubrel = new MqttMsgPubrel {
+                                                MessageId = msgInflight.MessageId
+                                            };
 
                                             msgContext.State = MqttMsgState.WaitForPubcomp;
                                             msgContext.Timestamp = Environment.TickCount;
