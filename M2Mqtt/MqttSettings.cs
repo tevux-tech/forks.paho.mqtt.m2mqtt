@@ -74,16 +74,16 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         public static MqttSettings Instance {
             get {
-                if (instance == null) {
-                    instance = new MqttSettings();
+                if (_instance == null) {
+                    _instance = new MqttSettings();
                 }
 
-                return instance;
+                return _instance;
             }
         }
 
         // singleton instance
-        private static MqttSettings instance;
+        private static MqttSettings _instance;
 
         /// <summary>
         /// Constructor

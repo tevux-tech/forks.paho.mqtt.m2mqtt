@@ -27,8 +27,8 @@ namespace uPLibrary.Networking.M2Mqtt {
     /// Channel to communicate over the network
     /// </summary>
     public class MqttNetworkChannel : IMqttNetworkChannel {
-        private readonly RemoteCertificateValidationCallback userCertificateValidationCallback;
-        private readonly LocalCertificateSelectionCallback userCertificateSelectionCallback;
+        private readonly RemoteCertificateValidationCallback _userCertificateValidationCallback;
+        private readonly LocalCertificateSelectionCallback _userCertificateSelectionCallback;
 
         private Socket _socket;
         private bool _secure;
@@ -80,8 +80,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _secure = secure;
             _serverCert = serverCert;
             _sslProtocol = sslProtocol;
-            this.userCertificateValidationCallback = userCertificateValidationCallback;
-            this.userCertificateSelectionCallback = userCertificateSelectionCallback;
+            this._userCertificateValidationCallback = userCertificateValidationCallback;
+            this._userCertificateSelectionCallback = userCertificateSelectionCallback;
         }
 
         public MqttNetworkChannel(string remoteHostName, int remotePort) : this(remoteHostName, remotePort, false, null, null, MqttSslProtocols.None, null, null) {
@@ -122,8 +122,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _caCert = caCert;
             _clientCert = clientCert;
             _sslProtocol = sslProtocol;
-            this.userCertificateValidationCallback = userCertificateValidationCallback;
-            this.userCertificateSelectionCallback = userCertificateSelectionCallback;
+            this._userCertificateValidationCallback = userCertificateValidationCallback;
+            this._userCertificateSelectionCallback = userCertificateSelectionCallback;
 
             if (alpnProtocols != null) {
                 _alpnProtocols = alpnProtocols;
@@ -142,7 +142,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             if (_secure) {
                 // create SSL stream
                 _netStream = new NetworkStream(_socket);
-                _sslStream = new SslStream(_netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
+                _sslStream = new SslStream(_netStream, false, _userCertificateValidationCallback, _userCertificateSelectionCallback);
 
                 // server authentication (SSL/TLS handshake)
                 X509CertificateCollection clientCertificates = null;
@@ -274,7 +274,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             // secure channel requested
             if (_secure) {
                 _netStream = new NetworkStream(_socket);
-                _sslStream = new SslStream(_netStream, false, userCertificateValidationCallback, userCertificateSelectionCallback);
+                _sslStream = new SslStream(_netStream, false, _userCertificateValidationCallback, _userCertificateSelectionCallback);
                 _sslStream.AuthenticateAsServerAsync(_serverCert, false, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
             }
 
