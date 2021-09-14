@@ -20,7 +20,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgDisconnect : MqttMsgBase, ISentToBroker {
         public MqttMsgDisconnect() {
-            type = MessageType.Disconnect;
+            Type = MessageType.Disconnect;
         }
 
         public byte[] GetBytes() {

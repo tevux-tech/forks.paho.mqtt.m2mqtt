@@ -25,9 +25,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// Constructor
         /// </summary>
         public MqttMsgPubrel() {
-            type = MessageType.PubRel;
+            Type = MessageType.PubRel;
             // PUBREL message use QoS Level 1 (not "officially" in 3.1.1)
-            qosLevel = QosLevels.AtLeastOnce;
+            QosLevel = QosLevels.AtLeastOnce;
         }
 
         public byte[] GetBytes() {
@@ -64,8 +64,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // get next message identifier
-            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
+            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
 
             return buffer;
         }
@@ -88,15 +88,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             channel.Receive(buffer);
 
             // message id
-            msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.messageId |= (buffer[index++]);
+            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
+            msg.MessageId |= (buffer[index++]);
 
             return msg;
         }
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("PUBREL", new object[] { "messageId" }, new object[] { messageId });
+            return GetTraceString("PUBREL", new object[] { "messageId" }, new object[] { MessageId });
 #else
             return base.ToString();
 #endif

@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgUnsuback : MqttMsgBase {
         public MqttMsgUnsuback() {
-            type = MessageType.UnsubAck;
+            Type = MessageType.UnsubAck;
         }
 
         public static MqttMsgUnsuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
@@ -43,15 +43,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             channel.Receive(buffer);
 
             // message id
-            msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.messageId |= (buffer[index++]);
+            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
+            msg.MessageId |= (buffer[index++]);
 
             return msg;
         }
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("UNSUBACK", new object[] { "messageId" }, new object[] { messageId });
+            return GetTraceString("UNSUBACK", new object[] { "messageId" }, new object[] { MessageId });
 #else
             return base.ToString();
 #endif

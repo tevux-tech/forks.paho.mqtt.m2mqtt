@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgPubcomp : MqttMsgBase, ISentToBroker {
         public MqttMsgPubcomp() {
-            type = MessageType.PubComp;
+            Type = MessageType.PubComp;
         }
 
         public byte[] GetBytes() {
@@ -60,8 +60,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // get message identifier
-            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
+            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
 
             return buffer;
         }
@@ -84,15 +84,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             channel.Receive(buffer);
 
             // message id
-            msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.messageId |= (buffer[index++]);
+            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
+            msg.MessageId |= (buffer[index++]);
 
             return msg;
         }
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { messageId });
+            return GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { MessageId });
 #else
             return base.ToString();
 #endif

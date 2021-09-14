@@ -29,17 +29,17 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public byte[] QoSLevels { get; set; }
 
         public MqttMsgSubscribe() {
-            type = MessageType.Subscribe;
+            Type = MessageType.Subscribe;
         }
 
         public MqttMsgSubscribe(string[] topics, byte[] qosLevels) {
-            type = MessageType.Subscribe;
+            Type = MessageType.Subscribe;
 
             Topics = topics;
             QoSLevels = qosLevels;
 
             // SUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
-            qosLevel = QosLevels.AtLeastOnce;
+            QosLevel = QosLevels.AtLeastOnce;
         }
 
         public byte[] GetBytes() {
@@ -107,12 +107,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // check message identifier assigned (SUBSCRIBE uses QoS Level 1, so message id is mandatory)
-            if (messageId == 0) {
+            if (MessageId == 0) {
                 throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
             }
 
-            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
+            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
 
             topicIdx = 0;
             for (topicIdx = 0; topicIdx < Topics.Length; topicIdx++) {
@@ -131,7 +131,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("SUBSCRIBE", new object[] { "messageId", "topics", "qosLevels" }, new object[] { messageId, Topics, QoSLevels });
+            return GetTraceString("SUBSCRIBE", new object[] { "messageId", "topics", "qosLevels" }, new object[] { MessageId, Topics, QoSLevels });
 #else
             return base.ToString();
 #endif

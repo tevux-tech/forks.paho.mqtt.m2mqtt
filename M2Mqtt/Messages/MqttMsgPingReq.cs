@@ -16,21 +16,18 @@ Contributors:
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for PINGREQ message from client to broker
+    /// Class for PINGREQ message from client to broker. See section 3.12.
     /// </summary>
     public class MqttMsgPingReq : MqttMsgBase, ISentToBroker {
         public MqttMsgPingReq() {
-            type = MessageType.PingReq;
+            Type = MessageType.PingReq;
         }
 
         public byte[] GetBytes() {
+            // Message content is fixed, no variables here.
             var buffer = new byte[2];
-            var index = 0;
-
-            // first fixed header byte
-
-            buffer[index++] = (MessageType.PingReq << FixedHeader.TypeOffset) | MessageFlags.PingReq; // [v.3.1.1]
-            buffer[index++] = 0x00;
+            buffer[0] = 0b1100_0000;
+            buffer[1] = 0;
 
             return buffer;
         }

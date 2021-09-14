@@ -28,16 +28,16 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public string[] TopicsToUnsubscribe { get; set; }
 
         public MqttMsgUnsubscribe() {
-            type = MessageType.Unsubscribe;
+            Type = MessageType.Unsubscribe;
         }
 
         public MqttMsgUnsubscribe(string[] topicsToUnsubscribe) {
-            type = MessageType.Unsubscribe;
+            Type = MessageType.Unsubscribe;
 
             TopicsToUnsubscribe = topicsToUnsubscribe;
 
             // UNSUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
-            qosLevel = QosLevels.AtLeastOnce;
+            QosLevel = QosLevels.AtLeastOnce;
         }
 
         public byte[] GetBytes() {
@@ -93,12 +93,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // check message identifier assigned
-            if (messageId == 0) {
+            if (MessageId == 0) {
                 throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
             }
 
-            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
+            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
 
             topicIdx = 0;
             for (topicIdx = 0; topicIdx < TopicsToUnsubscribe.Length; topicIdx++) {
@@ -114,7 +114,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { messageId, TopicsToUnsubscribe });
+            return GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { MessageId, TopicsToUnsubscribe });
 #else
             return base.ToString();
 #endif

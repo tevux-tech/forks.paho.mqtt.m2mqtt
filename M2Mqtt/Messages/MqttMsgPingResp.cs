@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgPingResp : MqttMsgBase {
         public MqttMsgPingResp() {
-            type = MessageType.PingResp;
+            Type = MessageType.PingResp;
         }
 
         public static MqttMsgPingResp Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {

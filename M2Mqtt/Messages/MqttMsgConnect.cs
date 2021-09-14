@@ -63,14 +63,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         protected byte willQosLevel;
 
         public MqttMsgConnect() {
-            type = MessageType.Connect;
+            Type = MessageType.Connect;
         }
 
         public MqttMsgConnect(string clientId) : this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KeepAliveDefaultValue) {
         }
 
         public MqttMsgConnect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
-            type = MessageType.Connect;
+            Type = MessageType.Connect;
 
             ClientId = clientId;
             Username = username;

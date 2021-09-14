@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgPuback : MqttMsgBase, ISentToBroker {
         public MqttMsgPuback() {
-            type = MessageType.PubAck;
+            Type = MessageType.PubAck;
         }
         public static MqttMsgPuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             byte[] buffer;
@@ -42,8 +42,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             channel.Receive(buffer);
 
             // message id
-            msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.messageId |= (buffer[index++]);
+            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
+            msg.MessageId |= (buffer[index++]);
 
             return msg;
         }
@@ -56,7 +56,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
         public override string ToString() {
 #if TRACE
-            return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { messageId });
+            return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { MessageId });
 #else
             return base.ToString();
 #endif

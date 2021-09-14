@@ -24,7 +24,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public byte[] GrantedQoSLevels { get; set; }
 
         public MqttMsgSuback() {
-            type = MessageType.SubAck;
+            Type = MessageType.SubAck;
         }
 
         public static MqttMsgSuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
@@ -45,8 +45,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             channel.Receive(buffer);
 
             // message id
-            msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.messageId |= (buffer[index++]);
+            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
+            msg.MessageId |= (buffer[index++]);
 
             // payload contains QoS levels granted
             msg.GrantedQoSLevels = new byte[remainingLength - MessageIdSize];
@@ -60,7 +60,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("SUBACK", new object[] { "messageId", "grantedQosLevels" }, new object[] { messageId, GrantedQoSLevels });
+            return GetTraceString("SUBACK", new object[] { "messageId", "grantedQosLevels" }, new object[] { MessageId, GrantedQoSLevels });
 #else
             return base.ToString();
 #endif

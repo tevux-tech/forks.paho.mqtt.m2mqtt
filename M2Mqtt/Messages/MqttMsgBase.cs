@@ -91,42 +91,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public const ushort MinTopicLength = 1;
         public const byte MessageIdSize = 2;
 
-        public byte Type {
-            get { return type; }
-            set { type = value; }
-        }
-
-        public bool DupFlag {
-            get { return dupFlag; }
-            set { dupFlag = value; }
-        }
-
-        public byte QosLevel {
-            get { return qosLevel; }
-            set { qosLevel = value; }
-        }
-
-        public bool Retain {
-            get { return retain; }
-            set { retain = value; }
-        }
-
-        public ushort MessageId {
-            get { return messageId; }
-            set { messageId = value; }
-        }
-
-
-        protected byte type;
-        protected bool dupFlag;
-        protected byte qosLevel;
-        protected bool retain;
-        protected ushort messageId;
-
-        /// <summary>
-        /// Returns message bytes rapresentation
-        /// </summary>
-        //public abstract byte[] GetBytes();
+        public byte Type { get; set; }
+        public bool DupFlag { get; set; }
+        public byte QosLevel { get; set; }
+        public bool Retain { get; set; }
+        public ushort MessageId { get; set; }
 
         /// <summary>
         /// Encode remaining length and insert it into message buffer

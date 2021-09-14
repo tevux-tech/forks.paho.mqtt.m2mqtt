@@ -41,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public byte ReturnCode { get; set; }
 
         public MqttMsgConnack() {
-            type = MessageType.ConAck;
+            Type = MessageType.ConAck;
         }
 
         public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
