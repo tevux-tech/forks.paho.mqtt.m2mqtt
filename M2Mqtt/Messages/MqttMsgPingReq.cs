@@ -31,7 +31,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // first fixed header byte
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PingReq << MSG_TYPE_OFFSET) | MQTT_MSG_PINGREQ_FLAG_BITS; // [v.3.1.1]
+                buffer[index++] = (MessageType.PingReq << MSG_TYPE_OFFSET) | MessageFlags.PingReq; // [v.3.1.1]
             }
             else {
                 buffer[index++] = (MessageType.PingReq << MSG_TYPE_OFFSET);
@@ -47,7 +47,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_PINGREQ_FLAG_BITS) {
+                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MessageFlags.PingReq) {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
                 }
             }

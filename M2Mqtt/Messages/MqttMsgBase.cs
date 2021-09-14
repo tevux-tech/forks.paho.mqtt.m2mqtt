@@ -55,22 +55,24 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             public const byte Disconnect = 0x0E;
         }
 
+        public class MessageFlags {
+            // [v3.1.1] MQTT flag bits
+            public const byte Connect = 0x00;
+            public const byte ConAck = 0x00;
+            public const byte Publish = 0x00; // just defined as 0x00 but depends on publish props (dup, qos, retain) 
+            public const byte PubAck = 0x00;
+            public const byte PubRec = 0x00;
+            public const byte PubRel = 0x02;
+            public const byte PubComp = 0x00;
+            public const byte Subcribe = 0x02;
+            public const byte SubAck = 0x00;
+            public const byte Unsubscribe = 0x02;
+            public const byte UnsubAck = 0x00;
+            public const byte PingReq = 0x00;
+            public const byte PingResp = 0x00;
+            public const byte Disconnect = 0x00;
+        }
 
-        // [v3.1.1] MQTT flag bits
-        internal const byte MQTT_MSG_CONNECT_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_CONNACK_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_PUBLISH_FLAG_BITS = 0x00; // just defined as 0x00 but depends on publish props (dup, qos, retain) 
-        internal const byte MQTT_MSG_PUBACK_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_PUBREC_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_PUBREL_FLAG_BITS = 0x02;
-        internal const byte MQTT_MSG_PUBCOMP_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_SUBSCRIBE_FLAG_BITS = 0x02;
-        internal const byte MQTT_MSG_SUBACK_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_UNSUBSCRIBE_FLAG_BITS = 0x02;
-        internal const byte MQTT_MSG_UNSUBACK_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_PINGREQ_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_PINGRESP_FLAG_BITS = 0x00;
-        internal const byte MQTT_MSG_DISCONNECT_FLAG_BITS = 0x00;
 
         // QOS levels
         public class QosLevels {

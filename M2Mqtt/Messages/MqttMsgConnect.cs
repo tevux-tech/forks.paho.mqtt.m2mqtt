@@ -317,7 +317,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            buffer[index++] = (MessageType.Connect << MSG_TYPE_OFFSET) | MQTT_MSG_CONNECT_FLAG_BITS; // [v.3.1.1]
+            buffer[index++] = (MessageType.Connect << MSG_TYPE_OFFSET) | MessageFlags.Connect; // [v.3.1.1]
 
             // encode remaining length
             index = EncodeRemainingLength(remainingLength, buffer, index);
