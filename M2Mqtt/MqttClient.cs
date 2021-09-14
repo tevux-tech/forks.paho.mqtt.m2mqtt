@@ -274,7 +274,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             // if connection accepted, start keep alive timer and 
-            if (connack.ReturnCode == MqttMsgConnack.CONN_ACCEPTED) {
+            if (connack.ReturnCode == MqttMsgConnack.ReturnCodes.Accepted) {
                 // set all client properties
                 ClientId = clientId;
                 CleanSession = cleanSession;
@@ -788,138 +788,74 @@ namespace uPLibrary.Networking.M2Mqtt {
                         msgType = (byte)((fixedHeaderFirstByte[0] & MqttMsgBase.FixedHeader.TypeMask) >> MqttMsgBase.FixedHeader.TypeOffset);
 
                         switch (msgType) {
-                            // CONNECT message received
-                            case MqttMsgBase.MessageType.Connect:
-                                throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
-                            // CONNACK message received
                             case MqttMsgBase.MessageType.ConAck:
-
                                 _msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
-
                                 _syncEndReceiving.Set();
                                 break;
 
-                            // PINGREQ message received
-                            case MqttMsgBase.MessageType.PingReq:
-
-
-                                throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
-                            // PINGRESP message received
                             case MqttMsgBase.MessageType.PingResp:
-
                                 _msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
-
                                 _syncEndReceiving.Set();
                                 break;
 
-                            // SUBSCRIBE message received
-                            case MqttMsgBase.MessageType.Subscribe:
-                                throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
-                            // SUBACK message received
                             case MqttMsgBase.MessageType.SubAck:
                                 // enqueue SUBACK message received (for QoS Level 1) into the internal queue
                                 var suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", suback);
-
-                                // enqueue SUBACK message into the internal queue
                                 EnqueueInternal(suback);
-
                                 break;
 
-                            // PUBLISH message received
                             case MqttMsgBase.MessageType.Publish:
-
                                 var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", publish);
-
-                                // enqueue PUBLISH message to acknowledge into the inflight queue
                                 EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
-
                                 break;
 
-                            // PUBACK message received
                             case MqttMsgBase.MessageType.PubAck:
-
                                 // enqueue PUBACK message received (for QoS Level 1) into the internal queue
                                 var puback = MqttMsgPuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", puback);
-
-                                // enqueue PUBACK message into the internal queue
                                 EnqueueInternal(puback);
-
                                 break;
 
-                            // PUBREC message received
                             case MqttMsgBase.MessageType.PubRec:
-
                                 // enqueue PUBREC message received (for QoS Level 2) into the internal queue
                                 var pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrec);
-
-                                // enqueue PUBREC message into the internal queue
                                 EnqueueInternal(pubrec);
-
                                 break;
 
-                            // PUBREL message received
                             case MqttMsgBase.MessageType.PubRel:
-
                                 // enqueue PUBREL message received (for QoS Level 2) into the internal queue
                                 var pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrel);
-
-                                // enqueue PUBREL message into the internal queue
                                 EnqueueInternal(pubrel);
 
                                 break;
 
-                            // PUBCOMP message received
                             case MqttMsgBase.MessageType.PubComp:
-
                                 // enqueue PUBCOMP message received (for QoS Level 2) into the internal queue
                                 var pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
-
-                                // enqueue PUBCOMP message into the internal queue
                                 EnqueueInternal(pubcomp);
-
                                 break;
 
-                            // UNSUBSCRIBE message received
-                            case MqttMsgBase.MessageType.Unsubscribe:
-                                throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
-                            // UNSUBACK message received
                             case MqttMsgBase.MessageType.UnsubAck:
                                 // enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
                                 var unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
-
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsuback);
-
-                                // enqueue UNSUBACK message into the internal queue
                                 EnqueueInternal(unsuback);
-
                                 break;
 
-                            // DISCONNECT message received
+                            case MqttMsgBase.MessageType.Connect:
+                            case MqttMsgBase.MessageType.PingReq:
+                            case MqttMsgBase.MessageType.Subscribe:
+                            case MqttMsgBase.MessageType.Unsubscribe:
                             case MqttMsgBase.MessageType.Disconnect:
-                                throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
                             default:
-
+                                // These message are meant for the broker, not client.
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
                         }
 
@@ -943,8 +879,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                         var ex = e as MqttClientException;
                         close = ((ex.ErrorCode == MqttClientErrorCode.InvalidFlagBits) || (ex.ErrorCode == MqttClientErrorCode.InvalidProtocolName) || (ex.ErrorCode == MqttClientErrorCode.InvalidConnectFlags));
                     }
-                    else if ((e.GetType() == typeof(IOException)) || (e.GetType() == typeof(SocketException)) ||
-                             ((e.InnerException != null) && (e.InnerException.GetType() == typeof(SocketException)))) // added for SSL/TLS incoming connection that use SslStream that wraps SocketException
+                    else if ((e.GetType() == typeof(IOException)) || (e.GetType() == typeof(SocketException)) || ((e.InnerException != null) && (e.InnerException.GetType() == typeof(SocketException)))) // added for SSL/TLS incoming connection that use SslStream that wraps SocketException
                     {
                         close = true;
                     }

@@ -22,13 +22,16 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgConnack : MqttMsgBase {
 
-        // return codes for CONNACK message
-        public const byte CONN_ACCEPTED = 0x00;
-        public const byte CONN_REFUSED_PROT_VERS = 0x01;
-        public const byte CONN_REFUSED_IDENT_REJECTED = 0x02;
-        public const byte CONN_REFUSED_SERVER_UNAVAILABLE = 0x03;
-        public const byte CONN_REFUSED_USERNAME_PASSWORD = 0x04;
-        public const byte CONN_REFUSED_NOT_AUTHORIZED = 0x05;
+        public class ReturnCodes {
+            // Section 3.2.2.3.
+            public const byte Accepted = 0x00;
+            public const byte RefusedUnacceptableProtocolVersion = 0x01;
+            public const byte RefusedIdentifierRejected = 0x02;
+            public const byte RefusedServerUnavailable = 0x03;
+            public const byte RefusedBadUsernameOrPassword = 0x04;
+            public const byte RefusedNotAuthorized = 0x05;
+
+        }
 
         private const byte TOPIC_NAME_COMP_RESP_BYTE_OFFSET = 0;
         private const byte TOPIC_NAME_COMP_RESP_BYTE_SIZE = 1;
