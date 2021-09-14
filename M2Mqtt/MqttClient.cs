@@ -93,17 +93,11 @@ namespace uPLibrary.Networking.M2Mqtt {
         // last communication time in ticks
         private int _lastCommTime;
 
-        // event for PUBLISH message received
-        public event MqttMsgPublishEventHandler MqttMsgPublishReceived;
-        // event for published message
-        public event MqttMsgPublishedEventHandler MqttMsgPublished;
-        // event for subscribed topic
-        public event MqttMsgSubscribedEventHandler MqttMsgSubscribed;
-        // event for unsubscribed topic
-        public event MqttMsgUnsubscribedEventHandler MqttMsgUnsubscribed;
-
-        // event for peer/client disconnection
-        public event ConnectionClosedEventHandler ConnectionClosed;
+        public event MqttMsgPublishEventHandler MqttMsgPublishReceived = delegate { };
+        public event MqttMsgPublishedEventHandler MqttMsgPublished = delegate { };
+        public event MqttMsgSubscribedEventHandler MqttMsgSubscribed = delegate { };
+        public event MqttMsgUnsubscribedEventHandler MqttMsgUnsubscribed = delegate { };
+        public event ConnectionClosedEventHandler ConnectionClosed = delegate { };
 
         // channel to communicate over the network
         private IMqttNetworkChannel _channel;
