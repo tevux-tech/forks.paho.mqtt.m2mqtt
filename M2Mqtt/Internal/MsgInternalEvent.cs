@@ -16,18 +16,15 @@ Contributors:
 
 using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace uPLibrary.Networking.M2Mqtt.Internal
-{
+namespace uPLibrary.Networking.M2Mqtt.Internal {
     /// <summary>
     /// Internal event with a message
     /// </summary>
-    public class MsgInternalEvent : InternalEvent
-    {
+    public class MsgInternalEvent : InternalEvent {
 
         public MqttMsgBase Message { get; set; }
 
-        public MsgInternalEvent(MqttMsgBase msg)
-        {
+        public MsgInternalEvent(MqttMsgBase msg) {
             Message = msg;
         }
     }

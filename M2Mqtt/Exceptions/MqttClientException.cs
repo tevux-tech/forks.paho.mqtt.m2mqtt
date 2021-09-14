@@ -16,16 +16,13 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Exceptions
-{
+namespace uPLibrary.Networking.M2Mqtt.Exceptions {
     /// <summary>
     /// MQTT client exception
     /// </summary>
-    public class MqttClientException : Exception
-    {
+    public class MqttClientException : Exception {
         public MqttClientErrorCode ErrorCode { get; set; }
-        public MqttClientException(MqttClientErrorCode errorCode)
-        {
+        public MqttClientException(MqttClientErrorCode errorCode) {
             ErrorCode = errorCode;
         }
     }
@@ -33,8 +30,7 @@ namespace uPLibrary.Networking.M2Mqtt.Exceptions
     /// <summary>
     /// MQTT client error code
     /// </summary>
-    public enum MqttClientErrorCode
-    {
+    public enum MqttClientErrorCode {
         /// <summary>
         /// Will error (topic, message or QoS level)
         /// </summary>

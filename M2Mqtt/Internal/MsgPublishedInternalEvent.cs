@@ -16,18 +16,15 @@ Contributors:
 
 using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace uPLibrary.Networking.M2Mqtt.Internal
-{
+namespace uPLibrary.Networking.M2Mqtt.Internal {
     /// <summary>
     /// Internal event for a published message
     /// </summary>
-    public class MsgPublishedInternalEvent : MsgInternalEvent
-    {
+    public class MsgPublishedInternalEvent : MsgInternalEvent {
 
         public bool IsPublished { get; internal set; }
 
-        public MsgPublishedInternalEvent(MqttMsgBase msg, bool isPublished) : base(msg)
-        {
+        public MsgPublishedInternalEvent(MqttMsgBase msg, bool isPublished) : base(msg) {
             IsPublished = isPublished;
         }
     }

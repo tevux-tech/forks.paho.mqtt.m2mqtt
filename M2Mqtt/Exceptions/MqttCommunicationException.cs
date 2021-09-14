@@ -16,19 +16,15 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Exceptions
-{
+namespace uPLibrary.Networking.M2Mqtt.Exceptions {
     /// <summary>
     /// Exception due to error communication with broker on socket
     /// </summary>
-    public class MqttCommunicationException : Exception
-    {
-        public MqttCommunicationException()
-        {
+    public class MqttCommunicationException : Exception {
+        public MqttCommunicationException() {
         }
 
-        public MqttCommunicationException(Exception e) : base(string.Empty, e)
-        {
+        public MqttCommunicationException(Exception e) : base(string.Empty, e) {
         }
     }
 }
