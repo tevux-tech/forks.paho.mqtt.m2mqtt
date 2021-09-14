@@ -89,12 +89,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             byte[] buffer;
             var index = 0;
 
-            if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
+            if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // flags byte and connect return code
                 varHeaderSize += (CONN_ACK_FLAGS_BYTE_SIZE + CONN_RETURN_CODE_BYTE_SIZE);
-            else
+            }
+            else {
                 // topic name compression response and connect return code
                 varHeaderSize += (TOPIC_NAME_COMP_RESP_BYTE_SIZE + CONN_RETURN_CODE_BYTE_SIZE);
+            }
 
             remainingLength += (varHeaderSize + payloadSize);
 
@@ -113,20 +115,24 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
+            if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 buffer[index++] = (MessageType.ConAck << MSG_TYPE_OFFSET) | MQTT_MSG_CONNACK_FLAG_BITS; // [v.3.1.1]
-            else
+            }
+            else {
                 buffer[index++] = (byte)(MessageType.ConAck << MSG_TYPE_OFFSET);
+            }
 
             // encode remaining length
             index = EncodeRemainingLength(remainingLength, buffer, index);
 
-            if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
+            if (ProtocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] session present flag
                 buffer[index++] = SessionPresent ? (byte)(1 << SESSION_PRESENT_FLAG_OFFSET) : (byte)0x00;
-            else
+            }
+            else {
                 // topic name compression response (reserved values. not used);
                 buffer[index++] = 0x00;
+            }
 
             // connect return code
             buffer[index++] = ReturnCode;

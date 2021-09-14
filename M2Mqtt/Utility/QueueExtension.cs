@@ -36,8 +36,9 @@ namespace uPLibrary.Networking.M2Mqtt.Utility {
         /// <returns>Item matches the predicate</returns>
         internal static object Get(this Queue queue, QueuePredicate predicate) {
             foreach (var item in queue) {
-                if (predicate(item))
+                if (predicate(item)) {
                     return item;
+                }
             }
             return null;
         }

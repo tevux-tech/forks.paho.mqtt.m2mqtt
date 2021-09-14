@@ -208,8 +208,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 var sb = new StringBuilder();
                 sb.Append('[');
                 for (var i = 0; i < list.Length; ++i) {
-                    if (i > 0)
+                    if (i > 0) {
                         sb.Append(',');
+                    }
+
                     sb.Append(list[i]);
                 }
                 sb.Append(']');

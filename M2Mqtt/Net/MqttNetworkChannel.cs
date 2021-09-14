@@ -64,10 +64,12 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         public bool DataAvailable {
             get {
-                if (_secure)
+                if (_secure) {
                     return _netStream.DataAvailable;
-                else
+                }
+                else {
                     return (_socket.Available > 0);
+                }
             }
         }
 
@@ -134,8 +136,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                     // check for the first address not null
                     // it seems that with .Net Micro Framework, the IPV6 addresses aren't supported and return "null"
                     var i = 0;
-                    while (hostEntry.AddressList[i] == null)
+                    while (hostEntry.AddressList[i] == null) {
                         i++;
+                    }
+
                     remoteIpAddress = hostEntry.AddressList[i];
                 }
                 else {
@@ -175,8 +179,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                 // server authentication (SSL/TLS handshake)
                 X509CertificateCollection clientCertificates = null;
                 // check if there is a client certificate to add to the collection, otherwise it's null (as empty)
-                if (_clientCert != null)
+                if (_clientCert != null) {
                     clientCertificates = new X509CertificateCollection(new X509Certificate[] { _clientCert });
+                }
 
 #if NETCOREAPP3_1
                 if (_alpnProtocols.Count > 0) {
@@ -199,7 +204,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     _sslStream.AuthenticateAsClientAsync(RemoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
                 }
 #else
-                 _sslStream.AuthenticateAsClientAsync(RemoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
+                _sslStream.AuthenticateAsClientAsync(RemoteHostName, clientCertificates, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
 #endif
             }
         }
@@ -215,8 +220,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                 _sslStream.Flush();
                 return buffer.Length;
             }
-            else
+            else {
                 return _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
+            }
         }
 
         /// <summary>
@@ -232,8 +238,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
                     read = _sslStream.Read(buffer, idx, buffer.Length - idx);
-                    if (read == 0)
+                    if (read == 0) {
                         return 0;
+                    }
+
                     idx += read;
                 }
                 return buffer.Length;
@@ -245,8 +253,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
                     read = _socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
-                    if (read == 0)
+                    if (read == 0) {
                         return 0;
+                    }
+
                     idx += read;
                 }
                 return buffer.Length;

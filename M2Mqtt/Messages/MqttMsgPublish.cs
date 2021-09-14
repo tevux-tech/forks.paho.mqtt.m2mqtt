@@ -54,16 +54,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var index = 0;
 
             // topic can't contain wildcards
-            if ((Topic.IndexOf('#') != -1) || (Topic.IndexOf('+') != -1))
+            if ((Topic.IndexOf('#') != -1) || (Topic.IndexOf('+') != -1)) {
                 throw new MqttClientException(MqttClientErrorCode.TopicWildcard);
+            }
 
             // check topic length
-            if ((Topic.Length < MinTopicLength) || (Topic.Length > MaxTopicLength))
+            if ((Topic.Length < MinTopicLength) || (Topic.Length > MaxTopicLength)) {
                 throw new MqttClientException(MqttClientErrorCode.TopicLength);
+            }
 
             // check wrong QoS level (both bits can't be set 1)
-            if (qosLevel > QosLevels.ExactlyOnce)
+            if (qosLevel > QosLevels.ExactlyOnce) {
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
+            }
 
             var topicUtf8 = Encoding.UTF8.GetBytes(Topic);
 
@@ -77,9 +80,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             }
 
             // check on message with zero length
-            if (Message != null)
+            if (Message != null) {
                 // message data
                 payloadSize += Message.Length;
+            }
 
             remainingLength += (varHeaderSize + payloadSize);
 
@@ -117,8 +121,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             if ((qosLevel == QosLevels.AtLeastOnce) ||
                 (qosLevel == QosLevels.ExactlyOnce)) {
                 // check message identifier assigned
-                if (messageId == 0)
+                if (messageId == 0) {
                     throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
+                }
+
                 buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(messageId & 0x00FF); // LSB
             }
@@ -165,8 +171,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             // read QoS level from fixed header
             msg.qosLevel = (byte)((fixedHeaderFirstByte & QOS_LEVEL_MASK) >> QOS_LEVEL_OFFSET);
             // check wrong QoS level (both bits can't be set 1)
-            if (msg.qosLevel > QosLevels.ExactlyOnce)
+            if (msg.qosLevel > QosLevels.ExactlyOnce) {
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
+            }
             // read DUP flag from fixed header
             msg.dupFlag = (((fixedHeaderFirstByte & DUP_FLAG_MASK) >> DUP_FLAG_OFFSET) == 0x01);
             // read retain flag from fixed header

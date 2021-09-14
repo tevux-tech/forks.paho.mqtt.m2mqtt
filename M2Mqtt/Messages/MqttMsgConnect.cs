@@ -201,8 +201,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             msg.ProtocolName = new string(Encoding.UTF8.GetChars(protNameUtf8));
 
             // [v3.1.1] wrong protocol name
-            if (!msg.ProtocolName.Equals(PROTOCOL_NAME_V3_1) && !msg.ProtocolName.Equals(PROTOCOL_NAME_V3_1_1))
+            if (!msg.ProtocolName.Equals(PROTOCOL_NAME_V3_1) && !msg.ProtocolName.Equals(PROTOCOL_NAME_V3_1_1)) {
                 throw new MqttClientException(MqttClientErrorCode.InvalidProtocolName);
+            }
 
             // protocol version
             msg.ProtocolVersion = buffer[index];
@@ -211,8 +212,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             // connect flags
             // [v3.1.1] check lsb (reserved) must be 0
             if ((msg.ProtocolVersion == PROTOCOL_VERSION_V3_1_1) &&
-                ((buffer[index] & RESERVED_FLAG_MASK) != 0x00))
+                ((buffer[index] & RESERVED_FLAG_MASK) != 0x00)) {
                 throw new MqttClientException(MqttClientErrorCode.InvalidConnectFlags);
+            }
 
             isUsernameFlag = (buffer[index] & USERNAME_FLAG_MASK) != 0x00;
             isPasswordFlag = (buffer[index] & PASSWORD_FLAG_MASK) != 0x00;
@@ -234,8 +236,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index += clientIdUtf8Length;
             msg.ClientId = new string(Encoding.UTF8.GetChars(clientIdUtf8));
             // [v3.1.1] if client identifier is zero bytes long, clean session must be true
-            if ((msg.ProtocolVersion == PROTOCOL_VERSION_V3_1_1) && (clientIdUtf8Length == 0) && (!msg.CleanSession))
+            if ((msg.ProtocolVersion == PROTOCOL_VERSION_V3_1_1) && (clientIdUtf8Length == 0) && (!msg.CleanSession)) {
                 throw new MqttClientException(MqttClientErrorCode.InvalidClientId);
+            }
 
             // will topic and will message
             if (msg.WillFlag) {
@@ -297,18 +300,21 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 if (WillFlag && ((willQosLevel >= 0x03) ||
                                        (willTopicUtf8 == null) || (willMessageUtf8 == null) ||
                                        ((willTopicUtf8 != null) && (willTopicUtf8.Length == 0)) ||
-                                       ((willMessageUtf8 != null) && (willMessageUtf8.Length == 0))))
+                                       ((willMessageUtf8 != null) && (willMessageUtf8.Length == 0)))) {
                     throw new MqttClientException(MqttClientErrorCode.WillWrong);
+                }
                 // willflag not set, retain must be 0 and will topic and message MUST NOT be present
                 else if (!WillFlag && ((willRetain) ||
                                             (willTopicUtf8 != null) || (willMessageUtf8 != null) ||
                                             ((willTopicUtf8 != null) && (willTopicUtf8.Length != 0)) ||
-                                            ((willMessageUtf8 != null) && (willMessageUtf8.Length != 0))))
+                                            ((willMessageUtf8 != null) && (willMessageUtf8.Length != 0)))) {
                     throw new MqttClientException(MqttClientErrorCode.WillWrong);
+                }
             }
 
-            if (KeepAlivePeriod > MAX_KEEP_ALIVE)
+            if (KeepAlivePeriod > MAX_KEEP_ALIVE) {
                 throw new MqttClientException(MqttClientErrorCode.KeepAliveWrong);
+            }
 
             // check on will QoS Level
             if ((willQosLevel < QosLevels.AtMostOnce) || (willQosLevel > QosLevels.ExactlyOnce)) {
@@ -389,8 +395,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             connectFlags |= (passwordUtf8 != null) ? (byte)(1 << PASSWORD_FLAG_OFFSET) : (byte)0x00;
             connectFlags |= (willRetain) ? (byte)(1 << WILL_RETAIN_FLAG_OFFSET) : (byte)0x00;
             // only if will flag is set, we have to use will QoS level (otherwise is MUST be 0)
-            if (WillFlag)
+            if (WillFlag) {
                 connectFlags |= (byte)(willQosLevel << WILL_QOS_FLAG_OFFSET);
+            }
+
             connectFlags |= (WillFlag) ? (byte)(1 << WILL_FLAG_OFFSET) : (byte)0x00;
             connectFlags |= (CleanSession) ? (byte)(1 << CLEAN_SESSION_FLAG_OFFSET) : (byte)0x00;
             buffer[index++] = connectFlags;

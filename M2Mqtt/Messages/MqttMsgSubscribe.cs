@@ -87,8 +87,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_SUBSCRIBE_FLAG_BITS)
+                if ((fixedHeaderFirstByte & MSG_FLAG_BITS_MASK) != MQTT_MSG_SUBSCRIBE_FLAG_BITS) {
                     throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
+                }
             }
 
             // get remaining length and allocate buffer
@@ -153,16 +154,19 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var index = 0;
 
             // topics list empty
-            if ((topics == null) || (topics.Length == 0))
+            if ((topics == null) || (topics.Length == 0)) {
                 throw new MqttClientException(MqttClientErrorCode.TopicsEmpty);
+            }
 
             // qos levels list empty
-            if ((qosLevels == null) || (qosLevels.Length == 0))
+            if ((qosLevels == null) || (qosLevels.Length == 0)) {
                 throw new MqttClientException(MqttClientErrorCode.QosLevelsEmpty);
+            }
 
             // topics and qos levels lists length don't match
-            if (topics.Length != qosLevels.Length)
+            if (topics.Length != qosLevels.Length) {
                 throw new MqttClientException(MqttClientErrorCode.TopicsQosLevelsNotMatch);
+            }
 
             // message identifier
             varHeaderSize += MessageIdSize;
@@ -172,8 +176,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             for (topicIdx = 0; topicIdx < topics.Length; topicIdx++) {
                 // check topic length
-                if ((topics[topicIdx].Length < MinTopicLength) || (topics[topicIdx].Length > MaxTopicLength))
+                if ((topics[topicIdx].Length < MinTopicLength) || (topics[topicIdx].Length > MaxTopicLength)) {
                     throw new MqttClientException(MqttClientErrorCode.TopicLength);
+                }
 
                 topicsUtf8[topicIdx] = Encoding.UTF8.GetBytes(topics[topicIdx]);
                 payloadSize += 2; // topic size (MSB, LSB)
@@ -198,8 +203,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1)
+            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
                 buffer[index++] = (MessageType.Subscribe << MSG_TYPE_OFFSET) | MQTT_MSG_SUBSCRIBE_FLAG_BITS; // [v.3.1.1]
+            }
             else {
                 buffer[index] = (byte)((MessageType.Subscribe << MSG_TYPE_OFFSET) |
                                    (qosLevel << QOS_LEVEL_OFFSET));
@@ -211,8 +217,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index = EncodeRemainingLength(remainingLength, buffer, index);
 
             // check message identifier assigned (SUBSCRIBE uses QoS Level 1, so message id is mandatory)
-            if (messageId == 0)
+            if (messageId == 0) {
                 throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
+            }
+
             buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
             buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
 

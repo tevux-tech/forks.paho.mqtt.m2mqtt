@@ -74,8 +74,10 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         public static MqttSettings Instance {
             get {
-                if (instance == null)
+                if (instance == null) {
                     instance = new MqttSettings();
+                }
+
                 return instance;
             }
         }
