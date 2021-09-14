@@ -26,18 +26,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public static MqttMsgDisconnect Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
-            var msg = new MqttMsgDisconnect();
-
-            // [v3.1.1] check flag bits
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Disconnect) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-            }
-
-            // get remaining length and allocate buffer
-            var remainingLength = DecodeRemainingLength(channel);
-            // NOTE : remainingLength must be 0
-
-            return msg;
+            // Not needed for the client side.
+            return new MqttMsgDisconnect();
         }
 
         public override byte[] GetBytes(byte protocolVersion) {

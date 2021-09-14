@@ -59,54 +59,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override byte[] GetBytes(byte protocolVersion) {
-            var fixedHeaderSize = 0;
-            var varHeaderSize = 0;
-            var payloadSize = 0;
-            var remainingLength = 0;
-            byte[] buffer;
-            var index = 0;
-
-            // message identifier
-            varHeaderSize += MessageIdSize;
-
-            var grantedQosIdx = 0;
-            for (grantedQosIdx = 0; grantedQosIdx < GrantedQoSLevels.Length; grantedQosIdx++) {
-                payloadSize++;
-            }
-
-            remainingLength += (varHeaderSize + payloadSize);
-
-            // first byte of fixed header
-            fixedHeaderSize = 1;
-
-            var temp = remainingLength;
-            // increase fixed header size based on remaining length
-            // (each remaining length byte can encode until 128)
-            do {
-                fixedHeaderSize++;
-                temp = temp / 128;
-            } while (temp > 0);
-
-            // allocate buffer for message
-            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
-
-            // first fixed header byte
-            buffer[index++] = (MessageType.SubAck << FixedHeader.TypeOffset) | MessageFlags.SubAck; // [v.3.1.1]
-
-
-            // encode remaining length
-            index = EncodeRemainingLength(remainingLength, buffer, index);
-
-            // message id
-            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(messageId & 0x00FF); // LSB
-
-            // payload contains QoS levels granted
-            for (grantedQosIdx = 0; grantedQosIdx < GrantedQoSLevels.Length; grantedQosIdx++) {
-                buffer[index++] = GrantedQoSLevels[grantedQosIdx];
-            }
-
-            return buffer;
+            // Not needed for the client side.
+            return new byte[0];
         }
 
         public override string ToString() {

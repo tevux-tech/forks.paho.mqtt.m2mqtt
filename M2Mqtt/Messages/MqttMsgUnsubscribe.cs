@@ -42,50 +42,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
-            byte[] buffer;
-            var index = 0;
-            byte[] topicUtf8;
-            int topicUtf8Length;
-            var msg = new MqttMsgUnsubscribe();
-
-            // [v3.1.1] check flag bits
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Unsubscribe) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-            }
-
-            // get remaining length and allocate buffer
-            var remainingLength = DecodeRemainingLength(channel);
-            buffer = new byte[remainingLength];
-
-            // read bytes from socket...
-            var received = channel.Receive(buffer);
-
-            // message id
-            msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.messageId |= (buffer[index++]);
-
-            // payload contains topics
-            // NOTE : before, I don't know how many topics will be in the payload (so use List)
-
-            IList<string> tmpTopics = new List<string>();
-
-            do {
-                // topic name
-                topicUtf8Length = ((buffer[index++] << 8) & 0xFF00);
-                topicUtf8Length |= buffer[index++];
-                topicUtf8 = new byte[topicUtf8Length];
-                Array.Copy(buffer, index, topicUtf8, 0, topicUtf8Length);
-                index += topicUtf8Length;
-                tmpTopics.Add(new string(Encoding.UTF8.GetChars(topicUtf8)));
-            } while (index < remainingLength);
-
-            // copy from list to array
-            msg.TopicsToUnsubscribe = new string[tmpTopics.Count];
-            for (var i = 0; i < tmpTopics.Count; i++) {
-                msg.TopicsToUnsubscribe[i] = (string)tmpTopics[i];
-            }
-
-            return msg;
+            // Not needed for the client side.
+            return new MqttMsgUnsubscribe();
         }
 
         public override byte[] GetBytes(byte protocolVersion) {

@@ -38,18 +38,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
-            var msg = new MqttMsgPingReq();
-
-            // [v3.1.1] check flag bits
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PingReq) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-            }
-
-            // already know remaininglength is zero (MQTT specification),
-            // so it isn't necessary to read other data from socket
-            var remainingLength = DecodeRemainingLength(channel);
-
-            return msg;
+            // Not needed for the client side.
+            return new MqttMsgPingReq();
         }
 
         public override string ToString() {
