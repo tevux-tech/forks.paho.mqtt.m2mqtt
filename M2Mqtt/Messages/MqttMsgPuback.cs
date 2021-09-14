@@ -24,7 +24,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public MqttMsgPuback() {
             type = MessageType.PubAck;
         }
-        public static MqttMsgPuback Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgPuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
             var msg = new MqttMsgPuback();
@@ -48,7 +48,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public override byte[] GetBytes(byte ProtocolVersion) {
+        public override byte[] GetBytes() {
             // Not needed for the client side.
             return new byte[0];
         }

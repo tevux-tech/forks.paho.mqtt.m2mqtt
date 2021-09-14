@@ -25,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.PingResp;
         }
 
-        public static MqttMsgPingResp Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgPingResp Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             // Section 3.13.
             var msg = new MqttMsgPingResp();
 
@@ -41,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             // Not needed for the client side.
             return new byte[0];
         }

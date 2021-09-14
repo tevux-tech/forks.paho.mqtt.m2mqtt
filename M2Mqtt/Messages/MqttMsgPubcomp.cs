@@ -25,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.PubComp;
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;
@@ -66,7 +66,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        public static MqttMsgPubcomp Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgPubcomp Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
             var msg = new MqttMsgPubcomp();

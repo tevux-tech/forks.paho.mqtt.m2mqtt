@@ -25,12 +25,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.Disconnect;
         }
 
-        public static MqttMsgDisconnect Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgDisconnect Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             // Not needed for the client side.
             return new MqttMsgDisconnect();
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             var buffer = new byte[2];
             var index = 0;
 

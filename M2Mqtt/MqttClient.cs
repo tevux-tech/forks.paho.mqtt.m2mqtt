@@ -128,7 +128,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         public byte WillQosLevel { get; private set; }
         public string WillTopic { get; private set; }
         public string WillMessage { get; private set; }
-        public MqttProtocolVersion ProtocolVersion { get; set; }
         public MqttSettings Settings {
             get { return _settings; }
         }
@@ -173,8 +172,6 @@ namespace uPLibrary.Networking.M2Mqtt {
            RemoteCertificateValidationCallback userCertificateValidationCallback,
            LocalCertificateSelectionCallback userCertificateSelectionCallback,
            List<string> alpnProtocols = null) {
-            // set default MQTT protocol version (default is 3.1.1)
-            ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
 
             _brokerHostName = brokerHostName;
             _brokerPort = brokerPort;
@@ -247,8 +244,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 willTopic,
                 willMessage,
                 cleanSession,
-                keepAlivePeriod,
-                (byte)ProtocolVersion);
+                keepAlivePeriod);
 
             try {
                 // connect to the broker
@@ -507,7 +503,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         private void Send(MqttMsgBase msg) {
             Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
-            Send(msg.GetBytes((byte)ProtocolVersion));
+            Send(msg.GetBytes());
         }
 
         /// <summary>
@@ -575,7 +571,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <returns>MQTT message response</returns>
         private MqttMsgBase SendReceive(MqttMsgBase msg, int timeout) {
             Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
-            return SendReceive(msg.GetBytes((byte)ProtocolVersion), timeout);
+            return SendReceive(msg.GetBytes(), timeout);
         }
 
         /// <summary>
@@ -789,47 +785,47 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         switch (msgType) {
                             case MqttMsgBase.MessageType.ConAck:
-                                _msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                _msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
                                 _syncEndReceiving.Set();
                                 break;
 
                             case MqttMsgBase.MessageType.PingResp:
-                                _msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                _msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
                                 _syncEndReceiving.Set();
                                 break;
 
                             case MqttMsgBase.MessageType.SubAck:
                                 // enqueue SUBACK message received (for QoS Level 1) into the internal queue
-                                var suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", suback);
                                 EnqueueInternal(suback);
                                 break;
 
                             case MqttMsgBase.MessageType.Publish:
-                                var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", publish);
                                 EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
                                 break;
 
                             case MqttMsgBase.MessageType.PubAck:
                                 // enqueue PUBACK message received (for QoS Level 1) into the internal queue
-                                var puback = MqttMsgPuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var puback = MqttMsgPuback.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", puback);
                                 EnqueueInternal(puback);
                                 break;
 
                             case MqttMsgBase.MessageType.PubRec:
                                 // enqueue PUBREC message received (for QoS Level 2) into the internal queue
-                                var pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrec);
                                 EnqueueInternal(pubrec);
                                 break;
 
                             case MqttMsgBase.MessageType.PubRel:
                                 // enqueue PUBREL message received (for QoS Level 2) into the internal queue
-                                var pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrel);
                                 EnqueueInternal(pubrel);
 
@@ -837,14 +833,14 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             case MqttMsgBase.MessageType.PubComp:
                                 // enqueue PUBCOMP message received (for QoS Level 2) into the internal queue
-                                var pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
                                 EnqueueInternal(pubcomp);
                                 break;
 
                             case MqttMsgBase.MessageType.UnsubAck:
                                 // enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
-                                var unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], (byte)ProtocolVersion, _channel);
+                                var unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], _channel);
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsuback);
                                 EnqueueInternal(unsuback);
                                 break;
@@ -1666,10 +1662,5 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
     }
 
-    /// <summary>
-    /// MQTT protocol version
-    /// </summary>
-    public enum MqttProtocolVersion {
-        Version_3_1_1 = 4
-    }
+
 }

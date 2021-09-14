@@ -37,7 +37,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public string ProtocolName { get; set; }
-        public byte ProtocolVersion { get; set; }
         public string ClientId { get; set; }
 
         public bool WillRetain {
@@ -67,11 +66,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.Connect;
         }
 
-        public MqttMsgConnect(string clientId) :
-            this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KeepAliveDefaultValue, 4) {
+        public MqttMsgConnect(string clientId) : this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KeepAliveDefaultValue) {
         }
 
-        public MqttMsgConnect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod, byte protocolVersion) {
+        public MqttMsgConnect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
             type = MessageType.Connect;
 
             ClientId = clientId;
@@ -84,17 +82,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             WillMessage = willMessage;
             CleanSession = cleanSession;
             KeepAlivePeriod = keepAlivePeriod;
-            // [v.3.1.1] added new protocol name and version
-            ProtocolVersion = protocolVersion;
-            ProtocolName = "MQTT";
         }
 
-        public static MqttMsgConnect Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgConnect Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             // Not needed for the client side.
             return new MqttMsgConnect();
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             var payloadSize = 0;
             byte[] buffer;
             var index = 0;
@@ -232,7 +227,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public override string ToString() {
 #if TRACE
-            return GetTraceString("CONNECT", new object[] { "protocolName", "protocolVersion", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ProtocolName, ProtocolVersion, ClientId, WillFlag, willRetain, willQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
+            return GetTraceString("CONNECT", new object[] { "protocolName", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ProtocolName, ClientId, WillFlag, willRetain, willQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
 #else
             return base.ToString();
 #endif

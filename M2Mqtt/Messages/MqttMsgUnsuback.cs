@@ -25,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.UnsubAck;
         }
 
-        public static MqttMsgUnsuback Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgUnsuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
             var msg = new MqttMsgUnsuback();
@@ -49,7 +49,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             // Not needed for the client side.
             return new byte[0];
         }

@@ -44,7 +44,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.ConAck;
         }
 
-        public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             // Section 3.2.2.
             // Byte 1: ConAck flags.
             // Byte 2: Return code.
@@ -76,7 +76,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public override byte[] GetBytes(byte ProtocolVersion) {
+        public override byte[] GetBytes() {
             // Not needed for the client side.
             return new byte[0];
         }

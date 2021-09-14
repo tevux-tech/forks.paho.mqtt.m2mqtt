@@ -126,7 +126,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// Returns message bytes rapresentation
         /// </summary>
-        public abstract byte[] GetBytes(byte protocolVersion);
+        public abstract byte[] GetBytes();
 
         /// <summary>
         /// Encode remaining length and insert it into message buffer

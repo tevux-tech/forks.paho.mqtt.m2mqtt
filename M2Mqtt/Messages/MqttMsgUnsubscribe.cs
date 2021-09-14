@@ -41,12 +41,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             // Not needed for the client side.
             return new MqttMsgUnsubscribe();
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;

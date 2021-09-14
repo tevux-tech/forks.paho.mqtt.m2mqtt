@@ -25,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             type = MessageType.PingReq;
         }
 
-        public override byte[] GetBytes(byte protocolVersion) {
+        public override byte[] GetBytes() {
             var buffer = new byte[2];
             var index = 0;
 
@@ -37,7 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+        public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             // Not needed for the client side.
             return new MqttMsgPingReq();
         }
