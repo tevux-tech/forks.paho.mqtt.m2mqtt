@@ -510,14 +510,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Send a message to the broker and wait answer
         /// </summary>
         /// <returns>MQTT message response</returns>
-        private MqttMsgBase SendReceive(byte[] msgBytes) {
-            return SendReceive(msgBytes, MqttSettings.MQTT_DEFAULT_TIMEOUT);
-        }
-
-        /// <summary>
-        /// Send a message to the broker and wait answer
-        /// </summary>
-        /// <returns>MQTT message response</returns>
         private MqttMsgBase SendReceive(byte[] msgBytes, int timeout) {
             // reset handle before sending
             _syncEndReceiving.Reset();
@@ -770,14 +762,13 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Thread for receiving messages
         /// </summary>
         private void ReceiveThread() {
-            var readBytes = 0;
             var fixedHeaderFirstByte = new byte[1];
             byte msgType;
 
             while (_isRunning) {
                 try {
                     // read first byte (fixed header)
-                    readBytes = _channel.Receive(fixedHeaderFirstByte);
+                    var readBytes = _channel.Receive(fixedHeaderFirstByte);
 
                     if (readBytes > 0) {
                         // extract message type from received byte
@@ -892,7 +883,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Thread for handling keep alive message
         /// </summary>
         private void KeepAliveThread() {
-            var delta = 0;
             var wait = _keepAlivePeriod;
 
             // create event to signal that current thread is end
@@ -903,7 +893,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 _keepAliveEvent.WaitOne(wait);
 
                 if (_isRunning) {
-                    delta = Environment.TickCount - _lastCommTime;
+                    var delta = Environment.TickCount - _lastCommTime;
 
                     // if timeout exceeded ...
                     if (delta >= _keepAlivePeriod) {
@@ -1035,10 +1025,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         private void ProcessInflightThread() {
             MqttMsgContext msgContext = null;
-            MqttMsgBase msgInflight = null;
             MqttMsgBase msgReceived = null;
-            InternalEvent internalEvent = null;
-            var acknowledge = false;
+            InternalEvent internalEvent;
             var timeout = Timeout.Infinite;
             int delta;
             var msgReceivedProcessed = false;
@@ -1056,7 +1044,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                             //        (ex. a PUBREC for a PUBLISH, a SUBACK for a SUBSCRIBE, ...)
                             //        if it's orphan we need to remove from internal queue
                             msgReceivedProcessed = false;
-                            acknowledge = false;
+                            var acknowledge = false;
                             msgReceived = null;
 
                             // set timeout tu MaxValue instead of Infinte (-1) to perform
@@ -1081,7 +1069,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                                 msgContext = (MqttMsgContext)_inflightQueue.Dequeue();
 
                                 // get inflight message
-                                msgInflight = (MqttMsgBase)msgContext.Message;
+                                var msgInflight = (MqttMsgBase)msgContext.Message;
 
                                 switch (msgContext.State) {
                                     case MqttMsgState.QueuedQos0:
@@ -1557,7 +1545,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // if message received is orphan, no corresponding message in inflight queue
                             // based on messageId, we need to remove from the queue
                             if ((msgReceived != null) && !msgReceivedProcessed) {
-                                _internalQueue.Dequeue();
+                                _ = _internalQueue.Dequeue();
 
                                 Trace.WriteLine(TraceLevel.Queuing, "dequeued {0} orphan", msgReceived);
                             }

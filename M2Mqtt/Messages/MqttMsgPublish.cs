@@ -39,14 +39,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             Topic = topic;
             Message = message;
-            this.DupFlag = dupFlag;
-            this.QosLevel = qosLevel;
-            this.Retain = retain;
+            DupFlag = dupFlag;
+            QosLevel = qosLevel;
+            Retain = retain;
             MessageId = 0;
         }
 
         public byte[] GetBytes() {
-            var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;
             var remainingLength = 0;
@@ -87,16 +86,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             remainingLength += (varHeaderSize + payloadSize);
 
-            // first byte of fixed header
-            fixedHeaderSize = 1;
-
-            var temp = remainingLength;
-            // increase fixed header size based on remaining length
-            // (each remaining length byte can encode until 128)
-            do {
-                fixedHeaderSize++;
-                temp = temp / 128;
-            } while (temp > 0);
+            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
 
             // allocate buffer for message
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
@@ -131,7 +121,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             if (Message != null) {
                 // message data
                 Array.Copy(Message, 0, buffer, index, Message.Length);
-                index += Message.Length;
             }
 
             return buffer;

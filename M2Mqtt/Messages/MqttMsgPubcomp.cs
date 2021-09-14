@@ -26,7 +26,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public byte[] GetBytes() {
-            var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;
             var remainingLength = 0;
@@ -38,16 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             remainingLength += (varHeaderSize + payloadSize);
 
-            // first byte of fixed header
-            fixedHeaderSize = 1;
-
-            var temp = remainingLength;
-            // increase fixed header size based on remaining length
-            // (each remaining length byte can encode until 128)
-            do {
-                fixedHeaderSize++;
-                temp = temp / 128;
-            } while (temp > 0);
+            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
 
             // allocate buffer for message
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];

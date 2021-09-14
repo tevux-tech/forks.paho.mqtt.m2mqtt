@@ -18,7 +18,7 @@ using uPLibrary.Networking.M2Mqtt.Exceptions;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for PINGRESP message from client to broker
+    /// Class for PINGRESP message from client to broker. See section 3.13.
     /// </summary>
     public class MqttMsgPingResp : MqttMsgBase {
         public MqttMsgPingResp() {
@@ -26,7 +26,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public static MqttMsgPingResp Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Section 3.13.
             var msg = new MqttMsgPingResp();
 
             // [v3.1.1] check flag bits
@@ -36,7 +35,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // already know remaininglength is zero (MQTT specification),
             // so it isn't necessary to read other data from socket
-            var remainingLength = DecodeRemainingLength(channel);
+            _ = DecodeRemainingLength(channel);
 
             return msg;
         }

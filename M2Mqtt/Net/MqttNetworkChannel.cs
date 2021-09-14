@@ -80,8 +80,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _secure = secure;
             _serverCert = serverCert;
             _sslProtocol = sslProtocol;
-            this._userCertificateValidationCallback = userCertificateValidationCallback;
-            this._userCertificateSelectionCallback = userCertificateSelectionCallback;
+            _userCertificateValidationCallback = userCertificateValidationCallback;
+            _userCertificateSelectionCallback = userCertificateSelectionCallback;
         }
 
         public MqttNetworkChannel(string remoteHostName, int remotePort) : this(remoteHostName, remotePort, false, null, null, MqttSslProtocols.None, null, null) {
@@ -122,8 +122,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _caCert = caCert;
             _clientCert = clientCert;
             _sslProtocol = sslProtocol;
-            this._userCertificateValidationCallback = userCertificateValidationCallback;
-            this._userCertificateSelectionCallback = userCertificateSelectionCallback;
+            _userCertificateValidationCallback = userCertificateValidationCallback;
+            _userCertificateSelectionCallback = userCertificateSelectionCallback;
 
             if (alpnProtocols != null) {
                 _alpnProtocols = alpnProtocols;
@@ -201,11 +201,11 @@ namespace uPLibrary.Networking.M2Mqtt {
         public int Receive(byte[] buffer) {
             if (_secure) {
                 // read all data needed (until fill buffer)
-                int idx = 0, read = 0;
+                int idx = 0;
                 while (idx < buffer.Length) {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
-                    read = _sslStream.Read(buffer, idx, buffer.Length - idx);
+                    var read = _sslStream.Read(buffer, idx, buffer.Length - idx);
                     if (read == 0) {
                         return 0;
                     }
@@ -216,11 +216,11 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
             else {
                 // read all data needed (until fill buffer)
-                int idx = 0, read = 0;
+                int idx = 0;
                 while (idx < buffer.Length) {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
-                    read = _socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
+                    var read = _socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
                     if (read == 0) {
                         return 0;
                     }

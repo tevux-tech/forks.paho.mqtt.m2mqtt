@@ -130,16 +130,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             var remainingLength = varHeaderSize + payloadSize;
 
-            // first byte of fixed header
-            var fixedHeaderSize = 1;
-
-            var temp = remainingLength;
-            // increase fixed header size based on remaining length
-            // (each remaining length byte can encode until 128)
-            do {
-                fixedHeaderSize++;
-                temp = temp / 128;
-            } while (temp > 0);
+            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
 
             // allocate buffer for message
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
@@ -214,7 +205,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 buffer[index++] = (byte)((passwordUtf8.Length >> 8) & 0x00FF); // MSB
                 buffer[index++] = (byte)(passwordUtf8.Length & 0x00FF); // LSB
                 Array.Copy(passwordUtf8, 0, buffer, index, passwordUtf8.Length);
-                index += passwordUtf8.Length;
             }
 
             return buffer;

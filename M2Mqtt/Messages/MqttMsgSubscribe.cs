@@ -43,7 +43,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public byte[] GetBytes() {
-            var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;
             var remainingLength = 0;
@@ -67,10 +66,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // message identifier
             varHeaderSize += MessageIdSize;
-
-            var topicIdx = 0;
             var topicsUtf8 = new byte[Topics.Length][];
 
+
+            int topicIdx;
             for (topicIdx = 0; topicIdx < Topics.Length; topicIdx++) {
                 // check topic length
                 if ((Topics[topicIdx].Length < MinTopicLength) || (Topics[topicIdx].Length > MaxTopicLength)) {
@@ -85,16 +84,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             remainingLength += (varHeaderSize + payloadSize);
 
-            // first byte of fixed header
-            fixedHeaderSize = 1;
-
-            var temp = remainingLength;
-            // increase fixed header size based on remaining length
-            // (each remaining length byte can encode until 128)
-            do {
-                fixedHeaderSize++;
-                temp = temp / 128;
-            } while (temp > 0);
+            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
 
             // allocate buffer for message
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
@@ -114,7 +104,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
             buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
 
-            topicIdx = 0;
             for (topicIdx = 0; topicIdx < Topics.Length; topicIdx++) {
                 // topic name
                 buffer[index++] = (byte)((topicsUtf8[topicIdx].Length >> 8) & 0x00FF); // MSB

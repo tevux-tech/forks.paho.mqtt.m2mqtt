@@ -16,7 +16,7 @@ Contributors:
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for DISCONNECT message from client to broker
+    /// Class for DISCONNECT message from client to broker. See section 3.14.
     /// </summary>
     public class MqttMsgDisconnect : MqttMsgBase, ISentToBroker {
         public MqttMsgDisconnect() {
@@ -24,12 +24,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public byte[] GetBytes() {
+            // Message content is fixed, no variables here.
             var buffer = new byte[2];
-            var index = 0;
-
-            // first fixed header byte
-            buffer[index++] = (MessageType.Disconnect << FixedHeader.TypeOffset) | MessageFlags.Disconnect; // [v.3.1.1]
-            buffer[index++] = 0x00;
+            buffer[0] = 0b1110_0000;
+            buffer[1] = 0;
 
             return buffer;
         }
