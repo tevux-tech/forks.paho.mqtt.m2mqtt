@@ -24,7 +24,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for UNSUBSCRIBE message from client to broker
     /// </summary>
-    public class MqttMsgUnsubscribe : MqttMsgBase {
+    public class MqttMsgUnsubscribe : MqttMsgBase, ISentToBroker {
 
         public string[] TopicsToUnsubscribe { get; set; }
 
@@ -41,12 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        public static MqttMsgUnsubscribe Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Not needed for the client side.
-            return new MqttMsgUnsubscribe();
-        }
-
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
             var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;

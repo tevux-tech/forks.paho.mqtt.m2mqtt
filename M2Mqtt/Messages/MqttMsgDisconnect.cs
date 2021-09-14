@@ -20,17 +20,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for DISCONNECT message from client to broker
     /// </summary>
-    public class MqttMsgDisconnect : MqttMsgBase {
+    public class MqttMsgDisconnect : MqttMsgBase, ISentToBroker {
         public MqttMsgDisconnect() {
             type = MessageType.Disconnect;
         }
 
-        public static MqttMsgDisconnect Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Not needed for the client side.
-            return new MqttMsgDisconnect();
-        }
-
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
             var buffer = new byte[2];
             var index = 0;
 

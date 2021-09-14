@@ -20,7 +20,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBACK message from broker to client
     /// </summary>
-    public class MqttMsgPuback : MqttMsgBase {
+    public class MqttMsgPuback : MqttMsgBase, ISentToBroker {
         public MqttMsgPuback() {
             type = MessageType.PubAck;
         }
@@ -48,7 +48,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
+# warning I think I overdid it here
+
             // Not needed for the client side.
             return new byte[0];
         }

@@ -20,7 +20,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBREL message from client top broker
     /// </summary>
-    public class MqttMsgPubrel : MqttMsgBase {
+    public class MqttMsgPubrel : MqttMsgBase, ISentToBroker {
         /// <summary>
         /// Constructor
         /// </summary>
@@ -30,7 +30,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
             var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;

@@ -23,7 +23,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for SUBSCRIBE message from client to broker
     /// </summary>
-    public class MqttMsgSubscribe : MqttMsgBase {
+    public class MqttMsgSubscribe : MqttMsgBase, ISentToBroker {
 
         public string[] Topics { get; set; }
 
@@ -43,12 +43,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             qosLevel = QosLevels.AtLeastOnce;
         }
 
-        public static MqttMsgSubscribe Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Not needed for the client side.
-            return new MqttMsgSubscribe();
-        }
-
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
             var fixedHeaderSize = 0;
             var varHeaderSize = 0;
             var payloadSize = 0;

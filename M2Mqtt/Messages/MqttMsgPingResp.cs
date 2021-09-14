@@ -41,11 +41,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public override byte[] GetBytes() {
-            // Not needed for the client side.
-            return new byte[0];
-        }
-
         public override string ToString() {
 #if TRACE
             return GetTraceString("PINGRESP", null, null);

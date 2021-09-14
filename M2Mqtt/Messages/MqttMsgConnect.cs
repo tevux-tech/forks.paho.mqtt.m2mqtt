@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for CONNECT message from client to broker
     /// </summary>
-    public class MqttMsgConnect : MqttMsgBase {
+    public class MqttMsgConnect : MqttMsgBase, ISentToBroker {
         public const ushort KeepAliveDefaultValue = 60; // seconds
         public const ushort KeepAliveMaximumValue = 65535; // 16 bit
 
@@ -84,12 +84,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             KeepAlivePeriod = keepAlivePeriod;
         }
 
-        public static MqttMsgConnect Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Not needed for the client side.
-            return new MqttMsgConnect();
-        }
-
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
             var payloadSize = 0;
             byte[] buffer;
             var index = 0;

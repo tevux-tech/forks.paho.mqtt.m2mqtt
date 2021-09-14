@@ -20,12 +20,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PINGREQ message from client to broker
     /// </summary>
-    public class MqttMsgPingReq : MqttMsgBase {
+    public class MqttMsgPingReq : MqttMsgBase, ISentToBroker {
         public MqttMsgPingReq() {
             type = MessageType.PingReq;
         }
 
-        public override byte[] GetBytes() {
+        public byte[] GetBytes() {
             var buffer = new byte[2];
             var index = 0;
 
@@ -35,11 +35,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer[index++] = 0x00;
 
             return buffer;
-        }
-
-        public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Not needed for the client side.
-            return new MqttMsgPingReq();
         }
 
         public override string ToString() {

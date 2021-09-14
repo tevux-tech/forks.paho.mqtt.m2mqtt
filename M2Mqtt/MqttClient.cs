@@ -501,7 +501,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        private void Send(MqttMsgBase msg) {
+        private void Send(ISentToBroker msg) {
             Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
             Send(msg.GetBytes());
         }
@@ -561,7 +561,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Send a message to the broker and wait answer
         /// </summary>
         /// <returns>MQTT message response</returns>
-        private MqttMsgBase SendReceive(MqttMsgBase msg) {
+        private MqttMsgBase SendReceive(ISentToBroker msg) {
             return SendReceive(msg, MqttSettings.MQTT_DEFAULT_TIMEOUT);
         }
 
@@ -569,7 +569,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Send a message to the broker and wait answer
         /// </summary>
         /// <returns>MQTT message response</returns>
-        private MqttMsgBase SendReceive(MqttMsgBase msg, int timeout) {
+        private MqttMsgBase SendReceive(ISentToBroker msg, int timeout) {
             Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
             return SendReceive(msg.GetBytes(), timeout);
         }
@@ -1088,7 +1088,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                                         // QoS 0, PUBLISH message to send to broker, no state change, no acknowledge
                                         if (msgContext.Flow == MqttMsgFlow.ToPublish) {
-                                            Send(msgInflight);
+                                            Send((ISentToBroker)msgInflight);
                                         }
                                         // QoS 0, no need acknowledge
                                         else if (msgContext.Flow == MqttMsgFlow.ToAcknowledge) {
@@ -1129,7 +1129,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                                                 msgContext.State = MqttMsgState.WaitForUnsuback;
                                             }
 
-                                            Send(msgInflight);
+                                            Send((ISentToBroker)msgInflight);
 
                                             // update timeout : minimum between delay (based on current message sent) or current timeout
                                             timeout = (_settings.DelayOnRetry < timeout) ? _settings.DelayOnRetry : timeout;
@@ -1165,7 +1165,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                                                 msgInflight.DupFlag = true;
                                             }
 
-                                            Send(msgInflight);
+                                            Send((ISentToBroker)msgInflight);
 
                                             // update timeout : minimum between delay (based on current message sent) or current timeout
                                             timeout = (_settings.DelayOnRetry < timeout) ? _settings.DelayOnRetry : timeout;
