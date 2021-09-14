@@ -213,7 +213,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public byte Connect(string clientId) {
-            return Connect(clientId, null, null, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KEEP_ALIVE_PERIOD_DEFAULT);
+            return Connect(clientId, null, null, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public byte Connect(string clientId, string username, string password) {
-            return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KEEP_ALIVE_PERIOD_DEFAULT);
+            return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
         }
 
         /// <summary>
