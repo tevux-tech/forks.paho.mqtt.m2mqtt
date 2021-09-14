@@ -34,13 +34,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         // variable header fields
         internal const byte PROTOCOL_NAME_LEN_SIZE = 2;
-        internal const byte PROTOCOL_NAME_V3_1_SIZE = 6;
         internal const byte PROTOCOL_NAME_V3_1_1_SIZE = 4; // [v.3.1.1]
         internal const byte PROTOCOL_VERSION_SIZE = 1;
         internal const byte CONNECT_FLAGS_SIZE = 1;
         internal const byte KEEP_ALIVE_TIME_SIZE = 2;
 
-        internal const byte PROTOCOL_VERSION_V3_1 = 0x03;
         internal const byte PROTOCOL_VERSION_V3_1_1 = 0x04; // [v.3.1.1]
         internal const ushort KEEP_ALIVE_PERIOD_DEFAULT = 60; // seconds
         internal const ushort MAX_KEEP_ALIVE = 65535; // 16 bit
@@ -274,14 +272,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             }
 
             // protocol name field size
-            // MQTT version 3.1
-            if (ProtocolVersion == PROTOCOL_VERSION_V3_1) {
-                varHeaderSize += (PROTOCOL_NAME_LEN_SIZE + PROTOCOL_NAME_V3_1_SIZE);
-            }
-            // MQTT version 3.1.1
-            else {
-                varHeaderSize += (PROTOCOL_NAME_LEN_SIZE + PROTOCOL_NAME_V3_1_1_SIZE);
-            }
+            varHeaderSize += (PROTOCOL_NAME_LEN_SIZE + PROTOCOL_NAME_V3_1_1_SIZE);
+
             // protocol level field size
             varHeaderSize += PROTOCOL_VERSION_SIZE;
             // connect flags field size
@@ -324,22 +316,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // protocol name
             buffer[index++] = 0; // MSB protocol name size
-            // MQTT version 3.1
-            if (ProtocolVersion == PROTOCOL_VERSION_V3_1) {
-                buffer[index++] = PROTOCOL_NAME_V3_1_SIZE; // LSB protocol name size
-                Array.Copy(Encoding.UTF8.GetBytes(PROTOCOL_NAME_V3_1), 0, buffer, index, PROTOCOL_NAME_V3_1_SIZE);
-                index += PROTOCOL_NAME_V3_1_SIZE;
-                // protocol version
-                buffer[index++] = PROTOCOL_VERSION_V3_1;
-            }
-            // MQTT version 3.1.1
-            else {
-                buffer[index++] = PROTOCOL_NAME_V3_1_1_SIZE; // LSB protocol name size
-                Array.Copy(Encoding.UTF8.GetBytes(PROTOCOL_NAME_V3_1_1), 0, buffer, index, PROTOCOL_NAME_V3_1_1_SIZE);
-                index += PROTOCOL_NAME_V3_1_1_SIZE;
-                // protocol version
-                buffer[index++] = PROTOCOL_VERSION_V3_1_1;
-            }
+            buffer[index++] = PROTOCOL_NAME_V3_1_1_SIZE; // LSB protocol name size
+            Array.Copy(Encoding.UTF8.GetBytes(PROTOCOL_NAME_V3_1_1), 0, buffer, index, PROTOCOL_NAME_V3_1_1_SIZE);
+            index += PROTOCOL_NAME_V3_1_1_SIZE;
+            // protocol version
+            buffer[index++] = PROTOCOL_VERSION_V3_1_1;
+
 
             // connect flags
             byte connectFlags = 0x00;

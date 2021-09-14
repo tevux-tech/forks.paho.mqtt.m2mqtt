@@ -97,15 +97,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             // read bytes from socket...
             channel.Receive(buffer);
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1) {
-                // only 3.1.0
-
-                // read QoS level from fixed header (would be QoS Level 1)
-                msg.qosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
-                // read DUP flag from fixed header
-                msg.dupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
-            }
-
             // message id
             msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
             msg.messageId |= (buffer[index++]);
