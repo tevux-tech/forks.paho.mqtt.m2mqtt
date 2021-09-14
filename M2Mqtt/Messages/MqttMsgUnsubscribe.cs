@@ -16,7 +16,6 @@ Contributors:
 
 using System;
 // if NOT .Net Micro Framework
-using System.Collections.Generic;
 using System.Text;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 

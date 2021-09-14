@@ -15,7 +15,6 @@ Contributors:
 */
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 

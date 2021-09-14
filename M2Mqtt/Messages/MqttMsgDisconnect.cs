@@ -14,8 +14,6 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
-
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for DISCONNECT message from client to broker
