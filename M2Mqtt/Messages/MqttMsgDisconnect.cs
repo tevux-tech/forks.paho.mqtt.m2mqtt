@@ -28,11 +28,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public static MqttMsgDisconnect Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             var msg = new MqttMsgDisconnect();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Disconnect) {
-                    throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-                }
+            // [v3.1.1] check flag bits
+            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Disconnect) {
+                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // get remaining length and allocate buffer
@@ -47,13 +45,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var index = 0;
 
             // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.Disconnect << FixedHeader.TypeOffset) | MessageFlags.Disconnect; // [v.3.1.1]
-            }
-            else {
-                buffer[index++] = (MessageType.Disconnect << FixedHeader.TypeOffset);
-            }
-
+            buffer[index++] = (MessageType.Disconnect << FixedHeader.TypeOffset) | MessageFlags.Disconnect; // [v.3.1.1]
             buffer[index++] = 0x00;
 
             return buffer;

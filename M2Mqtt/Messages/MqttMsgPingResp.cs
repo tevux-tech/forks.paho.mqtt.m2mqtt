@@ -29,11 +29,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             // Section 3.13.
             var msg = new MqttMsgPingResp();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PingResp) {
-                    throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-                }
+            // [v3.1.1] check flag bits
+            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PingResp) {
+                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // already know remaininglength is zero (MQTT specification),

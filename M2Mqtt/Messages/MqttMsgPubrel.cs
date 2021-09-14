@@ -58,15 +58,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PubRel << FixedHeader.TypeOffset) | MessageFlags.PubRel; // [v.3.1.1]
-            }
-            else {
-                buffer[index] = (byte)((MessageType.PubRel << FixedHeader.TypeOffset) |
-                                   (qosLevel << FixedHeader.QosLevelOffset));
-                buffer[index] |= dupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
-                index++;
-            }
+            buffer[index++] = (MessageType.PubRel << FixedHeader.TypeOffset) | MessageFlags.PubRel; // [v.3.1.1]
 
             // encode remaining length
             index = EncodeRemainingLength(remainingLength, buffer, index);
@@ -83,11 +75,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var index = 0;
             var msg = new MqttMsgPubrel();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PubRel) {
-                    throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-                }
+            // [v3.1.1] check flag bits
+            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PubRel) {
+                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // get remaining length and allocate buffer
@@ -96,15 +86,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // read bytes from socket...
             channel.Receive(buffer);
-
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1) {
-                // only 3.1.0
-
-                // read QoS level from fixed header (would be QoS Level 1)
-                msg.qosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
-                // read DUP flag from fixed header
-                msg.dupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
-            }
 
             // message id
             msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);

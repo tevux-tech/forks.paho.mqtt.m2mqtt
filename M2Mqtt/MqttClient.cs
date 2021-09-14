@@ -1531,12 +1531,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                                             msgContext.State = MqttMsgState.WaitForPubcomp;
                                             msgContext.Timestamp = Environment.TickCount;
                                             msgContext.Attempt++;
-                                            // retry ? set dup flag [v3.1.1] no needed
-                                            if (ProtocolVersion == MqttProtocolVersion.Version_3_1) {
-                                                if (msgContext.Attempt > 1) {
-                                                    pubrel.DupFlag = true;
-                                                }
-                                            }
 
                                             Send(pubrel);
 
@@ -1676,7 +1670,6 @@ namespace uPLibrary.Networking.M2Mqtt {
     /// MQTT protocol version
     /// </summary>
     public enum MqttProtocolVersion {
-        Version_3_1 = MqttMsgConnect.PROTOCOL_VERSION_V3_1,
-        Version_3_1_1 = MqttMsgConnect.PROTOCOL_VERSION_V3_1_1
+        Version_3_1_1 = 4
     }
 }

@@ -55,12 +55,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             byte[] buffer;
             var msg = new MqttMsgConnack();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.ConAck) {
-                    throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-                }
+            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.ConAck) {
+                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
+
 
             // get remaining length and allocate buffer
             var remainingLength = DecodeRemainingLength(channel);
@@ -68,10 +66,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // read bytes from socket...
             channel.Receive(buffer);
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] ... set session present flag ...
-                msg.SessionPresent = (buffer[flagsByteOffset] & flagsbyteMask) != 0x00;
-            }
+
+            // [v3.1.1] ... set session present flag ...
+            msg.SessionPresent = (buffer[flagsByteOffset] & flagsbyteMask) != 0x00;
+
             // ...and set return code from broker
             msg.ReturnCode = buffer[returnCodeByteOffset];
 

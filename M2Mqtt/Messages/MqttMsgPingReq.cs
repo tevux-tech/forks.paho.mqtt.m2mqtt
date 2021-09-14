@@ -30,13 +30,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var index = 0;
 
             // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PingReq << FixedHeader.TypeOffset) | MessageFlags.PingReq; // [v.3.1.1]
-            }
-            else {
-                buffer[index++] = (MessageType.PingReq << FixedHeader.TypeOffset);
-            }
 
+            buffer[index++] = (MessageType.PingReq << FixedHeader.TypeOffset) | MessageFlags.PingReq; // [v.3.1.1]
             buffer[index++] = 0x00;
 
             return buffer;
@@ -45,11 +40,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public static MqttMsgPingReq Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             var msg = new MqttMsgPingReq();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PingReq) {
-                    throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-                }
+            // [v3.1.1] check flag bits
+            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PingReq) {
+                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // already know remaininglength is zero (MQTT specification),

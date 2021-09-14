@@ -50,11 +50,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             int topicUtf8Length;
             var msg = new MqttMsgSubscribe();
 
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                // [v3.1.1] check flag bits
-                if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Subcribe) {
-                    throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-                }
+            // [v3.1.1] check flag bits
+            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.Subcribe) {
+                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
             }
 
             // get remaining length and allocate buffer
@@ -63,17 +61,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // read bytes from socket...
             var received = channel.Receive(buffer);
-
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1) {
-                // only 3.1.0
-
-                // read QoS level from fixed header
-                msg.qosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
-                // read DUP flag from fixed header
-                msg.dupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
-                // retain flag not used
-                msg.retain = false;
-            }
 
             // message id
             msg.messageId = (ushort)((buffer[index++] << 8) & 0xFF00);
@@ -168,15 +155,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.Subscribe << FixedHeader.TypeOffset) | MessageFlags.Subcribe; // [v.3.1.1]
-            }
-            else {
-                buffer[index] = (byte)((MessageType.Subscribe << FixedHeader.TypeOffset) |
-                                   (qosLevel << FixedHeader.QosLevelOffset));
-                buffer[index] |= dupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
-                index++;
-            }
+            buffer[index++] = (MessageType.Subscribe << FixedHeader.TypeOffset) | MessageFlags.Subcribe; // [v.3.1.1]
+
 
             // encode remaining length
             index = EncodeRemainingLength(remainingLength, buffer, index);
