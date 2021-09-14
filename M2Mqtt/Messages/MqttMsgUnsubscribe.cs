@@ -113,11 +113,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { MessageId, TopicsToUnsubscribe });
-#else
-            return base.ToString();
-#endif
         }
     }
 }

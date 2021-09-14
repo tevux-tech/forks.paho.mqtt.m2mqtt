@@ -77,11 +77,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("CONNACK", new object[] { "returnCode" }, new object[] { ReturnCode });
-#else
-            return base.ToString();
-#endif
         }
     }
 }

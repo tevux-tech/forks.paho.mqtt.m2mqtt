@@ -17,6 +17,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
+    <DefineConstants></DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="IReceivedFromBroker.xaml" />
   </ItemGroup>

@@ -134,7 +134,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return value;
         }
 
-#if TRACE
         /// <summary>
         /// Returns a string representation of the message for tracing
         /// </summary>
@@ -194,6 +193,5 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             return value;
         }
-#endif
     }
 }

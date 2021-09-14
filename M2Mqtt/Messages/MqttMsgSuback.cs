@@ -59,11 +59,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("SUBACK", new object[] { "messageId", "grantedQosLevels" }, new object[] { MessageId, GrantedQoSLevels });
-#else
-            return base.ToString();
-#endif
         }
     }
 }

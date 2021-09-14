@@ -95,11 +95,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("PUBREL", new object[] { "messageId" }, new object[] { MessageId });
-#else
-            return base.ToString();
-#endif
         }
     }
 }

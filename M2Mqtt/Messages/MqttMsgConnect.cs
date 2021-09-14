@@ -221,11 +221,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("CONNECT", new object[] { "protocolName", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ProtocolName, ClientId, WillFlag, willRetain, willQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
-#else
-            return base.ToString();
-#endif
         }
     }
 }

@@ -204,11 +204,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("PUBLISH", new object[] { "messageId", "topic", "message" }, new object[] { MessageId, Topic, Message });
-#else
-            return base.ToString();
-#endif
         }
     }
 }

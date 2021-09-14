@@ -33,11 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-#if TRACE
             return GetTraceString("PINGREQ", null, null);
-#else
-            return base.ToString();
-#endif
         }
     }
 }
