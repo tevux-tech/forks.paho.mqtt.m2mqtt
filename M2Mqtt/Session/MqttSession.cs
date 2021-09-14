@@ -20,7 +20,7 @@ namespace uPLibrary.Networking.M2Mqtt.Session {
     /// <summary>
     /// MQTT Session base class
     /// </summary>
-    public abstract class MqttSession {
+    public class MqttSession {
         public string ClientId { get; set; }
 
         public Hashtable InflightMessages { get; set; }
@@ -33,7 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt.Session {
             InflightMessages = new Hashtable();
         }
 
-        public virtual void Clear() {
+        public void Clear() {
             ClientId = null;
             InflightMessages.Clear();
         }

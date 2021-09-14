@@ -115,7 +115,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         // internal queue for dispatching events
         private Queue _eventQueue;
         // session
-        private MqttClientSession _session;
+        private MqttSession _session;
 
         // reference to avoid access to singleton via property
         private MqttSettings _settings;
@@ -1693,7 +1693,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 }
                 else {
                     // create new session
-                    _session = new MqttClientSession(ClientId);
+                    _session = new MqttSession(ClientId);
                 }
             }
             // clean any previous session
