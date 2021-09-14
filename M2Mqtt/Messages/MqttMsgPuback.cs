@@ -24,51 +24,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public MqttMsgPuback() {
             type = MessageType.PubAck;
         }
-        public override byte[] GetBytes(byte protocolVersion) {
-            var fixedHeaderSize = 0;
-            var varHeaderSize = 0;
-            var payloadSize = 0;
-            var remainingLength = 0;
-            byte[] buffer;
-            var index = 0;
-
-            // message identifier
-            varHeaderSize += MessageIdSize;
-
-            remainingLength += (varHeaderSize + payloadSize);
-
-            // first byte of fixed header
-            fixedHeaderSize = 1;
-
-            var temp = remainingLength;
-            // increase fixed header size based on remaining length
-            // (each remaining length byte can encode until 128)
-            do {
-                fixedHeaderSize++;
-                temp = temp / 128;
-            } while (temp > 0);
-
-            // allocate buffer for message
-            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
-
-            // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PubAck << FixedHeader.TypeOffset) | MessageFlags.PubAck;
-            }
-            else {
-                buffer[index++] = (MessageType.PubAck << FixedHeader.TypeOffset);
-            }
-
-            // encode remaining length
-            index = EncodeRemainingLength(remainingLength, buffer, index);
-
-            // get message identifier
-            buffer[index++] = (byte)((messageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(messageId & 0x00FF); // LSB 
-
-            return buffer;
-        }
-
         public static MqttMsgPuback Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -95,6 +50,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
+        public override byte[] GetBytes(byte ProtocolVersion) {
+            // Not needed for the client side.
+            return new byte[0];
+        }
         public override string ToString() {
 #if TRACE
             return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { messageId });
