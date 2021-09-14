@@ -26,6 +26,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public static MqttMsgPingResp Parse(byte fixedHeaderFirstByte, byte protocolVersion, IMqttNetworkChannel channel) {
+            // Section 3.13.
             var msg = new MqttMsgPingResp();
 
             if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
@@ -43,20 +44,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override byte[] GetBytes(byte protocolVersion) {
-            var buffer = new byte[2];
-            var index = 0;
-
-            // first fixed header byte
-            if (protocolVersion == MqttMsgConnect.PROTOCOL_VERSION_V3_1_1) {
-                buffer[index++] = (MessageType.PingResp << FixedHeader.TypeOffset) | MessageFlags.PingResp;
-            }
-            else {
-                buffer[index++] = (MessageType.PingResp << FixedHeader.TypeOffset);
-            }
-
-            buffer[index++] = 0x00;
-
-            return buffer;
+            // Not needed for the client side.
+            return new byte[0];
         }
 
         public override string ToString() {
