@@ -14,16 +14,13 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
-
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for CONNACK message from broker to client
+    /// Class for CONNACK message from broker to client. See section 3.2.
     /// </summary>
     public class MqttMsgConnack : MqttMsgBase {
 
         public enum ReturnCodes : byte {
-            // Section 3.2.2.3.
             Accepted = 0x00,
             RefusedUnacceptableProtocolVersion = 0x01,
             RefusedIdentifierRejected = 0x02,
@@ -32,47 +29,40 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             RefusedNotAuthorized = 0x05
         }
 
-        /// <summary>
-        /// Session present flag [v3.1.1]
-        /// </summary>
         public bool SessionPresent { get; set; }
-
         public ReturnCodes ReturnCode { get; set; }
 
         public MqttMsgConnack() {
             Type = MessageType.ConAck;
         }
 
-        public static MqttMsgConnack Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            // Section 3.2.2.
+        public static bool TryParse(byte[] variableHeader, out MqttMsgConnack parsedMessage) {
+            var isOk = true;
+
+            parsedMessage = new MqttMsgConnack();
+
             // Byte 1: ConAck flags.
-            // Byte 2: Return code.
-            byte flagsByteOffset = 0; // <-- [v3.1.1] connect acknowledge flags replace "old" topic name compression respone (not used in 3.1)
-            byte flagsbyteMask = 0x01;// <-- [v3.1.1] session present flag
-            byte returnCodeByteOffset = 1;
-
-            byte[] buffer;
-            var msg = new MqttMsgConnack();
-
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.ConAck) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
+            if (variableHeader[0] == 0) {
+                parsedMessage.SessionPresent = false;
+            }
+            else if (variableHeader[0] == 1) {
+                parsedMessage.SessionPresent = true;
+            }
+            else {
+                // That's a protocol violation. 
+                isOk = false;
             }
 
+            // Byte 2: Return code.
+            if (variableHeader[1] < 6) {
+                parsedMessage.ReturnCode = (ReturnCodes)variableHeader[1];
+            }
+            else {
+                // That's a protocol violation. 
+                isOk = false;
+            }
 
-            // get remaining length and allocate buffer
-            var remainingLength = DecodeRemainingLength(channel);
-            buffer = new byte[remainingLength];
-
-            // read bytes from socket...
-            channel.Receive(buffer);
-
-            // [v3.1.1] ... set session present flag ...
-            msg.SessionPresent = (buffer[flagsByteOffset] & flagsbyteMask) != 0x00;
-
-            // ...and set return code from broker
-            msg.ReturnCode = (ReturnCodes)buffer[returnCodeByteOffset];
-
-            return msg;
+            return isOk;
         }
 
         public override string ToString() {

@@ -37,13 +37,64 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                     if (readBytes > 0) {
                         // extract message type from received byte
-                        msgType = (byte)((fixedHeaderFirstByte[0] & MqttMsgBase.FixedHeader.TypeMask) >> MqttMsgBase.FixedHeader.TypeOffset);
+                        msgType = (byte)(fixedHeaderFirstByte[0] >> 4);
+                        var flags = (byte)(fixedHeaderFirstByte[0] & 0x0F);
+
+                        // Section 2.2. explains which bit can or cannot be set in the first byte.
+                        if (msgType == MqttMsgBase.MessageType.Publish) {
+                            // PUBLISH is the only packet that actually uses any flags, and it uses all 4 of them.
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.ConAck) && (flags == 0x00)) {
+                            // Remaining length is always 2, see section 3.2.1.
+                            // Thus, need to read 3 more bytes.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
+                            var variablePayloadBytes = new byte[2];
+                            _channel.Receive(variablePayloadBytes);
+
+                            var isOk = MqttMsgConnack.TryParse(variablePayloadBytes, out var parsedMessage);
+                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
+#warning  definitely need some better state machine for this _msgReceived handling
+                            _msgReceived = parsedMessage;
+                            _syncEndReceiving.Set();
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.PingResp) && (flags == 0x00)) {
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.PubAck) && (flags == 0x00)) {
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.PubRec) && (flags == 0x00)) {
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.PubRel) && (flags == 0x02)) {
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.PubComp) && (flags == 0x00)) {
+
+                        }
+                        else if ((msgType == MqttMsgBase.MessageType.UnsubAck) && (flags == 0x00)) {
+
+                        }
+                        else {
+                            // This is either a malformed message header, or it is meant for server, not client.
+                            // Either way, it is a protocol violation, so network connection should be closed.
+                            // Although specification is not entirely clear what to do if a client receives a messages which is meant for a server.
+                            // But I will go with section 4.8 and close the connection anyway.
+#warning add some error propagation here to close connection
+                        }
+
+
 
                         switch (msgType) {
                             case MqttMsgBase.MessageType.ConAck:
-                                _msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
-                                _syncEndReceiving.Set();
+                                //_msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
+                                //_syncEndReceiving.Set();
                                 break;
 
                             case MqttMsgBase.MessageType.PingResp:
