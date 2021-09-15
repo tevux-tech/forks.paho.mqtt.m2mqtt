@@ -34,10 +34,10 @@ namespace uPLibrary.Networking.M2Mqtt {
             _settings = MqttSettings.Instance;
             // set settings port based on secure connection or not
             if (!secure) {
-                _settings.Port = _brokerPort;
+                _settings.UnsecurePort = _brokerPort;
             }
             else {
-                _settings.SslPort = _brokerPort;
+                _settings.SecurePort = _brokerPort;
             }
 
             _syncEndReceiving = new AutoResetEvent(false);

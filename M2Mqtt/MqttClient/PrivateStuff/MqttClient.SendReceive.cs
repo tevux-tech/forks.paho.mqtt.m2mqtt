@@ -71,7 +71,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>MQTT message response</returns>
         private MqttMsgBase SendReceive(ISentToBroker msg) {
-            return SendReceive(msg, MqttSettings.MQTT_DEFAULT_TIMEOUT);
+            return SendReceive(msg, MqttSettings.DefaultTimeout);
         }
 
         /// <summary>
