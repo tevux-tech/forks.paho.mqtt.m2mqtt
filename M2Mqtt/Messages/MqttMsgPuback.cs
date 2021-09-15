@@ -24,6 +24,35 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public MqttMsgPuback() {
             Type = MessageType.PubAck;
         }
+        public byte[] GetBytes() {
+            var varHeaderSize = 0;
+            var payloadSize = 0;
+            var remainingLength = 0;
+            byte[] buffer;
+            var index = 0;
+
+            // message identifier
+            varHeaderSize += MessageIdSize;
+
+            remainingLength += (varHeaderSize + payloadSize);
+
+            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
+
+            // allocate buffer for message
+            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
+
+            buffer[index++] = (MessageType.PubAck << FixedHeader.TypeOffset) | MessageFlags.PubAck;
+
+            // encode remaining length
+            index = EncodeRemainingLength(remainingLength, buffer, index);
+
+            // get message identifier
+            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
+            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
+
+            return buffer;
+        }
+
         public static MqttMsgPuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
             byte[] buffer;
             var index = 0;
@@ -48,12 +77,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return msg;
         }
 
-        public byte[] GetBytes() {
-# warning I think I overdid it here
-
-            // Not needed for the client side.
-            return new byte[0];
-        }
         public override string ToString() {
             return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { MessageId });
         }
