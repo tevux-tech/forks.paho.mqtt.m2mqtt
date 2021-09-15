@@ -60,7 +60,15 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PingResp) && (flags == 0x00)) {
+                            // Remaining length is always 0, see section 3.13.
+                            // Thus, need to read 1 more byte, and discard it.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
 
+                            var isOk = MqttMsgPingResp.TryParse(out var parsedMessage);
+                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
+                            _msgReceived = parsedMessage;
+                            _syncEndReceiving.Set();
                         }
                         else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
 
@@ -98,9 +106,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                                 break;
 
                             case MqttMsgBase.MessageType.PingResp:
-                                _msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
-                                _syncEndReceiving.Set();
+                                //_msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
+                                //_syncEndReceiving.Set();
                                 break;
 
                             case MqttMsgBase.MessageType.SubAck:

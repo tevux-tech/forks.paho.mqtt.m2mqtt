@@ -14,8 +14,6 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
-
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PINGRESP message from client to broker. See section 3.13.
@@ -25,19 +23,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Type = MessageType.PingResp;
         }
 
-        public static MqttMsgPingResp Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            var msg = new MqttMsgPingResp();
+        public static bool TryParse(out MqttMsgPingResp parsedMessage) {
+            // Nothing to parse here.
+            parsedMessage = new MqttMsgPingResp();
 
-            // [v3.1.1] check flag bits
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PingResp) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-            }
-
-            // already know remaininglength is zero (MQTT specification),
-            // so it isn't necessary to read other data from socket
-            _ = DecodeRemainingLength(channel);
-
-            return msg;
+            return true;
         }
 
         public override string ToString() {
