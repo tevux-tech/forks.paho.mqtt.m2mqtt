@@ -14,11 +14,9 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
-
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for SUBACK message from broker to client
+    /// Class for SUBACK message from broker to client. See section 3.9.
     /// </summary>
     public class MqttMsgSuback : MqttMsgBase {
         public byte[] GrantedQoSLevels { get; set; }
@@ -27,35 +25,31 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Type = MessageType.SubAck;
         }
 
-        public static MqttMsgSuback Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            byte[] buffer;
-            var index = 0;
-            var msg = new MqttMsgSuback();
+        public static bool TryParse(byte[] variableHeaderBytes, byte[] payloadBytes, out MqttMsgSuback parsedMessage) {
+            var isOk = true;
+            parsedMessage = new MqttMsgSuback();
 
-            // [v3.1.1] check flag bits
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.SubAck) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
+            // Bytes 1-2: Packet Identifier. Can be anything.
+            parsedMessage.MessageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+
+            // Remaining bytes: QoS levels granted.
+            parsedMessage.GrantedQoSLevels = new byte[payloadBytes.Length];
+            for (var i = 0; i < payloadBytes.Length; i++) {
+                if ((payloadBytes[i] & 0x80) == 0x80) {
+                    // QoS was not granted for that topic, but that's a valid payload.
+                    parsedMessage.GrantedQoSLevels[i] = payloadBytes[i];
+                }
+                else if ((payloadBytes[i] & 0x03) < 0x03) {
+                    // QoS was granted.
+                    parsedMessage.GrantedQoSLevels[i] = payloadBytes[i];
+                }
+                else {
+                    // That's a protocol violation.
+                    isOk = false;
+                }
             }
 
-            // get remaining length and allocate buffer
-            var remainingLength = DecodeRemainingLength(channel);
-            buffer = new byte[remainingLength];
-
-            // read bytes from socket...
-            channel.Receive(buffer);
-
-            // message id
-            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.MessageId |= (buffer[index++]);
-
-            // payload contains QoS levels granted
-            msg.GrantedQoSLevels = new byte[remainingLength - MessageIdSize];
-            var qosIdx = 0;
-            do {
-                msg.GrantedQoSLevels[qosIdx++] = buffer[index++];
-            } while (index < remainingLength);
-
-            return msg;
+            return isOk;
         }
 
         public override string ToString() {

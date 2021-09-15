@@ -49,10 +49,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
                             _channel.Receive(lengthBytes);
-                            var variablePayloadBytes = new byte[2];
-                            _channel.Receive(variablePayloadBytes);
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
 
-                            var isOk = MqttMsgConnack.TryParse(variablePayloadBytes, out var parsedMessage);
+                            var isOk = MqttMsgConnack.TryParse(variableHeaderBytes, out var parsedMessage);
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 #warning  definitely need some better state machine for this _msgReceived handling
                             _msgReceived = parsedMessage;
@@ -71,7 +71,20 @@ namespace uPLibrary.Networking.M2Mqtt {
                             _syncEndReceiving.Set();
                         }
                         else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
+                            // Remaining length is variable header (2 bytes) plus the length of the payload, see section 3.9.
+                            // Thus, need to decode remaining length field itself first.
+                            var remainingLength = MqttMsgBase.DecodeRemainingLength(_channel);
 
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
+
+                            var payloadBytes = new byte[remainingLength - 2];
+                            _channel.Receive(payloadBytes);
+
+                            // enqueue SUBACK message received (for QoS Level 1) into the internal queue
+                            var isOk = MqttMsgSuback.TryParse(variableHeaderBytes, payloadBytes, out var parsedMessage);
+                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
+                            EnqueueInternal(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubAck) && (flags == 0x00)) {
 
@@ -112,10 +125,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                                 break;
 
                             case MqttMsgBase.MessageType.SubAck:
-                                // enqueue SUBACK message received (for QoS Level 1) into the internal queue
-                                var suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", suback);
-                                EnqueueInternal(suback);
+                                //// enqueue SUBACK message received (for QoS Level 1) into the internal queue
+                                //var suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", suback);
+                                //EnqueueInternal(suback);
                                 break;
 
                             case MqttMsgBase.MessageType.Publish:

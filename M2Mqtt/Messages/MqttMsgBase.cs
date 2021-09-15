@@ -107,7 +107,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// Decode remaining length reading bytes from socket
         /// </summary>
-        protected static int DecodeRemainingLength(IMqttNetworkChannel channel) {
+        public static int DecodeRemainingLength(IMqttNetworkChannel channel) {
             var multiplier = 1;
             var value = 0;
             var nextByte = new byte[1];
