@@ -31,17 +31,17 @@ namespace uPLibrary.Networking.M2Mqtt {
         private readonly LocalCertificateSelectionCallback _userCertificateSelectionCallback;
 
         private Socket _socket;
-        private bool _secure;
+        private readonly bool _secure;
 
         // CA certificate (on client)
-        private X509Certificate _caCert;
+        private readonly X509Certificate _caCert;
         // Server certificate (on broker)
-        private X509Certificate _serverCert;
+        private readonly X509Certificate _serverCert;
         // client certificate (on client)
-        private X509Certificate _clientCert;
+        private readonly X509Certificate _clientCert;
 
         // SSL/TLS protocol version
-        private MqttSslProtocols _sslProtocol;
+        private readonly MqttSslProtocols _sslProtocol;
 
         public string RemoteHostName { get; private set; }
         public IPAddress RemoteIpAddress { get; private set; }
@@ -54,7 +54,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <summary>
         /// List of Protocol for ALPN
         /// </summary>
-        private List<string> _alpnProtocols = new List<string>();
+        private readonly List<string> _alpnProtocols = new List<string>();
 
 
         /// <summary>
