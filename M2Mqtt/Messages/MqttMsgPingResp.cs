@@ -41,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return GetTraceString("PINGRESP", null, null);
+            return Helpers.GetTraceString("PINGRESP", null, null);
         }
     }
 }

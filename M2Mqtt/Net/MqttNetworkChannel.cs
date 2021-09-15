@@ -201,7 +201,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public int Receive(byte[] buffer) {
             if (_secure) {
                 // read all data needed (until fill buffer)
-                int idx = 0;
+                var idx = 0;
                 while (idx < buffer.Length) {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.
@@ -216,7 +216,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
             else {
                 // read all data needed (until fill buffer)
-                int idx = 0;
+                var idx = 0;
                 while (idx < buffer.Length) {
                     // fixed scenario with socket closed gracefully by peer/broker and
                     // Read return 0. Avoid infinite loop.

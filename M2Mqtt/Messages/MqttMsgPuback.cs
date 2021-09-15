@@ -78,7 +78,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { MessageId });
+            return Helpers.GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { MessageId });
         }
     }
 }

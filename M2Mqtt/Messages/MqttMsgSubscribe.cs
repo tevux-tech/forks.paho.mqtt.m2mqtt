@@ -119,7 +119,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return GetTraceString("SUBSCRIBE", new object[] { "messageId", "topics", "qosLevels" }, new object[] { MessageId, Topics, QoSLevels });
+            return Helpers.GetTraceString("SUBSCRIBE", new object[] { "messageId", "topics", "qosLevels" }, new object[] { MessageId, Topics, QoSLevels });
         }
     }
 }

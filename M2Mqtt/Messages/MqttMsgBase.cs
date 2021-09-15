@@ -14,8 +14,6 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System.Text;
-
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Base class for all MQTT messages
@@ -130,66 +128,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 value += ((digit & 127) * multiplier);
                 multiplier *= 128;
             } while ((digit & 128) != 0);
-
-            return value;
-        }
-
-        /// <summary>
-        /// Returns a string representation of the message for tracing
-        /// </summary>
-        protected string GetTraceString(string name, object[] fieldNames, object[] fieldValues) {
-            var sb = new StringBuilder();
-            sb.Append(name);
-
-            if ((fieldNames != null) && (fieldValues != null)) {
-                sb.Append("(");
-                var addComma = false;
-                for (var i = 0; i < fieldValues.Length; i++) {
-                    if (fieldValues[i] != null) {
-                        if (addComma) {
-                            sb.Append(",");
-                        }
-
-                        sb.Append(fieldNames[i]);
-                        sb.Append(":");
-                        sb.Append(GetStringObject(fieldValues[i]));
-                        addComma = true;
-                    }
-                }
-                sb.Append(")");
-            }
-
-            return sb.ToString();
-        }
-
-        object GetStringObject(object value) {
-            var binary = value as byte[];
-            if (binary != null) {
-                var hexChars = "0123456789ABCDEF";
-                var sb = new StringBuilder(binary.Length * 2);
-                for (var i = 0; i < binary.Length; ++i) {
-                    sb.Append(hexChars[binary[i] >> 4]);
-                    sb.Append(hexChars[binary[i] & 0x0F]);
-                }
-
-                return sb.ToString();
-            }
-
-            var list = value as object[];
-            if (list != null) {
-                var sb = new StringBuilder();
-                sb.Append('[');
-                for (var i = 0; i < list.Length; ++i) {
-                    if (i > 0) {
-                        sb.Append(',');
-                    }
-
-                    sb.Append(list[i]);
-                }
-                sb.Append(']');
-
-                return sb.ToString();
-            }
 
             return value;
         }
