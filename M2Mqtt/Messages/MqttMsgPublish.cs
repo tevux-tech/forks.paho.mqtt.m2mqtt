@@ -31,10 +31,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Type = MessageType.Publish;
         }
 
-        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QosLevels.AtMostOnce, false) {
+        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QosLevel.AtMostOnce, false) {
         }
 
-        public MqttMsgPublish(string topic, byte[] message, bool dupFlag, byte qosLevel, bool retain) : base() {
+        public MqttMsgPublish(string topic, byte[] message, bool dupFlag, QosLevel qosLevel, bool retain) : base() {
             Type = MessageType.Publish;
 
             Topic = topic;
@@ -63,7 +63,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             }
 
             // check wrong QoS level (both bits can't be set 1)
-            if (QosLevel > QosLevels.ExactlyOnce) {
+            if (QosLevel > QosLevel.ExactlyOnce) {
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
             }
 
@@ -73,8 +73,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             varHeaderSize += topicUtf8.Length + 2;
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((QosLevel == QosLevels.AtLeastOnce) ||
-                (QosLevel == QosLevels.ExactlyOnce)) {
+            if ((QosLevel == QosLevel.AtLeastOnce) || (QosLevel == QosLevel.ExactlyOnce)) {
                 varHeaderSize += MessageIdSize;
             }
 
@@ -92,7 +91,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
 
             // first fixed header byte
-            buffer[index] = (byte)((MessageType.Publish << FixedHeader.TypeOffset) | (QosLevel << FixedHeader.QosLevelOffset));
+            buffer[index] = (byte)((MessageType.Publish << FixedHeader.TypeOffset) | (((byte)QosLevel) << FixedHeader.QosLevelOffset));
             buffer[index] |= DupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
             buffer[index] |= Retain ? (byte)(1 << FixedHeader.RetainFlagOffset) : (byte)0x00;
             index++;
@@ -107,7 +106,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             index += topicUtf8.Length;
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((QosLevel == QosLevels.AtLeastOnce) || (QosLevel == QosLevels.ExactlyOnce)) {
+            if ((QosLevel == QosLevel.AtLeastOnce) || (QosLevel == QosLevel.ExactlyOnce)) {
                 // check message identifier assigned
                 if (MessageId == 0) {
                     throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
@@ -149,9 +148,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             msg.Topic = new string(Encoding.UTF8.GetChars(topicUtf8));
 
             // read QoS level from fixed header
-            msg.QosLevel = (byte)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
+            msg.QosLevel = (QosLevel)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
             // check wrong QoS level (both bits can't be set 1)
-            if (msg.QosLevel > QosLevels.ExactlyOnce) {
+            if (msg.QosLevel > QosLevel.ExactlyOnce) {
                 throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
             }
             // read DUP flag from fixed header
@@ -160,8 +159,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             msg.Retain = (((fixedHeaderFirstByte & FixedHeader.RetainFlagMask) >> FixedHeader.RetainFlagOffset) == 0x01);
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((msg.QosLevel == QosLevels.AtLeastOnce) ||
-                (msg.QosLevel == QosLevels.ExactlyOnce)) {
+            if ((msg.QosLevel == QosLevel.AtLeastOnce) || (msg.QosLevel == QosLevel.ExactlyOnce)) {
                 // message id
                 msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
                 msg.MessageId |= (buffer[index++]);

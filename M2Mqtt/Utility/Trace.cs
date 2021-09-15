@@ -23,13 +23,14 @@ namespace uPLibrary.Networking.M2Mqtt.Utility {
         Information = 0x04,
         Verbose = 0x0F,
         Frame = 0x10,
-        Queuing = 0x20
+        Queuing = 0x20,
+        All = Error | Warning | Information | Verbose | Frame | Queuing
     }
 
     public delegate void WriteTrace(string format, params object[] args);
 
     public static class Trace {
-        public static TraceLevel TraceLevel = TraceLevel.Error;
+        public static TraceLevel TraceLevel = TraceLevel.All;
         public static WriteTrace TraceListener = delegate { };
 
         [Conditional("DEBUG")]

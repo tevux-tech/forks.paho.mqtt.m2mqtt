@@ -27,7 +27,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public MqttMsgPubrel() {
             Type = MessageType.PubRel;
             // PUBREL message use QoS Level 1 (not "officially" in 3.1.1)
-            QosLevel = QosLevels.AtLeastOnce;
+            QosLevel = QosLevel.AtLeastOnce;
         }
 
         public byte[] GetBytes() {

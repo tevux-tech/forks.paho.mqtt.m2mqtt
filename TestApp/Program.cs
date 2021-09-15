@@ -19,7 +19,13 @@ namespace TestApp {
 
             var client = new MqttClient("172.16.0.2");
             client.MqttMsgPublishReceived += HandlePublishReceived;
-            client.Connect(Guid.NewGuid().ToString());
+            client.Connect("TestApp");
+
+            client.Subscribe(new[] { "temp/testapp" }, new byte[] { 0 });
+
+            Thread.Sleep(1000);
+
+            client.Disconnect();
         }
         private void HandlePublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.MqttMsgPublishEventArgs e) {
 

@@ -73,15 +73,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             public const byte Disconnect = 0x00;
         }
 
-
-        // QOS levels
-        public class QosLevels {
-            public const byte AtMostOnce = 0x00;
-            public const byte AtLeastOnce = 0x01;
-            public const byte ExactlyOnce = 0x02;
-        }
-
-
         // SUBSCRIBE QoS level granted failure [v3.1.1]
         public const byte QosLevelGrantedFailure = 0x80;
 
@@ -91,7 +82,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public byte Type { get; set; }
         public bool DupFlag { get; set; }
-        public byte QosLevel { get; set; }
+        public QosLevel QosLevel { get; set; }
         public bool Retain { get; set; }
         public ushort MessageId { get; set; }
 

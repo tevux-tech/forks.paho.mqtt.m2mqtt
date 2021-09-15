@@ -24,14 +24,14 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Message Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message) {
-            return Publish(topic, message, MqttMsgBase.QosLevels.AtMostOnce, false);
+            return Publish(topic, message, QosLevel.AtMostOnce, false);
         }
 
         /// <summary>
         /// Publish a message asynchronously
         /// </summary>
         /// <returns>Message Id related to PUBLISH message</returns>
-        public ushort Publish(string topic, byte[] message, byte qosLevel, bool retain) {
+        public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
             var publish = new MqttMsgPublish(topic, message, false, qosLevel, retain) {
                 MessageId = GetMessageId()
             };

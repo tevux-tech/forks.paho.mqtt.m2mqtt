@@ -24,8 +24,19 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <param name="topics">List of topics to subscribe</param>
         /// <param name="qosLevels">QOS levels related to topics</param>
         /// <returns>Message Id related to SUBSCRIBE message</returns>
-        public ushort Subscribe(string[] topics, byte[] qosLevels) {
+        public ushort Subscribe(string[] topics, QosLevel[] qosLevels) {
             var subscribe = new MqttMsgSubscribe(topics, qosLevels) {
+                MessageId = GetMessageId()
+            };
+
+            // enqueue subscribe request into the inflight queue
+            EnqueueInflight(subscribe, MqttMsgFlow.ToPublish);
+
+            return subscribe.MessageId;
+        }
+
+        public ushort Subscribe(string topic, QosLevel qosLevel) {
+            var subscribe = new MqttMsgSubscribe(new[] { topic }, new[] { qosLevel }) {
                 MessageId = GetMessageId()
             };
 

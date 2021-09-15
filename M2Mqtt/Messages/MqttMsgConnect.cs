@@ -39,15 +39,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public string ProtocolName { get; set; }
         public string ClientId { get; set; }
 
-        public bool WillRetain {
-            get { return willRetain; }
-            set { willRetain = value; }
-        }
-
-        public byte WillQosLevel {
-            get { return willQosLevel; }
-            set { willQosLevel = value; }
-        }
+        public bool WillRetain { get; set; }
+        public QosLevel WillQosLevel { get; set; }
 
         public bool WillFlag { get; set; }
         public string WillTopic { get; set; }
@@ -58,25 +51,21 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public bool CleanSession { get; set; }
         public ushort KeepAlivePeriod { get; set; }
 
-
-        protected bool willRetain;
-        protected byte willQosLevel;
-
         public MqttMsgConnect() {
             Type = MessageType.Connect;
         }
 
-        public MqttMsgConnect(string clientId) : this(clientId, null, null, false, QosLevels.AtLeastOnce, false, null, null, true, KeepAliveDefaultValue) {
+        public MqttMsgConnect(string clientId) : this(clientId, null, null, false, QosLevel.AtLeastOnce, false, null, null, true, KeepAliveDefaultValue) {
         }
 
-        public MqttMsgConnect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
+        public MqttMsgConnect(string clientId, string username, string password, bool willRetain, QosLevel willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
             Type = MessageType.Connect;
 
             ClientId = clientId;
             Username = username;
             Password = password;
-            this.willRetain = willRetain;
-            this.willQosLevel = willQosLevel;
+            this.WillRetain = willRetain;
+            this.WillQosLevel = willQosLevel;
             WillFlag = willFlag;
             WillTopic = willTopic;
             WillMessage = willMessage;
@@ -97,11 +86,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
 
             // will flag set, will topic and will message MUST be present
-            if (WillFlag && ((willQosLevel >= 0x03) || (willTopicUtf8 == null) || (willMessageUtf8 == null) || ((willTopicUtf8 != null) && (willTopicUtf8.Length == 0)) || ((willMessageUtf8 != null) && (willMessageUtf8.Length == 0)))) {
+            if (WillFlag && (((byte)WillQosLevel >= 0x03) || (willTopicUtf8 == null) || (willMessageUtf8 == null) || ((willTopicUtf8 != null) && (willTopicUtf8.Length == 0)) || ((willMessageUtf8 != null) && (willMessageUtf8.Length == 0)))) {
                 throw new MqttClientException(MqttClientErrorCode.WillWrong);
             }
             // willflag not set, retain must be 0 and will topic and message MUST NOT be present
-            else if (!WillFlag && (willRetain || (willTopicUtf8 != null) || (willMessageUtf8 != null) || ((willTopicUtf8 != null) && (willTopicUtf8.Length != 0)) || ((willMessageUtf8 != null) && (willMessageUtf8.Length != 0)))) {
+            else if (!WillFlag && (WillRetain || (willTopicUtf8 != null) || (willMessageUtf8 != null) || ((willTopicUtf8 != null) && (willTopicUtf8.Length != 0)) || ((willMessageUtf8 != null) && (willMessageUtf8.Length != 0)))) {
                 throw new MqttClientException(MqttClientErrorCode.WillWrong);
             }
 
@@ -110,7 +99,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             }
 
             // check on will QoS Level
-            if ((willQosLevel < QosLevels.AtMostOnce) || (willQosLevel > QosLevels.ExactlyOnce)) {
+            if ((WillQosLevel < QosLevel.AtMostOnce) || (WillQosLevel > QosLevel.ExactlyOnce)) {
                 throw new MqttClientException(MqttClientErrorCode.WillWrong);
             }
 
@@ -156,10 +145,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             byte connectFlags = 0x00;
             connectFlags |= (usernameUtf8 != null) ? (byte)(1 << FlagOffset.Username) : (byte)0x00;
             connectFlags |= (passwordUtf8 != null) ? (byte)(1 << FlagOffset.Password) : (byte)0x00;
-            connectFlags |= (willRetain) ? (byte)(1 << FlagOffset.WillRetain) : (byte)0x00;
+            connectFlags |= (WillRetain) ? (byte)(1 << FlagOffset.WillRetain) : (byte)0x00;
             // only if will flag is set, we have to use will QoS level (otherwise is MUST be 0)
             if (WillFlag) {
-                connectFlags |= (byte)(willQosLevel << FlagOffset.WillQoS);
+                connectFlags |= (byte)(((byte)WillQosLevel) << FlagOffset.WillQoS);
             }
 
             connectFlags |= (WillFlag) ? (byte)(1 << FlagOffset.Will) : (byte)0x00;
@@ -211,7 +200,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("CONNECT", new object[] { "protocolName", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ProtocolName, ClientId, WillFlag, willRetain, willQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
+            return Helpers.GetTraceString("CONNECT", new object[] { "protocolName", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ProtocolName, ClientId, WillFlag, WillRetain, WillQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
         }
     }
 }

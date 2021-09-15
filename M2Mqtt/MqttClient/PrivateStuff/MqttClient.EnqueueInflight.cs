@@ -32,8 +32,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             var enqueue = true;
 
             // if it is a PUBLISH message with QoS Level 2
-            if ((msg.Type == MqttMsgBase.MessageType.Publish) &&
-                (msg.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce)) {
+            if ((msg.Type == MqttMsgBase.MessageType.Publish) && (msg.QosLevel == QosLevel.ExactlyOnce)) {
                 lock (_inflightQueue) {
                     // if it is a PUBLISH message already received (it is in the inflight queue), the publisher
                     // re-sent it because it didn't received the PUBREC. In this case, we have to re-send PUBREC
@@ -63,21 +62,15 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                 // based on QoS level, the messages flow between broker and client changes
                 switch (msg.QosLevel) {
-                    // QoS Level 0
-                    case MqttMsgBase.QosLevels.AtMostOnce:
-
+                    case QosLevel.AtMostOnce:
                         state = MqttMsgState.QueuedQos0;
                         break;
 
-                    // QoS Level 1
-                    case MqttMsgBase.QosLevels.AtLeastOnce:
-
+                    case QosLevel.AtLeastOnce:
                         state = MqttMsgState.QueuedQos1;
                         break;
 
-                    // QoS Level 2
-                    case MqttMsgBase.QosLevels.ExactlyOnce:
-
+                    case QosLevel.ExactlyOnce:
                         state = MqttMsgState.QueuedQos2;
                         break;
                 }
@@ -113,15 +106,13 @@ namespace uPLibrary.Networking.M2Mqtt {
                         if (msg.Type == MqttMsgBase.MessageType.Publish) {
                             // to publish and QoS level 1 or 2
                             if ((msgContext.Flow == MqttMsgFlow.ToPublish) &&
-                                ((msg.QosLevel == MqttMsgBase.QosLevels.AtLeastOnce) ||
-                                 (msg.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce))) {
+                                ((msg.QosLevel == QosLevel.AtLeastOnce) || (msg.QosLevel == QosLevel.ExactlyOnce))) {
                                 if (_session != null) {
                                     _session.InflightMessages.Add(msgContext.Key, msgContext);
                                 }
                             }
                             // to acknowledge and QoS level 2
-                            else if ((msgContext.Flow == MqttMsgFlow.ToAcknowledge) &&
-                                     (msg.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce)) {
+                            else if ((msgContext.Flow == MqttMsgFlow.ToAcknowledge) && (msg.QosLevel == QosLevel.ExactlyOnce)) {
                                 if (_session != null) {
                                     _session.InflightMessages.Add(msgContext.Key, msgContext);
                                 }

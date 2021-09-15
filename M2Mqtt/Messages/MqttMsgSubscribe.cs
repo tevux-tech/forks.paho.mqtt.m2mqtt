@@ -26,20 +26,20 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public string[] Topics { get; set; }
 
-        public byte[] QoSLevels { get; set; }
+        public QosLevel[] QoSLevels { get; set; }
 
         public MqttMsgSubscribe() {
             Type = MessageType.Subscribe;
         }
 
-        public MqttMsgSubscribe(string[] topics, byte[] qosLevels) {
+        public MqttMsgSubscribe(string[] topics, QosLevel[] qosLevels) {
             Type = MessageType.Subscribe;
 
             Topics = topics;
             QoSLevels = qosLevels;
 
             // SUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
-            QosLevel = QosLevels.AtLeastOnce;
+            QosLevel = QosLevel.AtLeastOnce;
         }
 
         public byte[] GetBytes() {
@@ -112,7 +112,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
                 index += topicsUtf8[topicIdx].Length;
 
                 // requested QoS
-                buffer[index++] = QoSLevels[topicIdx];
+                buffer[index++] = (byte)QoSLevels[topicIdx];
             }
 
             return buffer;

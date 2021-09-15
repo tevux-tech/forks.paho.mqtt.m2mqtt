@@ -37,7 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             TopicsToUnsubscribe = topicsToUnsubscribe;
 
             // UNSUBSCRIBE message uses QoS Level 1 (not "officially" in 3.1.1)
-            QosLevel = QosLevels.AtLeastOnce;
+            QosLevel = QosLevel.AtLeastOnce;
         }
 
         public byte[] GetBytes() {

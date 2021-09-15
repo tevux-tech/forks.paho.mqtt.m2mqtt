@@ -26,7 +26,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public ReturnCodes Connect(string clientId) {
-            return Connect(clientId, null, null, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
+            return Connect(clientId, null, null, false, QosLevel.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public ReturnCodes Connect(string clientId, string username, string password) {
-            return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
+            return Connect(clientId, username, password, false, QosLevel.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
         }
 
         /// <summary>
@@ -42,14 +42,14 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public ReturnCodes Connect(string clientId, string username, string password, bool cleanSession, ushort keepAlivePeriod) {
-            return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, cleanSession, keepAlivePeriod);
+            return Connect(clientId, username, password, false, QosLevel.AtMostOnce, false, null, null, cleanSession, keepAlivePeriod);
         }
 
         /// <summary>
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
+        public ReturnCodes Connect(string clientId, string username, string password, bool willRetain, QosLevel willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
             // create CONNECT message
             var connect = new MqttMsgConnect(clientId,
                 username,
@@ -86,7 +86,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             // if connection accepted, start keep alive timer and 
-            if (connack.ReturnCode == MqttMsgConnack.ReturnCodes.Accepted) {
+            if (connack.ReturnCode == ReturnCodes.Accepted) {
                 // set all client properties
                 ClientId = clientId;
                 CleanSession = cleanSession;

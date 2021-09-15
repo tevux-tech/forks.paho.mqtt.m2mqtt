@@ -112,7 +112,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public string ClientId { get; private set; }
         public bool CleanSession { get; private set; }
         public bool WillFlag { get; private set; }
-        public byte WillQosLevel { get; private set; }
+        public QosLevel WillQosLevel { get; private set; }
         public string WillTopic { get; private set; }
         public string WillMessage { get; private set; }
         public MqttSettings Settings {

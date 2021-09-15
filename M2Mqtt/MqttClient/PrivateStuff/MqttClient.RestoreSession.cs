@@ -32,13 +32,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                             if ((msgContext.Message.Type == MqttMsgBase.MessageType.Publish) &&
                                 (msgContext.Flow == MqttMsgFlow.ToPublish)) {
                                 // it's QoS 1 and we haven't received PUBACK
-                                if ((msgContext.Message.QosLevel == MqttMsgBase.QosLevels.AtLeastOnce) &&
-                                    (msgContext.State == MqttMsgState.WaitForPuback)) {
+                                if ((msgContext.Message.QosLevel == QosLevel.AtLeastOnce) && (msgContext.State == MqttMsgState.WaitForPuback)) {
                                     // we haven't received PUBACK, we need to resend PUBLISH message
                                     msgContext.State = MqttMsgState.QueuedQos1;
                                 }
                                 // it's QoS 2
-                                else if (msgContext.Message.QosLevel == MqttMsgBase.QosLevels.ExactlyOnce) {
+                                else if (msgContext.Message.QosLevel == QosLevel.ExactlyOnce) {
                                     // we haven't received PUBREC, we need to resend PUBLISH message
                                     if (msgContext.State == MqttMsgState.WaitForPubrec) {
                                         msgContext.State = MqttMsgState.QueuedQos2;
