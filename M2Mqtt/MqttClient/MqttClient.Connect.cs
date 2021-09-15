@@ -17,6 +17,7 @@ Contributors:
 using System;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -24,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public byte Connect(string clientId) {
+        public ReturnCodes Connect(string clientId) {
             return Connect(clientId, null, null, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
         }
 
@@ -32,7 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public byte Connect(string clientId, string username, string password) {
+        public ReturnCodes Connect(string clientId, string username, string password) {
             return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
         }
 
@@ -40,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public byte Connect(string clientId, string username, string password, bool cleanSession, ushort keepAlivePeriod) {
+        public ReturnCodes Connect(string clientId, string username, string password, bool cleanSession, ushort keepAlivePeriod) {
             return Connect(clientId, username, password, false, MqttMsgBase.QosLevels.AtMostOnce, false, null, null, cleanSession, keepAlivePeriod);
         }
 
@@ -48,7 +49,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public byte Connect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
+        public ReturnCodes Connect(string clientId, string username, string password, bool willRetain, byte willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
             // create CONNECT message
             var connect = new MqttMsgConnect(clientId,
                 username,

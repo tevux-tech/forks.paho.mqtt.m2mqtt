@@ -22,15 +22,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// </summary>
     public class MqttMsgConnack : MqttMsgBase {
 
-        public class ReturnCodes {
+        public enum ReturnCodes : byte {
             // Section 3.2.2.3.
-            public const byte Accepted = 0x00;
-            public const byte RefusedUnacceptableProtocolVersion = 0x01;
-            public const byte RefusedIdentifierRejected = 0x02;
-            public const byte RefusedServerUnavailable = 0x03;
-            public const byte RefusedBadUsernameOrPassword = 0x04;
-            public const byte RefusedNotAuthorized = 0x05;
-
+            Accepted = 0x00,
+            RefusedUnacceptableProtocolVersion = 0x01,
+            RefusedIdentifierRejected = 0x02,
+            RefusedServerUnavailable = 0x03,
+            RefusedBadUsernameOrPassword = 0x04,
+            RefusedNotAuthorized = 0x05
         }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// </summary>
         public bool SessionPresent { get; set; }
 
-        public byte ReturnCode { get; set; }
+        public ReturnCodes ReturnCode { get; set; }
 
         public MqttMsgConnack() {
             Type = MessageType.ConAck;
@@ -71,13 +70,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             msg.SessionPresent = (buffer[flagsByteOffset] & flagsbyteMask) != 0x00;
 
             // ...and set return code from broker
-            msg.ReturnCode = buffer[returnCodeByteOffset];
+            msg.ReturnCode = (ReturnCodes)buffer[returnCodeByteOffset];
 
             return msg;
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("CONNACK", new object[] { "returnCode" }, new object[] { ReturnCode });
+            return Helpers.GetTraceString("CONNACK", new object[] { "returnCode" }, new object[] { (ReturnCodes)ReturnCode });
         }
     }
 }
