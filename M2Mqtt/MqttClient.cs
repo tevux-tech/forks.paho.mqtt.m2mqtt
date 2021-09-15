@@ -107,7 +107,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         // internal queue for received messages about inflight messages
         private Queue _internalQueue;
         // internal queue for dispatching events
-        private Queue _eventQueue;
+        private ConcurrentQueue _eventQueue = new ConcurrentQueue();
         // session
         private MqttSession _session;
 
@@ -195,7 +195,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             // queue for received message
             _receiveEventWaitHandle = new AutoResetEvent(false);
-            _eventQueue = new Queue();
+            // _eventQueue = new Queue();
             _internalQueue = new Queue();
 
             // session
@@ -429,9 +429,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="internalEvent">Internal event</param>
         private void OnInternalEvent(InternalEvent internalEvent) {
-            lock (_eventQueue) {
-                _eventQueue.Enqueue(internalEvent);
-            }
+            _eventQueue.Enqueue(internalEvent);
 
             _receiveEventWaitHandle.Set();
         }
@@ -925,15 +923,20 @@ namespace uPLibrary.Networking.M2Mqtt {
                 // check if it is running or we are closing client
                 if (_isRunning) {
                     // get event from queue
-                    InternalEvent internalEvent = null;
-                    lock (_eventQueue) {
-                        if (_eventQueue.Count > 0) {
-                            internalEvent = (InternalEvent)_eventQueue.Dequeue();
-                        }
-                    }
 
-                    // it's an event with a message inside
-                    if (internalEvent != null) {
+                    if (_eventQueue.TryDequeue(out var internalEvent)) {
+
+                        // TODO: remove this green code once proven that ConcurrentQueue works.
+                        //InternalEvent internalEvent = null;
+                        //lock (_eventQueue) {
+                        //    if (_eventQueue.Count > 0) {
+                        //        internalEvent = (InternalEvent)_eventQueue.Dequeue();
+                        //    }
+                        //}
+
+                        //// it's an event with a message inside
+                        //if (internalEvent != null) {
+
                         var msg = ((MsgInternalEvent)internalEvent).Message;
 
                         if (msg != null) {

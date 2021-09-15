@@ -35,9 +35,23 @@ namespace uPLibrary.Networking.M2Mqtt.Utility {
         /// <param name="predicate">Predicate to verify to get item</param>
         /// <returns>Item matches the predicate</returns>
         internal static object Get(this Queue queue, QueuePredicate predicate) {
-            foreach (var item in queue) {
-                if (predicate(item)) {
-                    return item;
+            lock (queue.SyncRoot) {
+                foreach (var item in queue) {
+                    if (predicate(item)) {
+                        return item;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // TODO: maybe merge this extension into the main class.
+        internal static object Get(this ConcurrentQueue queue, QueuePredicate predicate) {
+            lock (queue.SyncRoot) {
+                foreach (var item in queue) {
+                    if (predicate(item)) {
+                        return item;
+                    }
                 }
             }
             return null;
