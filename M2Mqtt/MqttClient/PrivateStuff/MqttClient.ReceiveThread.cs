@@ -90,7 +90,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // enqueue SUBACK message received (for QoS Level 1) into the internal queue
                             var isOk = MqttMsgSuback.TryParse(variableHeaderBytes, payloadBytes, out var parsedMessage);
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
-                            EnqueueInternal(parsedMessage);
+
+                            _subscribeStateMachine.ProcessMessage(parsedMessage);
+                            //EnqueueInternal(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubAck) && (flags == 0x00)) {
 

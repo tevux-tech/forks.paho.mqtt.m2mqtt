@@ -77,9 +77,9 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                 // [v3.1.1] SUBSCRIBE and UNSUBSCRIBE aren't "officially" QOS = 1
                 //          so QueuedQos1 state isn't valid for them
-                if (msg.Type == MqttMsgBase.MessageType.Subscribe) {
-                    state = MqttMsgState.SendSubscribe;
-                }
+                //if (msg.Type == MqttMsgBase.MessageType.Subscribe) {
+                //    state = MqttMsgState.SendSubscribe;
+                //}
                 //else if (msg.Type == MqttMsgBase.MessageType.Unsubscribe) {
                 //    state = MqttMsgState.SendUnsubscribe;
                 //}

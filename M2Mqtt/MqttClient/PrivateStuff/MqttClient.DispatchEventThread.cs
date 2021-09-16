@@ -44,10 +44,10 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         if (msg != null) {
                             switch (msg.Type) {
-                                case MqttMsgBase.MessageType.SubAck:
-                                    // raise subscribed topic event (SUBACK message received)
-                                    OnMqttMsgSubscribed((MqttMsgSuback)msg);
-                                    break;
+                                //case MqttMsgBase.MessageType.SubAck:
+                                //    // raise subscribed topic event (SUBACK message received)
+                                //    OnMqttMsgSubscribed((MqttMsgSuback)msg);
+                                //    break;
 
                                 case MqttMsgBase.MessageType.Publish:
                                     // PUBLISH message received in a published internal event, no publish succeeded

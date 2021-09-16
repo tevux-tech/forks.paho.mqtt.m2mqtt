@@ -29,21 +29,15 @@ namespace uPLibrary.Networking.M2Mqtt {
                 MessageId = GetNewMessageId()
             };
 
+            _subscribeStateMachine.Subscribe(subscribe);
             // enqueue subscribe request into the inflight queue
-            EnqueueInflight(subscribe, MqttMsgFlow.ToPublish);
+            // EnqueueInflight(subscribe, MqttMsgFlow.ToPublish);
 
             return subscribe.MessageId;
         }
 
         public ushort Subscribe(string topic, QosLevel qosLevel) {
-            var subscribe = new MqttMsgSubscribe(new[] { topic }, new[] { qosLevel }) {
-                MessageId = GetNewMessageId()
-            };
-
-            // enqueue subscribe request into the inflight queue
-            EnqueueInflight(subscribe, MqttMsgFlow.ToPublish);
-
-            return subscribe.MessageId;
+            return Subscribe(new[] { topic }, new[] { qosLevel });
         }
     }
 }

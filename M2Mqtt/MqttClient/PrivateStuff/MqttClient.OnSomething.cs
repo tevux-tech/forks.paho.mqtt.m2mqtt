@@ -61,7 +61,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Wrapper method for raising subscribed topic event
         /// </summary>
         /// <param name="suback">SUBACK message received</param>
-        private void OnMqttMsgSubscribed(MqttMsgSuback suback) {
+        internal void OnMqttMsgSubscribed(MqttMsgSuback suback) {
             MqttMsgSubscribed?.Invoke(this, new MqttMsgSubscribedEventArgs(suback.MessageId, suback.GrantedQoSLevels));
         }
 

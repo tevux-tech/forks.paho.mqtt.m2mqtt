@@ -102,6 +102,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         private PingStateMachine _pingStateMachine = new PingStateMachine();
         private ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
         private UnsubscribeStateMachine _unsubscribeStateMachine = new UnsubscribeStateMachine();
+        private SubscribeStateMachine _subscribeStateMachine = new SubscribeStateMachine();
 
         public bool IsConnected { get; private set; }
         public string ClientId { get; private set; }

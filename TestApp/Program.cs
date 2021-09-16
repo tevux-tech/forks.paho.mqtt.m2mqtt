@@ -23,7 +23,7 @@ namespace TestApp {
 
             client.Subscribe(new[] { "temp/testapp" }, new[] { QosLevel.AtMostOnce });
 
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
 
             client.Unsubscribe(new[] { "temp/testapp" });
 
