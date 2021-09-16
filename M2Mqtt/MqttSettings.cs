@@ -33,6 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public const int ConnectTimeout = 30000;
         // default inflight queue size
         public const int MaxInflightQueueSize = int.MaxValue;
+        public const int KeepAlivePeriod = 15000;
 
         public int UnsecurePort { get; internal set; }
         public int SecurePort { get; internal set; }

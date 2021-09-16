@@ -23,7 +23,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for CONNECT message from client to broker
     /// </summary>
     public class MqttMsgConnect : MqttMsgBase, ISentToBroker {
-        public const ushort KeepAliveDefaultValue = 60; // seconds
+        public const ushort KeepAliveDefaultValue = 15; // seconds
         public const ushort KeepAliveMaximumValue = 65535; // 16 bit
 
         // connect flags
