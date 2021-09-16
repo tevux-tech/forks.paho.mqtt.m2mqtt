@@ -69,7 +69,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Wrapper method for raising unsubscribed topic event
         /// </summary>
         /// <param name="messageId">Message identifier for unsubscribed topic</param>
-        private void OnMqttMsgUnsubscribed(ushort messageId) {
+        internal void OnMqttMsgUnsubscribed(ushort messageId) {
             MqttMsgUnsubscribed?.Invoke(this, new MqttMsgUnsubscribedEventArgs(messageId));
         }
 

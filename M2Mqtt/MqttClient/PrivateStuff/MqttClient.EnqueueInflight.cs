@@ -80,9 +80,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                 if (msg.Type == MqttMsgBase.MessageType.Subscribe) {
                     state = MqttMsgState.SendSubscribe;
                 }
-                else if (msg.Type == MqttMsgBase.MessageType.Unsubscribe) {
-                    state = MqttMsgState.SendUnsubscribe;
-                }
+                //else if (msg.Type == MqttMsgBase.MessageType.Unsubscribe) {
+                //    state = MqttMsgState.SendUnsubscribe;
+                //}
 
                 // queue message context
                 var msgContext = new MqttMsgContext() {

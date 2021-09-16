@@ -105,7 +105,21 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         }
                         else if ((msgType == MqttMsgBase.MessageType.UnsubAck) && (flags == 0x00)) {
+                            // Remaining length is always 2, see section 3.11.
+                            // Thus, need to read 3 more bytes.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
 
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
+
+                            var isOk = MqttMsgUnsuback.TryParse(variableHeaderBytes, out var parsedMessage);
+                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
+
+                            _unsubscribeStateMachine.ProcessMessage(parsedMessage);
+
+                            //_msgReceived = parsedMessage;
+                            // _syncEndReceiving.Set();
                         }
                         else {
                             // This is either a malformed message header, or it is meant for server, not client.
@@ -173,10 +187,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                                 break;
 
                             case MqttMsgBase.MessageType.UnsubAck:
-                                // enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
-                                var unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsuback);
-                                EnqueueInternal(unsuback);
+                                //// enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
+                                //var unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsuback);
+                                //EnqueueInternal(unsuback);
                                 break;
 
                             case MqttMsgBase.MessageType.Connect:

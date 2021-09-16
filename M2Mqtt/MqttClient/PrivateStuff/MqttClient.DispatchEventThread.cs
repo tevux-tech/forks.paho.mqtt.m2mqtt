@@ -75,9 +75,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                                     break;
 
 
-                                case MqttMsgBase.MessageType.UnsubAck:
-                                    OnMqttMsgUnsubscribed(msg.MessageId);
-                                    break;
+                                    //case MqttMsgBase.MessageType.UnsubAck:
+                                    //   OnMqttMsgUnsubscribed(msg.MessageId);
+                                    //   break;
 
                             }
                         }

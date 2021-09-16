@@ -57,12 +57,13 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);
+            _unsubscribeStateMachine.Initialize(this);
 
             new Thread(() => {
 
                 while (true) {
                     if (IsConnected) {
-
+                        _unsubscribeStateMachine.Tick();
                     }
                     else {
                         _connectStateMachine.Tick();

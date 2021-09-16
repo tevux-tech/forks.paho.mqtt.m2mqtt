@@ -33,7 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <returns>Message Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
             var publish = new MqttMsgPublish(topic, message, false, qosLevel, retain) {
-                MessageId = GetMessageId()
+                MessageId = GetNewMessageId()
             };
 
             // enqueue message to publish into the inflight queue

@@ -122,7 +122,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// Send UNSUBSCRIBE message
         /// </summary>
-        SendUnsubscribe,
+        // SendUnsubscribe,
 
         /// <summary>
         /// (QOS = 1), SUBSCRIBE sent, wait for SUBACK
@@ -132,6 +132,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// (QOS = 1), UNSUBSCRIBE sent, wait for UNSUBACK
         /// </summary>
-        WaitForUnsuback
+        // WaitForUnsuback
     }
 }

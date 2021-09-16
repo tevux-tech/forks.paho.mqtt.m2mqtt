@@ -21,11 +21,15 @@ namespace TestApp {
             client.MqttMsgPublishReceived += HandlePublishReceived;
             client.Connect("TestApp");
 
-            client.Subscribe(new[] { "temp/testapp" }, new byte[] { 0 });
+            client.Subscribe(new[] { "temp/testapp" }, new[] { QosLevel.AtMostOnce });
 
             Thread.Sleep(1000);
 
-            client.Disconnect();
+            client.Unsubscribe(new[] { "temp/testapp" });
+
+            Thread.Sleep(1000);
+
+            // client.Disconnect();
         }
         private void HandlePublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.MqttMsgPublishEventArgs e) {
 

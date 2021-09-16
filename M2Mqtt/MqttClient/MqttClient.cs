@@ -94,14 +94,14 @@ namespace uPLibrary.Networking.M2Mqtt {
         private MqttSettings _settings;
 
         // current message identifier generated
-        private ushort _messageIdCounter = 0;
+        private static ushort _messageIdCounter = 0;
 
         // connection is closing due to peer
         private bool _isConnectionClosing;
 
         private PingStateMachine _pingStateMachine = new PingStateMachine();
         private ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
-
+        private UnsubscribeStateMachine _unsubscribeStateMachine = new UnsubscribeStateMachine();
 
         public bool IsConnected { get; private set; }
         public string ClientId { get; private set; }

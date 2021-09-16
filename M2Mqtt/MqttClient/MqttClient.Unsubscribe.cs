@@ -25,11 +25,13 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <returns>Message Id in UNSUBACK message from broker</returns>
         public ushort Unsubscribe(string[] topics) {
             var unsubscribe = new MqttMsgUnsubscribe(topics) {
-                MessageId = GetMessageId()
+                MessageId = GetNewMessageId()
             };
 
+            _unsubscribeStateMachine.Unsubscribe(unsubscribe);
+
             // enqueue unsubscribe request into the inflight queue
-            EnqueueInflight(unsubscribe, MqttMsgFlow.ToPublish);
+            // EnqueueInflight(unsubscribe, MqttMsgFlow.ToPublish);
 
             return unsubscribe.MessageId;
         }
