@@ -54,9 +54,12 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             var isOk = MqttMsgConnack.TryParse(variableHeaderBytes, out var parsedMessage);
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
-#warning  definitely need some better state machine for this _msgReceived handling
-                            _msgReceived = parsedMessage;
-                            _syncEndReceiving.Set();
+
+                            _connectStateMachine.ProcessMessage(parsedMessage);
+
+                            // #warning  definitely need some better state machine for this _msgReceived handling
+                            //_msgReceived = parsedMessage;
+                            //_syncEndReceiving.Set();
 
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PingResp) && (flags == 0x00)) {

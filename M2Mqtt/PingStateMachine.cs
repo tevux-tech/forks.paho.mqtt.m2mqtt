@@ -1,6 +1,5 @@
 ﻿using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
-using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public class PingStateMachine {
@@ -28,16 +27,9 @@ namespace uPLibrary.Networking.M2Mqtt {
             else {
                 if (currentTime - _client.LastCommTime > MqttSettings.KeepAlivePeriod) {
                     var pingreq = new MqttMsgPingReq();
-
-                    try {
-                        _client.Send(pingreq);
-                        _isWaitingForPingResponse = true;
-                        _requestTimestamp = currentTime;
-                    }
-                    catch (Exception e) {
-#warning I think this also signifies a lost server connection?..
-                        Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-                    }
+                    _client.Send(pingreq);
+                    _isWaitingForPingResponse = true;
+                    _requestTimestamp = currentTime;
                 }
             }
         }

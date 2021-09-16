@@ -40,8 +40,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                 _settings.SecurePort = _brokerPort;
             }
 
-            _syncEndReceiving = new AutoResetEvent(false);
-
             // queue for handling inflight messages (publishing and acknowledge)
             _inflightWaitHandle = new AutoResetEvent(false);
             _inflightQueue = new Queue();
@@ -58,6 +56,23 @@ namespace uPLibrary.Networking.M2Mqtt {
             _channel = new MqttNetworkChannel(_brokerHostName, _brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);
 
             _pingStateMachine.Initialize(this);
+            _connectStateMachine.Initialize(this);
+
+            new Thread(() => {
+
+                while (true) {
+                    if (IsConnected) {
+
+                    }
+                    else {
+                        _connectStateMachine.Tick();
+                    }
+
+
+                    Thread.Sleep(1000);
+                }
+
+            }).Start();
         }
     }
 }

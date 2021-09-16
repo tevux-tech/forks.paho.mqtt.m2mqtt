@@ -21,18 +21,15 @@ using uPLibrary.Networking.M2Mqtt.Utility;
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
         internal void Send(byte[] msgBytes) {
-            try {
-                // send message
-                _channel.Send(msgBytes);
 
-                // update last message sent ticks
+            if (_channel.TrySend(msgBytes)) {
                 LastCommTime = Environment.TickCount;
             }
-            catch (Exception e) {
-                Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-
-                throw new MqttCommunicationException(e);
+            else {
+#warning this is temporary. Should get rid of exception altogether.
+                throw new MqttCommunicationException();
             }
+
         }
 
         internal void Send(ISentToBroker msg) {

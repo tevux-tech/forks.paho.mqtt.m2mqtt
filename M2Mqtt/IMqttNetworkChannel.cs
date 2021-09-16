@@ -45,6 +45,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <param name="buffer">Data buffer to send</param>
         /// <returns>Number of byte sent</returns>
         int Send(byte[] buffer);
+        bool TrySend(byte[] buffer);
 
         /// <summary>
         /// Close the network channel

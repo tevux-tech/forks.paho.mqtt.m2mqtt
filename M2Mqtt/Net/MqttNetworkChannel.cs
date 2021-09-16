@@ -193,6 +193,27 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
+        public bool TrySend(byte[] buffer) {
+            var isSent = false;
+
+            try {
+                Send(buffer);
+                isSent = true;
+            }
+            catch (Exception) {
+#warning maybe need to to some specific exception handling?
+
+                //if (typeof(SocketException) == e.GetType()) {
+                //    // connection reset by broker
+                //    if (((SocketException)e).SocketErrorCode == SocketError.ConnectionReset) {
+                //        IsConnected = false;
+                //    }
+                //}
+            }
+
+            return isSent;
+        }
+
         /// <summary>
         /// Receive data from the network
         /// </summary>

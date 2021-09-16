@@ -64,11 +64,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         // event for starting process inflight queue asynchronously
         private AutoResetEvent _inflightWaitHandle;
 
-        // event for signaling synchronous receive
-        AutoResetEvent _syncEndReceiving;
-        // message received
-        MqttMsgBase _msgReceived;
-
         // exeption thrown during receiving
         Exception _exReceiving;
 
@@ -105,6 +100,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         private bool _isConnectionClosing;
 
         private PingStateMachine _pingStateMachine = new PingStateMachine();
+        private ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
 
 
         public bool IsConnected { get; private set; }
