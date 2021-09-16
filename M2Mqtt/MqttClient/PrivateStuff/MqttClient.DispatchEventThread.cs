@@ -14,26 +14,19 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Internal;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Thread for raising event
-        /// </summary>
         private void DispatchEventThread() {
             while (_isRunning) {
                 if ((_eventQueue.Count == 0) && !_isConnectionClosing) {
-                    // wait on receiving message from client
                     _receiveEventWaitHandle.WaitOne();
                 }
 
                 // check if it is running or we are closing client
                 if (_isRunning) {
-                    // get event from queue
-
                     if (_eventQueue.TryDequeue(out var internalEvent)) {
 
                         // TODO: remove this green code once proven that ConcurrentQueue works.
@@ -51,72 +44,41 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         if (msg != null) {
                             switch (msg.Type) {
-                                case MqttMsgBase.MessageType.Connect:
-                                    throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
-                                // SUBSCRIBE message received
-                                case MqttMsgBase.MessageType.Subscribe:
-                                    throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-
-                                // SUBACK message received
                                 case MqttMsgBase.MessageType.SubAck:
-
                                     // raise subscribed topic event (SUBACK message received)
                                     OnMqttMsgSubscribed((MqttMsgSuback)msg);
                                     break;
 
-                                // PUBLISH message received
                                 case MqttMsgBase.MessageType.Publish:
-
                                     // PUBLISH message received in a published internal event, no publish succeeded
                                     if (internalEvent.GetType() == typeof(MsgPublishedInternalEvent)) {
                                         OnMqttMsgPublished(msg.MessageId, false);
                                     }
                                     else {
-                                        // raise PUBLISH message received event 
                                         OnMqttMsgPublishReceived((MqttMsgPublish)msg);
                                     }
-
                                     break;
 
-                                // PUBACK message received
                                 case MqttMsgBase.MessageType.PubAck:
-
-                                    // raise published message event
                                     // (PUBACK received for QoS Level 1)
                                     OnMqttMsgPublished(msg.MessageId, true);
                                     break;
 
-                                // PUBREL message received
                                 case MqttMsgBase.MessageType.PubRel:
-
-                                    // raise message received event 
                                     // (PUBREL received for QoS Level 2)
                                     OnMqttMsgPublishReceived((MqttMsgPublish)msg);
                                     break;
 
-                                // PUBCOMP message received
                                 case MqttMsgBase.MessageType.PubComp:
-
-                                    // raise published message event
                                     // (PUBCOMP received for QoS Level 2)
                                     OnMqttMsgPublished(msg.MessageId, true);
                                     break;
 
-                                // UNSUBSCRIBE message received from client
-                                case MqttMsgBase.MessageType.Unsubscribe:
-                                    throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
 
-                                // UNSUBACK message received
                                 case MqttMsgBase.MessageType.UnsubAck:
-
-                                    // raise unsubscribed topic event
                                     OnMqttMsgUnsubscribed(msg.MessageId);
                                     break;
 
-                                // DISCONNECT message received from client
-                                case MqttMsgBase.MessageType.Disconnect:
-                                    throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
                             }
                         }
                     }
@@ -133,6 +95,4 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
     }
-
-
 }
