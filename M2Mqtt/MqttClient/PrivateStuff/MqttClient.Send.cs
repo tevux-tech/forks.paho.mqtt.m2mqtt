@@ -20,13 +20,13 @@ using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        private void Send(byte[] msgBytes) {
+        internal void Send(byte[] msgBytes) {
             try {
                 // send message
                 _channel.Send(msgBytes);
 
                 // update last message sent ticks
-                _lastCommTime = Environment.TickCount;
+                LastCommTime = Environment.TickCount;
             }
             catch (Exception e) {
                 Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
@@ -35,7 +35,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        private void Send(ISentToBroker msg) {
+        internal void Send(ISentToBroker msg) {
             Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
             Send(msg.GetBytes());
         }

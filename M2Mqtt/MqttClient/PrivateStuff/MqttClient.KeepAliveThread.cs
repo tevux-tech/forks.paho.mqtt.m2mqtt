@@ -14,8 +14,8 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
 using System.Threading;
+using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -23,33 +23,16 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Thread for handling keep alive message
         /// </summary>
         private void KeepAliveThread() {
-            var wait = _keepAlivePeriod;
-
-            // create event to signal that current thread is end
-            _keepAliveEventEnd = new AutoResetEvent(false);
-
             while (_isRunning) {
-                // waiting...
-                _keepAliveEvent.WaitOne(wait);
+                _pingStateMachine.Tick();
 
-                if (_isRunning) {
-                    var delta = Environment.TickCount - _lastCommTime;
-
-                    // if timeout exceeded ...
-                    if (delta >= _keepAlivePeriod) {
-                        // ... send keep alive
-                        Ping();
-                        wait = _keepAlivePeriod;
-                    }
-                    else {
-                        // update waiting time
-                        wait = _keepAlivePeriod - delta;
-                    }
+                if (_pingStateMachine.IsServerLost) {
+                    Trace.WriteLine(TraceLevel.Error, "PING timeouted, beginning shutdown.");
+                    OnConnectionClosing();
                 }
-            }
 
-            // signal thread end
-            _keepAliveEventEnd.Set();
+                Thread.Sleep(1000);
+            }
         }
     }
 }

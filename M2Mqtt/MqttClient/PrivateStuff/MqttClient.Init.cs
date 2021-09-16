@@ -41,7 +41,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             _syncEndReceiving = new AutoResetEvent(false);
-            _keepAliveEvent = new AutoResetEvent(false);
 
             // queue for handling inflight messages (publishing and acknowledge)
             _inflightWaitHandle = new AutoResetEvent(false);
@@ -57,6 +56,8 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             // create network channel
             _channel = new MqttNetworkChannel(_brokerHostName, _brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);
+
+            _pingStateMachine.Initialize(this);
         }
     }
 }

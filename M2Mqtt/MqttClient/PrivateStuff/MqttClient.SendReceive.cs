@@ -35,7 +35,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 _channel.Send(msgBytes);
 
                 // update last message sent ticks
-                _lastCommTime = Environment.TickCount;
+                LastCommTime = Environment.TickCount;
             }
             catch (Exception e) {
                 if (typeof(SocketException) == e.GetType()) {

@@ -67,8 +67,11 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             var isOk = MqttMsgPingResp.TryParse(out var parsedMessage);
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
-                            _msgReceived = parsedMessage;
-                            _syncEndReceiving.Set();
+
+                            _pingStateMachine.ProcessMessage(parsedMessage);
+
+                            //_msgReceived = parsedMessage;
+                            // _syncEndReceiving.Set();
                         }
                         else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
                             // Remaining length is variable header (2 bytes) plus the length of the payload, see section 3.9.

@@ -74,11 +74,8 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // keep alive period (in ms)
         private int _keepAlivePeriod;
-        // events for signaling on keep alive thread
-        private AutoResetEvent _keepAliveEvent;
-        private AutoResetEvent _keepAliveEventEnd;
         // last communication time in ticks
-        private int _lastCommTime;
+        public int LastCommTime { get; private set; }
 
         public event MqttMsgPublishEventHandler MqttMsgPublishReceived = delegate { };
         public event MqttMsgPublishedEventHandler MqttMsgPublished = delegate { };
@@ -106,6 +103,8 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // connection is closing due to peer
         private bool _isConnectionClosing;
+
+        private PingStateMachine _pingStateMachine = new PingStateMachine();
 
 
         public bool IsConnected { get; private set; }

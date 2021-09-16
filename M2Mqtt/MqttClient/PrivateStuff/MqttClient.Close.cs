@@ -31,13 +31,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                 _inflightWaitHandle.Set();
             }
 
-            // unlock keep alive thread and wait
-            _keepAliveEvent.Set();
-
-            if (_keepAliveEventEnd != null) {
-                _keepAliveEventEnd.WaitOne();
-            }
-
             // clear all queues
             _inflightQueue.Clear();
             _internalQueue.Clear();

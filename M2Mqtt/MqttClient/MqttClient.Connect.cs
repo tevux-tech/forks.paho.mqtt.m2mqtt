@@ -70,7 +70,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 throw new MqttConnectionException("Exception connecting to the broker", ex);
             }
 
-            _lastCommTime = 0;
+            LastCommTime = 0;
             _isRunning = true;
             _isConnectionClosing = false;
             // start thread for receiving messages from broker
@@ -96,6 +96,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                 WillQosLevel = willQosLevel;
 
                 _keepAlivePeriod = keepAlivePeriod * 1000; // convert in ms
+
+                _pingStateMachine.Reset();
 
                 // restore previous session
                 RestoreSession();
