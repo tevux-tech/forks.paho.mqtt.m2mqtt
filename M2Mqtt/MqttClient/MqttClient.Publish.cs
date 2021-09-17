@@ -35,7 +35,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 MessageId = GetNewMessageId()
             };
 
-            _publishStateMachine.Publish(publish);
+            _outgoingPublishStateMachine.Publish(publish);
 
             // enqueue message to publish into the inflight queue
             //var enqueue = EnqueueInflight(publish, MqttMsgFlow.ToPublish);

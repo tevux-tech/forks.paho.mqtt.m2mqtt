@@ -15,7 +15,6 @@ Contributors:
 */
 
 using uPLibrary.Networking.M2Mqtt.Internal;
-using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -33,30 +32,30 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         if (msg != null) {
                             switch (msg.Type) {
-                                case MqttMsgBase.MessageType.Publish:
-                                    // PUBLISH message received in a published internal event, no publish succeeded
-                                    if (internalEvent.GetType() == typeof(MsgPublishedInternalEvent)) {
-                                        OnMqttMsgPublished(msg.MessageId, false);
-                                    }
-                                    else {
-                                        OnMqttMsgPublishReceived((MqttMsgPublish)msg);
-                                    }
-                                    break;
+                                //case MqttMsgBase.MessageType.Publish:
+                                //    // PUBLISH message received in a published internal event, no publish succeeded
+                                //    if (internalEvent.GetType() == typeof(MsgPublishedInternalEvent)) {
+                                //        OnMqttMsgPublished(msg.MessageId, false);
+                                //    }
+                                //    else {
+                                //        OnMqttMsgPublishReceived((MqttMsgPublish)msg);
+                                //    }
+                                //    break;
 
                                 //case MqttMsgBase.MessageType.PubAck:
                                 //    // (PUBACK received for QoS Level 1)
                                 //    OnMqttMsgPublished(msg.MessageId, true);
                                 //    break;
 
-                                case MqttMsgBase.MessageType.PubRel:
-                                    // (PUBREL received for QoS Level 2)
-                                    OnMqttMsgPublishReceived((MqttMsgPublish)msg);
-                                    break;
+                                //case MqttMsgBase.MessageType.PubRel:
+                                //    // (PUBREL received for QoS Level 2)
+                                //    OnMqttMsgPublishReceived((MqttMsgPublish)msg);
+                                //    break;
 
-                                    //case MqttMsgBase.MessageType.PubComp:
-                                    //    // (PUBCOMP received for QoS Level 2)
-                                    //    OnMqttMsgPublished(msg.MessageId, true);
-                                    //    break;
+                                //case MqttMsgBase.MessageType.PubComp:
+                                //    // (PUBCOMP received for QoS Level 2)
+                                //    OnMqttMsgPublished(msg.MessageId, true);
+                                //    break;
                             }
                         }
                     }

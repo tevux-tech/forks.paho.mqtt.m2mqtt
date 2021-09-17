@@ -59,7 +59,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _connectStateMachine.Initialize(this);
             _unsubscribeStateMachine.Initialize(this);
             _subscribeStateMachine.Initialize(this);
-            _publishStateMachine.Initialize(this);
+            _outgoingPublishStateMachine.Initialize(this);
+            _incomingPublishStateMachine.Initialize(this);
 
             new Thread(() => {
 
@@ -67,7 +68,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                     if (IsConnected) {
                         _unsubscribeStateMachine.Tick();
                         _subscribeStateMachine.Tick();
-                        _publishStateMachine.Tick();
+                        _outgoingPublishStateMachine.Tick();
+                        _incomingPublishStateMachine.Tick();
                     }
                     else {
                         _connectStateMachine.Tick();

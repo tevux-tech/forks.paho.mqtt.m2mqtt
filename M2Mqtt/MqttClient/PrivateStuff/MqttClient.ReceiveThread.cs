@@ -39,7 +39,17 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                         // Section 2.2. explains which bit can or cannot be set in the first byte.
                         if (msgType == MqttMsgBase.MessageType.Publish) {
-                            // PUBLISH is the only packet that actually uses any flags, and it uses all 4 of them.
+                            // PUBLISH is the only packet that actually uses any flags, and it uses all 4 of them, see section 3.3.
+                            // Remaining length is variable header (variable number bytes) plus the length of the payload.
+                            // Thus, need to decode remaining length field itself first.
+                            var remainingLength = MqttMsgBase.DecodeRemainingLength(_channel);
+
+                            var variableHeaderAndPayloadBytes = new byte[remainingLength];
+                            _channel.Receive(variableHeaderAndPayloadBytes);
+
+                            var isOk = MqttMsgPublish.TryParse(flags, variableHeaderAndPayloadBytes, out var parsedMessage);
+
+                            _incomingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.ConAck) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.2.1.
@@ -90,7 +100,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             var isOk = MqttMsgPuback.TryParse(variableHeaderBytes, out var parsedMessage);
 
-                            _publishStateMachine.ProcessMessage(parsedMessage);
+                            _outgoingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubRec) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.5.
@@ -103,7 +113,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             var isOk = MqttMsgPubrec.TryParse(variableHeaderBytes, out var parsedMessage);
 
-                            _publishStateMachine.ProcessMessage(parsedMessage);
+                            _outgoingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubRel) && (flags == 0x02)) {
                             // Remaining length is always 2, see section 3.6.
@@ -114,10 +124,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                             var variableHeaderBytes = new byte[2];
                             _channel.Receive(variableHeaderBytes);
 
-                            var isOk = MqttMsgPubcomp.TryParse(variableHeaderBytes, out var parsedMessage);
-                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
+                            var isOk = MqttMsgPubrel.TryParse(variableHeaderBytes, out var parsedMessage);
 
-                            EnqueueInternal(parsedMessage);
+                            _incomingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubComp) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.7.
@@ -130,7 +139,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             var isOk = MqttMsgPubcomp.TryParse(variableHeaderBytes, out var parsedMessage);
 
-                            _publishStateMachine.ProcessMessage(parsedMessage);
+                            _outgoingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.UnsubAck) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.11.
@@ -161,9 +170,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                         switch (msgType) {
 
                             case MqttMsgBase.MessageType.Publish:
-                                var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", publish);
-                                EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
+                                //var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", publish);
+                                //EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
                                 break;
 
                             case MqttMsgBase.MessageType.PubRec:

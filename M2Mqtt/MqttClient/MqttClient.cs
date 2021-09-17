@@ -103,7 +103,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         private ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
         private UnsubscribeStateMachine _unsubscribeStateMachine = new UnsubscribeStateMachine();
         private SubscribeStateMachine _subscribeStateMachine = new SubscribeStateMachine();
-        private OutgoingPublishStateMachine _publishStateMachine = new OutgoingPublishStateMachine();
+        private OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
+        private IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
 
         public bool IsConnected { get; private set; }
         public string ClientId { get; private set; }

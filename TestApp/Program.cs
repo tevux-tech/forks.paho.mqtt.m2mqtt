@@ -23,6 +23,9 @@ namespace TestApp {
             client.Connect("TestApp");
 
             client.Subscribe(new[] { "temp/testapp" }, new[] { QosLevel.AtMostOnce });
+            client.Subscribe(new[] { "temp/test-publish2" }, new[] { QosLevel.ExactlyOnce });
+
+            Thread.Sleep(1000);
 
             client.Publish("temp/test-publish0", Encoding.UTF8.GetBytes("That's a QOS 0 publish message."), QosLevel.AtMostOnce, false);
             client.Publish("temp/test-publish1", Encoding.UTF8.GetBytes("That's a QOS 1 publish message."), QosLevel.AtLeastOnce, false);
@@ -30,7 +33,7 @@ namespace TestApp {
 
             Thread.Sleep(5000);
 
-            client.Unsubscribe(new[] { "temp/testapp" });
+            //client.Unsubscribe(new[] { "temp/testapp" });
 
             Thread.Sleep(1000);
 

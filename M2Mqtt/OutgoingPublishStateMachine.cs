@@ -79,7 +79,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             if (isOk) {
                 var pubrelMessage = new MqttMsgPubrel() { MessageId = message.MessageId };
                 var pubrelContext = new MqttMsgContext() { Message = pubrelMessage, Attempt = 1, Timestamp = currentTime };
-                lock (_messagesWaitingForQoS2Pubcomp) {
+                lock (_messagesWaitingForQoS2Pubcomp.SyncRoot) {
                     _messagesWaitingForQoS2Pubcomp.Add(message.MessageId, pubrelContext);
                 }
 

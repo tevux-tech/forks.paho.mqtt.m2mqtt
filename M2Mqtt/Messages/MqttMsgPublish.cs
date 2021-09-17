@@ -20,7 +20,7 @@ using uPLibrary.Networking.M2Mqtt.Exceptions;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for PUBLISH message from client to broker
+    /// Class for PUBLISH message from client to broker. See section 3.3.
     /// </summary>
     public class MqttMsgPublish : MqttMsgBase, ISentToBroker {
         public string Topic { get; set; }
@@ -125,69 +125,51 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        public static MqttMsgPublish Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            byte[] buffer;
-            var index = 0;
-            byte[] topicUtf8;
-            int topicUtf8Length;
-            var msg = new MqttMsgPublish();
-
-            // get remaining length and allocate buffer
-            var remainingLength = DecodeRemainingLength(channel);
-            buffer = new byte[remainingLength];
-
-            // read bytes from socket...
-            var received = channel.Receive(buffer);
+        public static bool TryParse(byte flags, byte[] variableHeaderAndPayloadBytes, out MqttMsgPublish parsedMessage) {
+            var isOk = true;
+            parsedMessage = new MqttMsgPublish();
 
             // topic name
-            topicUtf8Length = ((buffer[index++] << 8) & 0xFF00);
-            topicUtf8Length |= buffer[index++];
-            topicUtf8 = new byte[topicUtf8Length];
-            Array.Copy(buffer, index, topicUtf8, 0, topicUtf8Length);
-            index += topicUtf8Length;
-            msg.Topic = new string(Encoding.UTF8.GetChars(topicUtf8));
+            var topicUtf8Length = (variableHeaderAndPayloadBytes[0] << 8) + variableHeaderAndPayloadBytes[1];
+
+
+            //topicUtf8 = new byte[topicUtf8Length];
+            //Array.Copy(buffer, index, topicUtf8, 0, topicUtf8Length);
+            //index += topicUtf8Length;
+
+            parsedMessage.Topic = new string(Encoding.UTF8.GetChars(variableHeaderAndPayloadBytes, 2, topicUtf8Length));
 
             // read QoS level from fixed header
-            msg.QosLevel = (QosLevel)((fixedHeaderFirstByte & FixedHeader.QosLevelMask) >> FixedHeader.QosLevelOffset);
+            parsedMessage.QosLevel = (QosLevel)((flags & 0b0110) >> 1);
             // check wrong QoS level (both bits can't be set 1)
-            if (msg.QosLevel > QosLevel.ExactlyOnce) {
-                throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
+            if (parsedMessage.QosLevel > QosLevel.ExactlyOnce) {
+                isOk = false;
             }
+
             // read DUP flag from fixed header
-            msg.DupFlag = (((fixedHeaderFirstByte & FixedHeader.DuplicateFlagMask) >> FixedHeader.DuplicateFlagOffset) == 0x01);
+            parsedMessage.DupFlag = (flags >> 3) == 0x01;
+
             // read retain flag from fixed header
-            msg.Retain = (((fixedHeaderFirstByte & FixedHeader.RetainFlagMask) >> FixedHeader.RetainFlagOffset) == 0x01);
+            parsedMessage.Retain = ((flags & 0x01) >> FixedHeader.RetainFlagOffset) == 0x01;
 
             // message id is valid only with QOS level 1 or QOS level 2
-            if ((msg.QosLevel == QosLevel.AtLeastOnce) || (msg.QosLevel == QosLevel.ExactlyOnce)) {
+            if ((parsedMessage.QosLevel == QosLevel.AtLeastOnce) || (parsedMessage.QosLevel == QosLevel.ExactlyOnce)) {
                 // message id
-                msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-                msg.MessageId |= (buffer[index++]);
+                parsedMessage.MessageId = (ushort)((variableHeaderAndPayloadBytes[topicUtf8Length] << 8) + variableHeaderAndPayloadBytes[topicUtf8Length + 1]);
             }
 
             // get payload with message data
-            var messageSize = remainingLength - index;
-            var remaining = messageSize;
-            var messageOffset = 0;
-            msg.Message = new byte[messageSize];
-
-            // BUG FIX 26/07/2013 : receiving large payload
-
-            // copy first part of payload data received
-            Array.Copy(buffer, index, msg.Message, messageOffset, received - index);
-            remaining -= (received - index);
-            messageOffset += (received - index);
-
-            // if payload isn't finished
-            while (remaining > 0) {
-                // receive other payload data
-                received = channel.Receive(buffer);
-                Array.Copy(buffer, 0, msg.Message, messageOffset, received);
-                remaining -= received;
-                messageOffset += received;
+            var payloadSize = variableHeaderAndPayloadBytes.Length - topicUtf8Length - 2;
+            if ((parsedMessage.QosLevel == QosLevel.AtLeastOnce) || (parsedMessage.QosLevel == QosLevel.ExactlyOnce)) {
+                payloadSize -= 2;
             }
 
-            return msg;
+            var payloadOffset = variableHeaderAndPayloadBytes.Length - payloadSize;
+            parsedMessage.Message = new byte[payloadSize];
+
+            Array.Copy(variableHeaderAndPayloadBytes, payloadOffset, parsedMessage.Message, 0, payloadSize);
+
+            return isOk;
         }
 
         public override string ToString() {
