@@ -1,5 +1,6 @@
 ﻿using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using uPLibrary.Networking.M2Mqtt.Utility;
 using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
 
 namespace uPLibrary.Networking.M2Mqtt {
@@ -35,6 +36,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void ProcessMessage(MqttMsgConnack message) {
+            Trace.WriteLine(TraceLevel.Frame, "<-ConAck");
+
             _isWaitingForConnack = false;
             IsConnectionCompleted = true;
             ConnectionResult = message.ReturnCode;
@@ -45,6 +48,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             _client.Send(message);
             _isWaitingForConnack = true;
             _requestTimestamp = currentTime;
+            Trace.WriteLine(TraceLevel.Frame, "Connec->");
         }
 
         public void Reset() {

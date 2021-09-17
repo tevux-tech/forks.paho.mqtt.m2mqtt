@@ -30,9 +30,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             _unsubscribeStateMachine.Unsubscribe(unsubscribe);
 
-            // enqueue unsubscribe request into the inflight queue
-            // EnqueueInflight(unsubscribe, MqttMsgFlow.ToPublish);
-
             return unsubscribe.MessageId;
         }
     }

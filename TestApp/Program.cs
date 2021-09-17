@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Utility;
@@ -22,6 +23,10 @@ namespace TestApp {
             client.Connect("TestApp");
 
             client.Subscribe(new[] { "temp/testapp" }, new[] { QosLevel.AtMostOnce });
+
+            client.Publish("temp/test-publish0", Encoding.UTF8.GetBytes("That's a QOS 0 publish message."), QosLevel.AtMostOnce, false);
+            client.Publish("temp/test-publish1", Encoding.UTF8.GetBytes("That's a QOS 1 publish message."), QosLevel.AtLeastOnce, false);
+            client.Publish("temp/test-publish2", Encoding.UTF8.GetBytes("That's a QOS 2 publish message."), QosLevel.ExactlyOnce, false);
 
             Thread.Sleep(5000);
 

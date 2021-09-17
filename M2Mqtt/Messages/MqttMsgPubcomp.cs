@@ -14,11 +14,9 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
-
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for PUBCOMP message from broker to client
+    /// Class for PUBCOMP message from broker to client. See section 3.7.
     /// </summary>
     public class MqttMsgPubcomp : MqttMsgBase, ISentToBroker {
         public MqttMsgPubcomp() {
@@ -56,28 +54,14 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             return buffer;
         }
 
-        public static MqttMsgPubcomp Parse(byte fixedHeaderFirstByte, IMqttNetworkChannel channel) {
-            byte[] buffer;
-            var index = 0;
-            var msg = new MqttMsgPubcomp();
+        public static bool TryParse(byte[] variableHeaderBytes, out MqttMsgPubcomp parsedMessage) {
+            var isOk = true;
+            parsedMessage = new MqttMsgPubcomp();
 
-            // [v3.1.1] check flag bits
-            if ((fixedHeaderFirstByte & FixedHeader.FlagBitsMask) != MessageFlags.PubComp) {
-                throw new MqttClientException(MqttClientErrorCode.InvalidFlagBits);
-            }
+            // Bytes 1-2: Packet Identifier. Can be anything.
+            parsedMessage.MessageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
 
-            // get remaining length and allocate buffer
-            var remainingLength = DecodeRemainingLength(channel);
-            buffer = new byte[remainingLength];
-
-            // read bytes from socket...
-            channel.Receive(buffer);
-
-            // message id
-            msg.MessageId = (ushort)((buffer[index++] << 8) & 0xFF00);
-            msg.MessageId |= (buffer[index++]);
-
-            return msg;
+            return isOk;
         }
 
         public override string ToString() {

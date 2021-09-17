@@ -16,7 +16,6 @@ Contributors:
 
 using System;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
-using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -33,7 +32,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         internal void Send(ISentToBroker msg) {
-            Trace.WriteLine(TraceLevel.Frame, "SEND {0}", msg);
             Send(msg.GetBytes());
         }
     }

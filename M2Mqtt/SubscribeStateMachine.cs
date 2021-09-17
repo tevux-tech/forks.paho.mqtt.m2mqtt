@@ -27,7 +27,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                     if (message.Attempt >= MqttSettings.AttemptsRetry) {
                         _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
+                        Trace.WriteLine(TraceLevel.Queuing, $"                Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
                     }
                 }
             }
@@ -35,7 +35,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             var areThereMessageToRemove = true;
             while (areThereMessageToRemove) {
                 if (_tempList.TryDequeue(out var item)) {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Subscribe message {item.ToString()}.");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                Cleaning unacknowledged Subscribe message {item.ToString()}.");
                     lock (_messagesWaitingForAck.SyncRoot) {
                         _messagesWaitingForAck.Remove(item);
                     }
@@ -54,9 +54,12 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             _client.Send(message);
+            Trace.WriteLine(TraceLevel.Frame, $"                Subscr-> {message.MessageId.ToString("X4")}");
         }
 
         public void ProcessMessage(MqttMsgSuback message) {
+            Trace.WriteLine(TraceLevel.Frame, $"                <-SubAck {message.MessageId.ToString("X4")}");
+
             lock (_messagesWaitingForAck.SyncRoot) {
                 if (_messagesWaitingForAck.Contains(message.MessageId)) {
                     _messagesWaitingForAck.Remove(message.MessageId);
@@ -64,7 +67,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     _client.OnMqttMsgSubscribed(message);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Rogue SubAck message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                Rogue SubAck message for MessageId {message.MessageId}");
 #warning Rogue SubAck message, what do I do now?..
                 }
             }

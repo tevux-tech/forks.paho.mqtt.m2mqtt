@@ -79,12 +79,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// QOS = 1, PUBLISH sent, wait for PUBACK
         /// </summary>
-        WaitForPuback,
+        //WaitForPuback,
 
         /// <summary>
         /// QOS = 2, PUBLISH sent, wait for PUBREC
         /// </summary>
-        WaitForPubrec,
+        //WaitForPubrec,
 
         /// <summary>
         /// QOS = 2, PUBREC sent, wait for PUBREL
@@ -99,7 +99,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// QOS = 2, start first phase handshake send PUBREC
         /// </summary>
-        SendPubrec,
+        // SendPubrec,
 
         /// <summary>
         /// QOS = 2, start second phase handshake send PUBREL
@@ -109,12 +109,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// QOS = 2, end second phase handshake send PUBCOMP
         /// </summary>
-        SendPubcomp,
+        //SendPubcomp,
 
         /// <summary>
         /// QOS = 1, PUBLISH received, send PUBACK
         /// </summary>
-        SendPuback,
+        //SendPuback,
 
         // [v3.1.1] SUBSCRIBE isn't "officially" QOS = 1
         /// <summary>

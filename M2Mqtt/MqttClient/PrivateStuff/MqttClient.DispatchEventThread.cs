@@ -43,20 +43,20 @@ namespace uPLibrary.Networking.M2Mqtt {
                                     }
                                     break;
 
-                                case MqttMsgBase.MessageType.PubAck:
-                                    // (PUBACK received for QoS Level 1)
-                                    OnMqttMsgPublished(msg.MessageId, true);
-                                    break;
+                                //case MqttMsgBase.MessageType.PubAck:
+                                //    // (PUBACK received for QoS Level 1)
+                                //    OnMqttMsgPublished(msg.MessageId, true);
+                                //    break;
 
                                 case MqttMsgBase.MessageType.PubRel:
                                     // (PUBREL received for QoS Level 2)
                                     OnMqttMsgPublishReceived((MqttMsgPublish)msg);
                                     break;
 
-                                case MqttMsgBase.MessageType.PubComp:
-                                    // (PUBCOMP received for QoS Level 2)
-                                    OnMqttMsgPublished(msg.MessageId, true);
-                                    break;
+                                    //case MqttMsgBase.MessageType.PubComp:
+                                    //    // (PUBCOMP received for QoS Level 2)
+                                    //    OnMqttMsgPublished(msg.MessageId, true);
+                                    //    break;
                             }
                         }
                     }

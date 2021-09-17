@@ -30,8 +30,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             };
 
             _subscribeStateMachine.Subscribe(subscribe);
-            // enqueue subscribe request into the inflight queue
-            // EnqueueInflight(subscribe, MqttMsgFlow.ToPublish);
 
             return subscribe.MessageId;
         }

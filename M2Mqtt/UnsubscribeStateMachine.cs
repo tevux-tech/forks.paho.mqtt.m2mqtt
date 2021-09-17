@@ -35,9 +35,12 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             _client.Send(message);
+            Trace.WriteLine(TraceLevel.Frame, $"                UnsubA-> {message.MessageId.ToString("X4")}");
         }
 
         public void ProcessMessage(MqttMsgUnsuback message) {
+            Trace.WriteLine(TraceLevel.Frame, $"                <-Unsubs {message.MessageId.ToString("X4")}");
+
             _lastAck = Environment.TickCount;
 
             lock (_unacknowledgedMessages.SyncRoot) {

@@ -50,7 +50,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             _channel.Receive(variableHeaderBytes);
 
                             var isOk = MqttMsgConnack.TryParse(variableHeaderBytes, out var parsedMessage);
-                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _connectStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -61,7 +60,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             _channel.Receive(lengthBytes);
 
                             var isOk = MqttMsgPingResp.TryParse(out var parsedMessage);
-                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _pingStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -78,21 +76,61 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                             // enqueue SUBACK message received (for QoS Level 1) into the internal queue
                             var isOk = MqttMsgSuback.TryParse(variableHeaderBytes, payloadBytes, out var parsedMessage);
-                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _subscribeStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubAck) && (flags == 0x00)) {
+                            // Remaining length is always 2, see section 3.4.
+                            // Thus, need to read 3 more bytes.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
 
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
+
+                            var isOk = MqttMsgPuback.TryParse(variableHeaderBytes, out var parsedMessage);
+
+                            _publishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubRec) && (flags == 0x00)) {
+                            // Remaining length is always 2, see section 3.5.
+                            // Thus, need to read 3 more bytes.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
 
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
+
+                            var isOk = MqttMsgPubrec.TryParse(variableHeaderBytes, out var parsedMessage);
+
+                            _publishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubRel) && (flags == 0x02)) {
+                            // Remaining length is always 2, see section 3.6.
+                            // Thus, need to read 3 more bytes.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
 
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
+
+                            var isOk = MqttMsgPubcomp.TryParse(variableHeaderBytes, out var parsedMessage);
+                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
+
+                            EnqueueInternal(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubComp) && (flags == 0x00)) {
+                            // Remaining length is always 2, see section 3.7.
+                            // Thus, need to read 3 more bytes.
+                            var lengthBytes = new byte[1];
+                            _channel.Receive(lengthBytes);
 
+                            var variableHeaderBytes = new byte[2];
+                            _channel.Receive(variableHeaderBytes);
+
+                            var isOk = MqttMsgPubcomp.TryParse(variableHeaderBytes, out var parsedMessage);
+
+                            _publishStateMachine.ProcessMessage(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.UnsubAck) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.11.
@@ -104,7 +142,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             _channel.Receive(variableHeaderBytes);
 
                             var isOk = MqttMsgUnsuback.TryParse(variableHeaderBytes, out var parsedMessage);
-                            Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _unsubscribeStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -129,33 +166,26 @@ namespace uPLibrary.Networking.M2Mqtt {
                                 EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
                                 break;
 
-                            case MqttMsgBase.MessageType.PubAck:
-                                // enqueue PUBACK message received (for QoS Level 1) into the internal queue
-                                var puback = MqttMsgPuback.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", puback);
-                                EnqueueInternal(puback);
-                                break;
-
                             case MqttMsgBase.MessageType.PubRec:
                                 // enqueue PUBREC message received (for QoS Level 2) into the internal queue
-                                var pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrec);
-                                EnqueueInternal(pubrec);
+                                //var pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrec);
+                                //EnqueueInternal(pubrec);
                                 break;
 
                             case MqttMsgBase.MessageType.PubRel:
                                 // enqueue PUBREL message received (for QoS Level 2) into the internal queue
-                                var pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrel);
-                                EnqueueInternal(pubrel);
+                                //var pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], _channel);
+                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrel);
+                                // EnqueueInternal(pubrel);
 
                                 break;
 
                             case MqttMsgBase.MessageType.PubComp:
                                 // enqueue PUBCOMP message received (for QoS Level 2) into the internal queue
-                                var pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], _channel);
-                                Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
-                                EnqueueInternal(pubcomp);
+                                // var pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], _channel);
+                                // Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
+                                // EnqueueInternal(pubcomp);
                                 break;
                         }
 

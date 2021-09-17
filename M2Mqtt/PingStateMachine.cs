@@ -1,5 +1,6 @@
 ﻿using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public class PingStateMachine {
@@ -28,6 +29,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 if (currentTime - _client.LastCommTime > MqttSettings.KeepAlivePeriod) {
                     var pingreq = new MqttMsgPingReq();
                     _client.Send(pingreq);
+                    Trace.WriteLine(TraceLevel.Frame, "                        PngReq->");
                     _isWaitingForPingResponse = true;
                     _requestTimestamp = currentTime;
                 }
@@ -35,6 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void ProcessMessage(MqttMsgPingResp message) {
+            Trace.WriteLine(TraceLevel.Frame, "                        <-PngRes");
             _isWaitingForPingResponse = false;
         }
 

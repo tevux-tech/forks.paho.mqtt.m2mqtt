@@ -44,7 +44,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Wrapper method for raising PUBLISH message received event
         /// </summary>
         /// <param name="publish">PUBLISH message received</param>
-        private void OnMqttMsgPublishReceived(MqttMsgPublish publish) {
+        internal void OnMqttMsgPublishReceived(MqttMsgPublish publish) {
             MqttMsgPublishReceived?.Invoke(this, new MqttMsgPublishEventArgs(publish.Topic, publish.Message, publish.DupFlag, publish.QosLevel, publish.Retain));
         }
 
@@ -53,7 +53,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="messageId">Message identifier for published message</param>
         /// <param name="isPublished">Publish flag</param>
-        private void OnMqttMsgPublished(ushort messageId, bool isPublished) {
+        internal void OnMqttMsgPublished(ushort messageId, bool isPublished) {
             MqttMsgPublished?.Invoke(this, new MqttMsgPublishedEventArgs(messageId, isPublished));
         }
 

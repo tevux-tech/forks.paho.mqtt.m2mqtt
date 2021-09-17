@@ -14,7 +14,6 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
@@ -36,17 +35,19 @@ namespace uPLibrary.Networking.M2Mqtt {
                 MessageId = GetNewMessageId()
             };
 
+            _publishStateMachine.Publish(publish);
+
             // enqueue message to publish into the inflight queue
-            var enqueue = EnqueueInflight(publish, MqttMsgFlow.ToPublish);
+            //var enqueue = EnqueueInflight(publish, MqttMsgFlow.ToPublish);
 
             // message enqueued
-            if (enqueue) {
-                return publish.MessageId;
-            }
+            //if (enqueue) {
+            return publish.MessageId;
+            //}
             // infligh queue full, message not enqueued
-            else {
-                throw new MqttClientException(MqttClientErrorCode.InflightQueueFull);
-            }
+            // else {
+            //     throw new MqttClientException(MqttClientErrorCode.InflightQueueFull);
+            //}
         }
     }
 }
