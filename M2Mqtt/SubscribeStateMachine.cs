@@ -26,7 +26,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     }
 
                     if (message.Attempt >= MqttSettings.AttemptsRetry) {
-                        _tempList.Enqueue(item);
+                        _tempList.Enqueue(item.Key);
                         Trace.WriteLine(TraceLevel.Queuing, $"Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
                     }
                 }
@@ -35,7 +35,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             var areThereMessageToRemove = true;
             while (areThereMessageToRemove) {
                 if (_tempList.TryDequeue(out var item)) {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Subscribe message {((MqttMsgContext)item).Message.MessageId}.");
+                    Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Subscribe message {item.ToString()}.");
                     lock (_messagesWaitingForAck.SyncRoot) {
                         _messagesWaitingForAck.Remove(item);
                     }
@@ -59,7 +59,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public void ProcessMessage(MqttMsgSuback message) {
             lock (_messagesWaitingForAck.SyncRoot) {
                 if (_messagesWaitingForAck.Contains(message.MessageId)) {
-                    _messagesWaitingForAck.Remove(message);
+                    _messagesWaitingForAck.Remove(message.MessageId);
 #warning of course, that's not the place to raise events.
                     _client.OnMqttMsgSubscribed(message);
                 }
