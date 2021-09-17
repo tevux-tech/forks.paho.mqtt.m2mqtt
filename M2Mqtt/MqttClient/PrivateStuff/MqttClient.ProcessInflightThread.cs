@@ -23,9 +23,6 @@ using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Process inflight messages queue
-        /// </summary>
         private void ProcessInflightThread() {
             MqttMsgContext msgContext = null;
             MqttMsgBase msgReceived = null;
@@ -44,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                         lock (_inflightQueue) {
                             // message received and peeked from internal queue is processed
                             // NOTE : it has the corresponding message in inflight queue based on messageId
-                            //        (ex. a PUBREC for a PUBLISH, a SUBACK for a SUBSCRIBE, ...)
+                            //        (ex. a PUBREC for a PUBLISH)
                             //        if it's orphan we need to remove from internal queue
                             msgReceivedProcessed = false;
                             var acknowledge = false;
@@ -94,11 +91,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                                         break;
 
                                     case MqttMsgState.QueuedQos1:
-                                        // [v3.1.1] SUBSCRIBE and UNSIBSCRIBE aren't "officially" QOS = 1
-                                        // case MqttMsgState.SendSubscribe:
-                                        // case MqttMsgState.SendUnsubscribe:
 
-                                        // QoS 1, PUBLISH or SUBSCRIBE/UNSUBSCRIBE message to send to broker, state change to wait PUBACK or SUBACK/UNSUBACK
+                                        // QoS 1, PUBLISH  to send to broker, state change to wait PUBACK 
                                         if (msgContext.Flow == MqttMsgFlow.ToPublish) {
                                             msgContext.Timestamp = Environment.TickCount;
                                             msgContext.Attempt++;
@@ -111,21 +105,13 @@ namespace uPLibrary.Networking.M2Mqtt {
                                                     msgInflight.DupFlag = true;
                                                 }
                                             }
-                                            //else if (msgInflight.Type == MqttMsgBase.MessageType.Subscribe) {
-                                            //    // SUBSCRIBE message to send, wait for SUBACK
-                                            //    msgContext.State = MqttMsgState.WaitForSuback;
-                                            //}
-                                            //else if (msgInflight.Type == MqttMsgBase.MessageType.Unsubscribe) {
-                                            //    // UNSUBSCRIBE message to send, wait for UNSUBACK
-                                            //    msgContext.State = MqttMsgState.WaitForUnsuback;
-                                            //}
 
                                             Send((ISentToBroker)msgInflight);
 
                                             // update timeout : minimum between delay (based on current message sent) or current timeout
                                             timeout = (_settings.DelayOnRetry < timeout) ? _settings.DelayOnRetry : timeout;
 
-                                            // re-enqueue message (I have to re-analyze for receiving PUBACK, SUBACK or UNSUBACK)
+                                            // re-enqueue message (I have to re-analyze for receiving PUBACK
                                             _inflightQueue.Enqueue(msgContext);
                                         }
                                         // QoS 1, PUBLISH message received from broker to acknowledge, send PUBACK
@@ -180,12 +166,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                                         break;
 
                                     case MqttMsgState.WaitForPuback:
-                                        //case MqttMsgState.WaitForSuback:
-                                        // case MqttMsgState.WaitForUnsuback:
 
-                                        // QoS 1, waiting for PUBACK of a PUBLISH message sent or
-                                        //        waiting for SUBACK of a SUBSCRIBE message sent or
-                                        //        waiting for UNSUBACK of a UNSUBSCRIBE message sent or
+                                        // QoS 1, waiting for PUBACK of a PUBLISH message sent
                                         if (msgContext.Flow == MqttMsgFlow.ToPublish) {
                                             acknowledge = false;
                                             lock (_internalQueue) {
@@ -194,12 +176,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                                                 }
                                             }
 
-                                            // it is a PUBACK message or a SUBACK/UNSUBACK message
+                                            // it is a PUBACK message
                                             if (msgReceived != null) {
-                                                // PUBACK message or SUBACK/UNSUBACK message for the current message
-                                                if (((msgReceived.Type == MqttMsgBase.MessageType.PubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Publish) && (msgReceived.MessageId == msgInflight.MessageId))
-                                                   /* || ((msgReceived.Type == MqttMsgBase.MessageType.SubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Subscribe) && (msgReceived.MessageId == msgInflight.MessageId))*/
-                                                   /* || ((msgReceived.Type == MqttMsgBase.MessageType.UnsubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Unsubscribe) && (msgReceived.MessageId == msgInflight.MessageId))*/) {
+                                                // PUBACK message for the current message
+                                                if ((msgReceived.Type == MqttMsgBase.MessageType.PubAck) && (msgInflight.Type == MqttMsgBase.MessageType.Publish) && (msgReceived.MessageId == msgInflight.MessageId)) {
                                                     lock (_internalQueue) {
                                                         // received message processed
                                                         _internalQueue.Dequeue();
@@ -232,9 +212,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                                             // current message not acknowledged, no PUBACK or SUBACK/UNSUBACK or not equal messageid 
                                             if (!acknowledge) {
                                                 delta = Environment.TickCount - msgContext.Timestamp;
-                                                // check timeout for receiving PUBACK since PUBLISH was sent or
-                                                // for receiving SUBACK since SUBSCRIBE was sent or
-                                                // for receiving UNSUBACK since UNSUBSCRIBE was sent
+                                                // check timeout for receiving PUBACK since PUBLISH was sent 
+
                                                 if (delta >= _settings.DelayOnRetry) {
                                                     // max retry not reached, resend
                                                     if (msgContext.Attempt < _settings.AttemptsOnRetry) {

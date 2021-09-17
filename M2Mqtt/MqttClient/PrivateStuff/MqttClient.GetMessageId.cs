@@ -18,9 +18,8 @@ namespace uPLibrary.Networking.M2Mqtt {
 
     public partial class MqttClient {
         /// <summary>
-        /// Generate the next message identifier
+        /// Generate the next message identifier.
         /// </summary>
-        /// <returns>Message identifier</returns>
         public static ushort GetNewMessageId() {
             // if 0 or max UInt16, it becomes 1 (first valid messageId)
             _messageIdCounter = ((_messageIdCounter % ushort.MaxValue) != 0) ? (ushort)(_messageIdCounter + 1) : (ushort)1;

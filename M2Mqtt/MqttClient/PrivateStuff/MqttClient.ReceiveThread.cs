@@ -23,9 +23,6 @@ using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Thread for receiving messages
-        /// </summary>
         private void ReceiveThread() {
             var fixedHeaderFirstByte = new byte[1];
             byte msgType;
@@ -56,11 +53,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _connectStateMachine.ProcessMessage(parsedMessage);
-
-                            // #warning  definitely need some better state machine for this _msgReceived handling
-                            //_msgReceived = parsedMessage;
-                            //_syncEndReceiving.Set();
-
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PingResp) && (flags == 0x00)) {
                             // Remaining length is always 0, see section 3.13.
@@ -72,9 +64,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _pingStateMachine.ProcessMessage(parsedMessage);
-
-                            //_msgReceived = parsedMessage;
-                            // _syncEndReceiving.Set();
                         }
                         else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
                             // Remaining length is variable header (2 bytes) plus the length of the payload, see section 3.9.
@@ -92,7 +81,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _subscribeStateMachine.ProcessMessage(parsedMessage);
-                            //EnqueueInternal(parsedMessage);
                         }
                         else if ((msgType == MqttMsgBase.MessageType.PubAck) && (flags == 0x00)) {
 
@@ -119,9 +107,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             Trace.WriteLine(TraceLevel.Frame, "RECV {0}", parsedMessage);
 
                             _unsubscribeStateMachine.ProcessMessage(parsedMessage);
-
-                            //_msgReceived = parsedMessage;
-                            // _syncEndReceiving.Set();
                         }
                         else {
                             // This is either a malformed message header, or it is meant for server, not client.
@@ -129,29 +114,14 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Although specification is not entirely clear what to do if a client receives a messages which is meant for a server.
                             // But I will go with section 4.8 and close the connection anyway.
 #warning add some error propagation here to close connection
+
+                            // These message are meant for the broker, not client.
+                            throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
                         }
 
 
 
                         switch (msgType) {
-                            case MqttMsgBase.MessageType.ConAck:
-                                //_msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
-                                //_syncEndReceiving.Set();
-                                break;
-
-                            case MqttMsgBase.MessageType.PingResp:
-                                //_msgReceived = MqttMsgPingResp.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", _msgReceived);
-                                //_syncEndReceiving.Set();
-                                break;
-
-                            case MqttMsgBase.MessageType.SubAck:
-                                //// enqueue SUBACK message received (for QoS Level 1) into the internal queue
-                                //var suback = MqttMsgSuback.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", suback);
-                                //EnqueueInternal(suback);
-                                break;
 
                             case MqttMsgBase.MessageType.Publish:
                                 var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], _channel);
@@ -187,22 +157,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                                 Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
                                 EnqueueInternal(pubcomp);
                                 break;
-
-                            case MqttMsgBase.MessageType.UnsubAck:
-                                //// enqueue UNSUBACK message received (for QoS Level 1) into the internal queue
-                                //var unsuback = MqttMsgUnsuback.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", unsuback);
-                                //EnqueueInternal(unsuback);
-                                break;
-
-                            case MqttMsgBase.MessageType.Connect:
-                            case MqttMsgBase.MessageType.PingReq:
-                            case MqttMsgBase.MessageType.Subscribe:
-                            case MqttMsgBase.MessageType.Unsubscribe:
-                            case MqttMsgBase.MessageType.Disconnect:
-                            default:
-                                // These message are meant for the broker, not client.
-                                throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
                         }
 
                         _exReceiving = null;

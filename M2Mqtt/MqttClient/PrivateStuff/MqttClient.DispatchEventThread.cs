@@ -29,26 +29,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                 if (_isRunning) {
                     if (_eventQueue.TryDequeue(out var internalEvent)) {
 
-                        // TODO: remove this green code once proven that ConcurrentQueue works.
-                        //InternalEvent internalEvent = null;
-                        //lock (_eventQueue) {
-                        //    if (_eventQueue.Count > 0) {
-                        //        internalEvent = (InternalEvent)_eventQueue.Dequeue();
-                        //    }
-                        //}
-
-                        //// it's an event with a message inside
-                        //if (internalEvent != null) {
-
                         var msg = ((MsgInternalEvent)internalEvent).Message;
 
                         if (msg != null) {
                             switch (msg.Type) {
-                                //case MqttMsgBase.MessageType.SubAck:
-                                //    // raise subscribed topic event (SUBACK message received)
-                                //    OnMqttMsgSubscribed((MqttMsgSuback)msg);
-                                //    break;
-
                                 case MqttMsgBase.MessageType.Publish:
                                     // PUBLISH message received in a published internal event, no publish succeeded
                                     if (internalEvent.GetType() == typeof(MsgPublishedInternalEvent)) {
@@ -73,12 +57,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                                     // (PUBCOMP received for QoS Level 2)
                                     OnMqttMsgPublished(msg.MessageId, true);
                                     break;
-
-
-                                    //case MqttMsgBase.MessageType.UnsubAck:
-                                    //   OnMqttMsgUnsubscribed(msg.MessageId);
-                                    //   break;
-
                             }
                         }
                     }
