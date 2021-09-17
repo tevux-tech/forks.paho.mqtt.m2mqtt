@@ -14,10 +14,14 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
+
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     public class MqttMsgContext {
         public MqttMsgBase Message { get; set; }
+        [Obsolete]
         public MqttMsgState State { get; set; }
+        [Obsolete]
         public MqttMsgFlow Flow { get; set; }
 
         /// <summary>
