@@ -32,10 +32,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         private Socket _socket;
 
-        // CA certificate (on client)
-        private readonly X509Certificate _caCert;
-        // Server certificate (on broker)
-        private readonly X509Certificate _serverCert;
         // client certificate (on client)
         private readonly X509Certificate _clientCert;
 
@@ -65,15 +61,14 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        public SecureTcpChannel(Socket socket, X509Certificate serverCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback) {
+        public SecureTcpChannel(Socket socket, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback) {
             _socket = socket;
-            _serverCert = serverCert;
             _sslProtocol = sslProtocol;
             _userCertificateValidationCallback = userCertificateValidationCallback;
             _userCertificateSelectionCallback = userCertificateSelectionCallback;
         }
 
-        public SecureTcpChannel(string remoteHostName, int remotePort, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> alpnProtocols = null) {
+        public SecureTcpChannel(string remoteHostName, int remotePort, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> alpnProtocols = null) {
             IPAddress remoteIpAddress = null;
             try {
                 // check if remoteHostName is a valid IP address and get it
@@ -104,7 +99,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             RemoteHostName = remoteHostName;
             RemoteIpAddress = remoteIpAddress;
             RemotePort = remotePort;
-            _caCert = caCert;
             _clientCert = clientCert;
             _sslProtocol = sslProtocol;
             _userCertificateValidationCallback = userCertificateValidationCallback;
@@ -243,17 +237,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                 // Refer to: https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.shutdown(v=vs.110).aspx
             }
             _socket.Dispose();
-        }
-
-        /// <summary>
-        /// Accept connection from a remote client
-        /// </summary>
-        public void Accept() {
-            _netStream = new NetworkStream(_socket);
-            _sslStream = new SslStream(_netStream, false, _userCertificateValidationCallback, _userCertificateSelectionCallback);
-            _sslStream.AuthenticateAsServerAsync(_serverCert, false, MqttSslUtility.ToSslPlatformEnum(_sslProtocol), false).Wait();
-
-            return;
         }
     }
 

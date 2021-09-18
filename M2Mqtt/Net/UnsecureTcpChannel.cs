@@ -165,12 +165,5 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
             _socket.Dispose();
         }
-
-        /// <summary>
-        /// Accept connection from a remote client
-        /// </summary>
-        public void Accept() {
-            return;
-        }
     }
 }
