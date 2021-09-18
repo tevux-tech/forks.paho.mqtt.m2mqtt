@@ -15,28 +15,17 @@ Contributors:
 */
 
 using System;
-using uPLibrary.Networking.M2Mqtt.Internal;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Wrapper method for raising events
-        /// </summary>
-        /// <param name="internalEvent">Internal event</param>
-        private void OnInternalEvent(InternalEvent internalEvent) {
-            _eventQueue.Enqueue(internalEvent);
-
-            _receiveEventWaitHandle.Set();
-        }
-
         /// <summary>
         /// Wrapper method for raising closing connection event
         /// </summary>
         private void OnConnectionClosing() {
             if (!_isConnectionClosing) {
                 _isConnectionClosing = true;
-                _receiveEventWaitHandle.Set();
+
             }
         }
 

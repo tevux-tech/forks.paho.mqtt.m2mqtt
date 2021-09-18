@@ -37,17 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             _outgoingPublishStateMachine.Publish(publish);
 
-            // enqueue message to publish into the inflight queue
-            //var enqueue = EnqueueInflight(publish, MqttMsgFlow.ToPublish);
-
-            // message enqueued
-            //if (enqueue) {
             return publish.MessageId;
-            //}
-            // infligh queue full, message not enqueued
-            // else {
-            //     throw new MqttClientException(MqttClientErrorCode.InflightQueueFull);
-            //}
         }
     }
 }

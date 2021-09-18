@@ -16,11 +16,7 @@ Contributors:
 
 #warning Maybe remove LINQ usage?
 using System;
-using System.Collections;
-using System.Threading;
 using uPLibrary.Networking.M2Mqtt.Messages;
-using uPLibrary.Networking.M2Mqtt.Session;
-using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
@@ -58,14 +54,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // running status of threads
         private bool _isRunning;
-        // event for raising received message event
-        private AutoResetEvent _receiveEventWaitHandle;
 
-        // event for starting process inflight queue asynchronously
-        private AutoResetEvent _inflightWaitHandle;
-
-        // exeption thrown during receiving
-        Exception _exReceiving;
 
         // keep alive period (in ms)
         private int _keepAlivePeriod;
@@ -80,15 +69,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // channel to communicate over the network
         private IMqttNetworkChannel _channel;
-
-        // inflight messages queue
-        private Queue _inflightQueue;
-        // internal queue for received messages about inflight messages
-        private Queue _internalQueue;
-        // internal queue for dispatching events
-        private ConcurrentQueue _eventQueue = new ConcurrentQueue();
-        // session
-        private MqttSession _session;
 
         // reference to avoid access to singleton via property
         private MqttSettings _settings;
@@ -124,20 +104,15 @@ namespace uPLibrary.Networking.M2Mqtt {
         internal class MqttMsgContextFinder {
             // PUBLISH message id
             internal ushort MessageId { get; set; }
-            // message flow into inflight queue
-            internal MqttMsgFlow Flow { get; set; }
 
-            internal MqttMsgContextFinder(ushort messageId, MqttMsgFlow flow) {
+            internal MqttMsgContextFinder(ushort messageId) {
                 MessageId = messageId;
-                Flow = flow;
+
             }
 
             internal bool Find(object item) {
                 var msgCtx = (MqttMsgContext)item;
-                return ((msgCtx.Message.Type == MqttMsgBase.MessageType.Publish) &&
-                        (msgCtx.Message.MessageId == MessageId) &&
-                        msgCtx.Flow == Flow);
-
+                return (msgCtx.Message.Type == MqttMsgBase.MessageType.Publish) && (msgCtx.Message.MessageId == MessageId);
             }
         }
     }

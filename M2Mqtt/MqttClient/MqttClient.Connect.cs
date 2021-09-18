@@ -98,26 +98,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                         Fx.StartThread(KeepAliveThread);
                     }
 
-                    // start thread for raising received message event from broker
-                    Fx.StartThread(DispatchEventThread);
-
-                    // start thread for handling inflight messages queue to broker asynchronously (publish and acknowledge)
-                    Fx.StartThread(ProcessInflightThread);
-
                     IsConnected = true;
                 }
             }
-
-            //MqttMsgConnack connack = null;
-            //try {
-            //    connack = (MqttMsgConnack)SendReceive(connectMessage);
-            //}
-            //catch (MqttCommunicationException) {
-            //    _isRunning = false;
-            //    throw;
-            //}
-
-
 
             return _connectStateMachine.ConnectionResult;
         }

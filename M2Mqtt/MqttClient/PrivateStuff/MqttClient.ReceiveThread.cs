@@ -164,41 +164,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // These message are meant for the broker, not client.
                             throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
                         }
-
-
-
-                        switch (msgType) {
-
-                            case MqttMsgBase.MessageType.Publish:
-                                //var publish = MqttMsgPublish.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", publish);
-                                //EnqueueInflight(publish, MqttMsgFlow.ToAcknowledge);
-                                break;
-
-                            case MqttMsgBase.MessageType.PubRec:
-                                // enqueue PUBREC message received (for QoS Level 2) into the internal queue
-                                //var pubrec = MqttMsgPubrec.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrec);
-                                //EnqueueInternal(pubrec);
-                                break;
-
-                            case MqttMsgBase.MessageType.PubRel:
-                                // enqueue PUBREL message received (for QoS Level 2) into the internal queue
-                                //var pubrel = MqttMsgPubrel.Parse(fixedHeaderFirstByte[0], _channel);
-                                //Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubrel);
-                                // EnqueueInternal(pubrel);
-
-                                break;
-
-                            case MqttMsgBase.MessageType.PubComp:
-                                // enqueue PUBCOMP message received (for QoS Level 2) into the internal queue
-                                // var pubcomp = MqttMsgPubcomp.Parse(fixedHeaderFirstByte[0], _channel);
-                                // Trace.WriteLine(TraceLevel.Frame, "RECV {0}", pubcomp);
-                                // EnqueueInternal(pubcomp);
-                                break;
-                        }
-
-                        _exReceiving = null;
                     }
                     // zero bytes read, peer gracefully closed socket
                     else {
@@ -209,8 +174,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                 catch (Exception e) {
 
                     Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-
-                    _exReceiving = new MqttCommunicationException(e);
 
                     var close = false;
                     if (e.GetType() == typeof(MqttClientException)) {
@@ -231,6 +194,4 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
     }
-
-
 }

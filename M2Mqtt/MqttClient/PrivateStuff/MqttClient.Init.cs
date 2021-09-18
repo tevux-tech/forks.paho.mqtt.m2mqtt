@@ -14,7 +14,6 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -39,18 +38,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             else {
                 _settings.SecurePort = _brokerPort;
             }
-
-            // queue for handling inflight messages (publishing and acknowledge)
-            _inflightWaitHandle = new AutoResetEvent(false);
-            _inflightQueue = new Queue();
-
-            // queue for received message
-            _receiveEventWaitHandle = new AutoResetEvent(false);
-            // _eventQueue = new Queue();
-            _internalQueue = new Queue();
-
-            // session
-            _session = null;
 
             // create network channel
             _channel = new MqttNetworkChannel(_brokerHostName, _brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);

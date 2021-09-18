@@ -21,21 +21,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             // stop receiving thread
             _isRunning = false;
 
-            // wait end receive event thread
-            if (_receiveEventWaitHandle != null) {
-                _receiveEventWaitHandle.Set();
-            }
-
-            // wait end process inflight thread
-            if (_inflightWaitHandle != null) {
-                _inflightWaitHandle.Set();
-            }
-
-            // clear all queues
-            _inflightQueue.Clear();
-            _internalQueue.Clear();
-            _eventQueue.Clear();
-
             // close network channel
             _channel.Close();
 
