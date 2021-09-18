@@ -58,7 +58,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     _client.OnMqttMsgUnsubscribed(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Rogue UnsubAck message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"Rogue UnsubAck message for MessageId {message.MessageId.ToString("X4")}");
 #warning Rogue UnsubAck message?..
                 }
             }

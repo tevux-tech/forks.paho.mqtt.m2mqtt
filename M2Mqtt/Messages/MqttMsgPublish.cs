@@ -59,8 +59,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             }
 
             var variableHeaderBytes = new byte[variableHeaderSize];
-            variableHeaderBytes[0] = (byte)(MessageId >> 8);
-            variableHeaderBytes[1] = (byte)(MessageId & 0xFF);
+            variableHeaderBytes[0] = (byte)(topicBytes.Length >> 8);
+            variableHeaderBytes[1] = (byte)(topicBytes.Length & 0xFF);
             Array.Copy(topicBytes, 0, variableHeaderBytes, 2, topicBytes.Length);
             Array.Copy(messageIdBytes, 0, variableHeaderBytes, 2 + topicBytes.Length, messageIdBytes.Length);
 

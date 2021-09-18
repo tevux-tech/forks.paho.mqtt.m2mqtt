@@ -54,7 +54,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     NotifyPublishSucceeded(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue SubAck message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue PubAck message for MessageId {message.MessageId.ToString("X4")}");
                     NotifyRogueMessageReceived(message.MessageId);
                 }
             }
@@ -70,7 +70,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     _messagesWaitingForQoS2Pubrec.Remove(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue Pubrec message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue Pubrec message for MessageId {message.MessageId.ToString("X4")}");
                     isOk = false;
                     NotifyRogueMessageReceived(message.MessageId);
                 }
@@ -97,7 +97,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     NotifyPublishSucceeded(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue Pubcomp message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue Pubcomp message for MessageId {message.MessageId.ToString("X4")}");
                     NotifyRogueMessageReceived(message.MessageId);
                 }
             }

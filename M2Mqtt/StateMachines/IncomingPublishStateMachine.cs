@@ -68,7 +68,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 }
                 else {
                     isOk = false;
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue PubRec message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue PubRel message for MessageId {message.MessageId.ToString("X4")}");
                     NotifyRogueMessageReceived(message.MessageId);
                 }
             }

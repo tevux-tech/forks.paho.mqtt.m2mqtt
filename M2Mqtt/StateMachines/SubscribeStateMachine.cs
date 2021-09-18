@@ -67,7 +67,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     _client.OnMqttMsgSubscribed(message);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                Rogue SubAck message for MessageId {message.MessageId}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                Rogue SubAck message for MessageId {message.MessageId.ToString("X4")}");
 #warning Rogue SubAck message, what do I do now?..
                 }
             }
