@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -40,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             // create network channel
-            _channel = new MqttNetworkChannel(_brokerHostName, _brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);
+            _channel = new UnsecureTcpChannel(_brokerHostName, _brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);
 
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);
@@ -53,6 +54,12 @@ namespace uPLibrary.Networking.M2Mqtt {
 
                 while (true) {
                     if (IsConnected) {
+                        _pingStateMachine.Tick();
+                        if (_pingStateMachine.IsServerLost) {
+                            Trace.WriteLine(TraceLevel.Error, "PING timeouted, beginning shutdown.");
+                            OnConnectionClosing();
+                        }
+
                         _unsubscribeStateMachine.Tick();
                         _subscribeStateMachine.Tick();
                         _outgoingPublishStateMachine.Tick();

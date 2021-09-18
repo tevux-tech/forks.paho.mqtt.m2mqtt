@@ -26,7 +26,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                 }
             }
             else {
-                if (currentTime - _client.LastCommTime > MqttSettings.KeepAlivePeriod) {
+                // Keep alive period equals zero means turning off keep alive mechanism.
+                if ((currentTime - _client.LastCommTime > MqttSettings.KeepAlivePeriod) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
                     var pingreq = new MqttMsgPingReq();
                     _client.Send(pingreq);
                     Trace.WriteLine(TraceLevel.Frame, "                        PngReq->");
