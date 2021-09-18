@@ -24,32 +24,16 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public byte[] GetBytes() {
-            var varHeaderSize = 0;
-            var payloadSize = 0;
-            var remainingLength = 0;
-            byte[] buffer;
-            var index = 0;
+            // PubComp packet is always 4 bytes long.
+            var buffer = new byte[4];
 
-            // message identifier
-            varHeaderSize += MessageIdSize;
+            // Fixed header is fixed, no variables here.
+            buffer[0] = MessageType.PubComp << 4;
+            buffer[1] = 2;
 
-            remainingLength += (varHeaderSize + payloadSize);
-
-            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
-
-            // allocate buffer for message
-            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
-
-            // first fixed header byte
-
-            buffer[index++] = (MessageType.PubComp << FixedHeader.TypeOffset) | MessageFlags.PubComp;
-
-            // encode remaining length
-            index = EncodeRemainingLength(remainingLength, buffer, index);
-
-            // get message identifier
-            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
+            // Variable header is always two bytes - packet ID.
+            buffer[2] = (byte)(MessageId >> 8);
+            buffer[3] = (byte)(MessageId & 0xFF);
 
             return buffer;
         }
