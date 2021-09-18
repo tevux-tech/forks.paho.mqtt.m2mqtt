@@ -16,7 +16,6 @@ Contributors:
 
 using System;
 using System.Text;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
@@ -27,7 +26,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
         public byte[] Message { get; set; }
 
-        public MqttMsgPublish() {
+        internal MqttMsgPublish() {
             Type = MessageType.Publish;
         }
 
@@ -46,83 +45,40 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public byte[] GetBytes() {
-            var varHeaderSize = 0;
-            var payloadSize = 0;
-            var remainingLength = 0;
-            byte[] buffer;
-            var index = 0;
+            // Variable header section.
+            var topicBytes = Encoding.UTF8.GetBytes(Topic);
+            var variableHeaderSize = topicBytes.Length + 2;
 
-            // topic can't contain wildcards
-            if ((Topic.IndexOf('#') != -1) || (Topic.IndexOf('+') != -1)) {
-                throw new MqttClientException(MqttClientErrorCode.TopicWildcard);
-            }
-
-            // check topic length
-            if ((Topic.Length < MinTopicLength) || (Topic.Length > MaxTopicLength)) {
-                throw new MqttClientException(MqttClientErrorCode.TopicLength);
-            }
-
-            // check wrong QoS level (both bits can't be set 1)
-            if (QosLevel > QosLevel.ExactlyOnce) {
-                throw new MqttClientException(MqttClientErrorCode.QosNotAllowed);
-            }
-
-            var topicUtf8 = Encoding.UTF8.GetBytes(Topic);
-
-            // topic name
-            varHeaderSize += topicUtf8.Length + 2;
-
-            // message id is valid only with QOS level 1 or QOS level 2
+            var messageIdBytes = new byte[0];
             if ((QosLevel == QosLevel.AtLeastOnce) || (QosLevel == QosLevel.ExactlyOnce)) {
-                varHeaderSize += MessageIdSize;
+                // For QoS levels 1 and 2, a Packet ID has to be appended to variable header.
+                variableHeaderSize += 2;
+                messageIdBytes = new byte[2];
+                messageIdBytes[0] = (byte)(MessageId >> 8);
+                messageIdBytes[1] = (byte)(MessageId & 0xFF);
             }
 
-            // check on message with zero length
-            if (Message != null) {
-                // message data
-                payloadSize += Message.Length;
-            }
+            var variableHeaderBytes = new byte[variableHeaderSize];
+            variableHeaderBytes[0] = (byte)(MessageId >> 8);
+            variableHeaderBytes[1] = (byte)(MessageId & 0xFF);
+            Array.Copy(topicBytes, 0, variableHeaderBytes, 2, topicBytes.Length);
+            Array.Copy(messageIdBytes, 0, variableHeaderBytes, 2 + topicBytes.Length, messageIdBytes.Length);
 
-            remainingLength += (varHeaderSize + payloadSize);
-
+            // Now we have all the sizes, so we can calculate fixed header size.
+            var remainingLength = variableHeaderBytes.Length + Message.Length;
             var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
 
-            // allocate buffer for message
-            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
+            // Finally, building the resulting full payload.
+            var finalBuffer = new byte[fixedHeaderSize + remainingLength];
+            finalBuffer[0] = MessageType.Publish << 4;
+            finalBuffer[0] += (byte)((DupFlag ? 1 : 0) << 3);
+            finalBuffer[0] += (byte)(((byte)QosLevel) << 1);
+            finalBuffer[0] += (byte)((Retain ? 1 : 0) << 0);
+            EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            Array.Copy(variableHeaderBytes, 0, finalBuffer, fixedHeaderSize, variableHeaderBytes.Length);
+            Array.Copy(Message, 0, finalBuffer, fixedHeaderSize + variableHeaderBytes.Length, Message.Length);
 
-            // first fixed header byte
-            buffer[index] = (byte)((MessageType.Publish << FixedHeader.TypeOffset) | (((byte)QosLevel) << FixedHeader.QosLevelOffset));
-            buffer[index] |= DupFlag ? (byte)(1 << FixedHeader.DuplicateFlagOffset) : (byte)0x00;
-            buffer[index] |= Retain ? (byte)(1 << FixedHeader.RetainFlagOffset) : (byte)0x00;
-            index++;
-
-            // encode remaining length
-            index = EncodeRemainingLength(remainingLength, buffer, index);
-
-            // topic name
-            buffer[index++] = (byte)((topicUtf8.Length >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(topicUtf8.Length & 0x00FF); // LSB
-            Array.Copy(topicUtf8, 0, buffer, index, topicUtf8.Length);
-            index += topicUtf8.Length;
-
-            // message id is valid only with QOS level 1 or QOS level 2
-            if ((QosLevel == QosLevel.AtLeastOnce) || (QosLevel == QosLevel.ExactlyOnce)) {
-                // check message identifier assigned
-                if (MessageId == 0) {
-                    throw new MqttClientException(MqttClientErrorCode.WrongMessageId);
-                }
-
-                buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
-                buffer[index++] = (byte)(MessageId & 0x00FF); // LSB
-            }
-
-            // check on message with zero length
-            if (Message != null) {
-                // message data
-                Array.Copy(Message, 0, buffer, index, Message.Length);
-            }
-
-            return buffer;
+            return finalBuffer;
         }
 
         public static bool TryParse(byte flags, byte[] variableHeaderAndPayloadBytes, out MqttMsgPublish parsedMessage) {

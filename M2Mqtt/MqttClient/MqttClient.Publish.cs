@@ -14,6 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
@@ -31,6 +32,11 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Message Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
+            // topic can't contain wildcards
+            if ((topic.IndexOf('#') != -1) || (topic.IndexOf('+') != -1)) { throw new ArgumentException("Topic cannot contain wildcards in Publish message"); }
+
+#warning check for topic length maybe?
+
             var publish = new MqttMsgPublish(topic, message, false, qosLevel, retain) {
                 MessageId = GetNewMessageId()
             };
