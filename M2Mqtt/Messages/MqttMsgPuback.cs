@@ -16,37 +16,24 @@ Contributors:
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for PUBACK message from broker to client
+    /// Class for PUBACK message from broker to client. See section 3.4.
     /// </summary>
     public class MqttMsgPuback : MqttMsgBase, ISentToBroker {
         public MqttMsgPuback() {
             Type = MessageType.PubAck;
         }
+
         public byte[] GetBytes() {
-            var varHeaderSize = 0;
-            var payloadSize = 0;
-            var remainingLength = 0;
-            byte[] buffer;
-            var index = 0;
+            // PubAck packet is always 4 bytes long.
+            var buffer = new byte[4];
 
-            // message identifier
-            varHeaderSize += MessageIdSize;
+            // Fixed header is fixed, no variables here.
+            buffer[0] = MessageType.PubAck << 4; ;
+            buffer[1] = 2;
 
-            remainingLength += (varHeaderSize + payloadSize);
-
-            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
-
-            // allocate buffer for message
-            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
-
-            buffer[index++] = (MessageType.PubAck << FixedHeader.TypeOffset) | MessageFlags.PubAck;
-
-            // encode remaining length
-            index = EncodeRemainingLength(remainingLength, buffer, index);
-
-            // get message identifier
-            buffer[index++] = (byte)((MessageId >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(MessageId & 0x00FF); // LSB 
+            // Variable header is always two bytes - packet ID.
+            buffer[2] = (byte)(MessageId >> 8);
+            buffer[3] = (byte)(MessageId & 0xFF);
 
             return buffer;
         }
