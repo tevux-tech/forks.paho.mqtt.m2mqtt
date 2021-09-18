@@ -86,13 +86,9 @@ namespace uPLibrary.Networking.M2Mqtt {
         private OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
         private IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
 
+        public ConnectionOptions ConnectionOptions { get; private set; }
         public bool IsConnected { get; private set; }
-        public string ClientId { get; private set; }
-        public bool CleanSession { get; private set; }
-        public bool WillFlag { get; private set; }
-        public QosLevel WillQosLevel { get; private set; }
-        public string WillTopic { get; private set; }
-        public string WillMessage { get; private set; }
+
         public MqttSettings Settings {
             get { return _settings; }
         }

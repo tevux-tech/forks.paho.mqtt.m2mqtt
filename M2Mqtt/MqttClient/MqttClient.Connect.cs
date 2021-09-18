@@ -26,32 +26,17 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(string clientId) {
-            return Connect(clientId, null, null, false, QosLevel.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
+        public ReturnCodes Connect() {
+            return Connect(new ConnectionOptions());
         }
+
 
         /// <summary>
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(string clientId, string username, string password) {
-            return Connect(clientId, username, password, false, QosLevel.AtMostOnce, false, null, null, true, MqttMsgConnect.KeepAliveDefaultValue);
-        }
-
-        /// <summary>
-        /// Connect to broker
-        /// </summary>
-        /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(string clientId, string username, string password, bool cleanSession, ushort keepAlivePeriod) {
-            return Connect(clientId, username, password, false, QosLevel.AtMostOnce, false, null, null, cleanSession, keepAlivePeriod);
-        }
-
-        /// <summary>
-        /// Connect to broker
-        /// </summary>
-        /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(string clientId, string username, string password, bool willRetain, QosLevel willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
-            var connectMessage = new MqttMsgConnect(clientId, username, password, willRetain, willQosLevel, willFlag, willTopic, willMessage, cleanSession, keepAlivePeriod);
+        public ReturnCodes Connect(ConnectionOptions connectionOptions) {
+            var connectMessage = new MqttMsgConnect(connectionOptions);
 
             try {
                 _channel.Connect();
@@ -78,14 +63,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                 // if connection accepted, start keep alive timer and 
                 if (_connectStateMachine.ConnectionResult == ReturnCodes.Accepted) {
                     // set all client properties
-                    ClientId = clientId;
-                    CleanSession = cleanSession;
-                    WillFlag = willFlag;
-                    WillTopic = willTopic;
-                    WillMessage = willMessage;
-                    WillQosLevel = willQosLevel;
 
-                    _keepAlivePeriod = keepAlivePeriod * 1000; // convert in ms
+                    ConnectionOptions = connectionOptions;
 
                     _pingStateMachine.Reset();
 
@@ -93,7 +72,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     RestoreSession();
 
                     // keep alive period equals zero means turning off keep alive mechanism
-                    if (_keepAlivePeriod != 0) {
+                    if (connectionOptions.KeepAlivePeriod != 0) {
                         // start thread for sending keep alive message to the broker
                         Fx.StartThread(KeepAliveThread);
                     }

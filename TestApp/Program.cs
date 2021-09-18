@@ -20,7 +20,9 @@ namespace TestApp {
 
             var client = new MqttClient("172.16.0.2");
             client.MqttMsgPublishReceived += HandlePublishReceived;
-            client.Connect("TestApp");
+            var connectionOptions = new ConnectionOptions();
+            connectionOptions.SetClientId("TestApp");
+            client.Connect(connectionOptions);
 
             client.Subscribe(new[] { "temp/testapp" }, new[] { QosLevel.AtMostOnce });
             client.Subscribe(new[] { "temp/test-publish2" }, new[] { QosLevel.ExactlyOnce });

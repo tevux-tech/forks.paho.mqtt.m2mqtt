@@ -16,15 +16,13 @@ Contributors:
 
 using System;
 using System.Text;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
-    /// Class for CONNECT message from client to broker
+    /// Class for CONNECT message from client to broker. See section 3.1.
     /// </summary>
     public class MqttMsgConnect : MqttMsgBase, ISentToBroker {
         public const ushort KeepAliveDefaultValue = 15; // seconds
-        public const ushort KeepAliveMaximumValue = 65535; // 16 bit
 
         // connect flags
         public class FlagOffset {
@@ -36,171 +34,127 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             public const byte CleanSession = 0x01;
         }
 
-        public string ProtocolName { get; set; }
-        public string ClientId { get; set; }
-
-        public bool WillRetain { get; set; }
-        public QosLevel WillQosLevel { get; set; }
-
-        public bool WillFlag { get; set; }
-        public string WillTopic { get; set; }
-        public string WillMessage { get; set; }
-        public string Username { get; set; }
-
-        public string Password { get; set; }
-        public bool CleanSession { get; set; }
-        public ushort KeepAlivePeriod { get; set; }
+        public ConnectionOptions ConnectionOptions { get; private set; }
 
         public MqttMsgConnect() {
             Type = MessageType.Connect;
         }
 
-        public MqttMsgConnect(string clientId) : this(clientId, null, null, false, QosLevel.AtLeastOnce, false, null, null, true, KeepAliveDefaultValue) {
-        }
-
-        public MqttMsgConnect(string clientId, string username, string password, bool willRetain, QosLevel willQosLevel, bool willFlag, string willTopic, string willMessage, bool cleanSession, ushort keepAlivePeriod) {
-            Type = MessageType.Connect;
-
-            ClientId = clientId;
-            Username = username;
-            Password = password;
-            this.WillRetain = willRetain;
-            this.WillQosLevel = willQosLevel;
-            WillFlag = willFlag;
-            WillTopic = willTopic;
-            WillMessage = willMessage;
-            CleanSession = cleanSession;
-            KeepAlivePeriod = keepAlivePeriod;
+        public MqttMsgConnect(ConnectionOptions connectionOptions) : this() {
+            ConnectionOptions = connectionOptions;
         }
 
         public byte[] GetBytes() {
-            var payloadSize = 0;
-            byte[] buffer;
-            var index = 0;
+            // This is the most complicated packet of them all, with multiple sections:
+            // 1. Fixed header (mandatory, variable length)
+            // 2. Variable header (mandatory, fixed length)
+            // 3. Client id section (mandatory, variable length)
+            // 4. Will section (optional, variable length)
+            // 5. Credentials section (optional, variable length)
 
-            var clientIdUtf8 = Encoding.UTF8.GetBytes(ClientId);
-            var willTopicUtf8 = (WillFlag && (WillTopic != null)) ? Encoding.UTF8.GetBytes(WillTopic) : null;
-            var willMessageUtf8 = (WillFlag && (WillMessage != null)) ? Encoding.UTF8.GetBytes(WillMessage) : null;
-            var usernameUtf8 = ((Username != null) && (Username.Length > 0)) ? Encoding.UTF8.GetBytes(Username) : null;
-            var passwordUtf8 = ((Password != null) && (Password.Length > 0)) ? Encoding.UTF8.GetBytes(Password) : null;
+            var flags = (ConnectionOptions.IsCleanSession ? 1 : 0) << 1;
 
+            // First we need to calculate length of all variable sections. Let's go with client ID section first, as it must be present.
+            // Specification allows for empty content, but also discourages it.
+            var clientIdBytes = Encoding.UTF8.GetBytes(ConnectionOptions.ClientId);
+            var clientIdPayload = new byte[2 + clientIdBytes.Length];
+            clientIdPayload[0] = (byte)(clientIdBytes.Length >> 8);
+            clientIdPayload[1] = (byte)(clientIdBytes.Length & 0xFF);
+            Array.Copy(clientIdBytes, 0, clientIdPayload, 2, clientIdBytes.Length);
 
-            // will flag set, will topic and will message MUST be present
-            if (WillFlag && (((byte)WillQosLevel >= 0x03) || (willTopicUtf8 == null) || (willMessageUtf8 == null) || ((willTopicUtf8 != null) && (willTopicUtf8.Length == 0)) || ((willMessageUtf8 != null) && (willMessageUtf8.Length == 0)))) {
-                throw new MqttClientException(MqttClientErrorCode.WillWrong);
+            // Now, the optional Will section.
+            var willPayload = new byte[0];
+            if (ConnectionOptions.IsWillUsed) {
+                var willPayloadSize = 0;
+
+                // Technically, specification allows for zero-length topics. Wouldn't make much sense, though...
+                willPayloadSize += ConnectionOptions.WillTopic.Length + 2;
+
+                // Will message length can be zero.
+                willPayloadSize += ConnectionOptions.WillMessage.Length + 2;
+
+                // Building the payload. 
+                willPayload = new byte[willPayloadSize];
+
+                var willTopicBytes = Encoding.UTF8.GetBytes(ConnectionOptions.WillTopic);
+                willPayload[0] = (byte)(willTopicBytes.Length >> 8);
+                willPayload[1] = (byte)(willTopicBytes.Length & 0xFF);
+                Array.Copy(willTopicBytes, 0, willPayload, 2, willTopicBytes.Length);
+
+                willPayload[willPayload.Length + 2 + 0] = (byte)(ConnectionOptions.WillMessage.Length >> 8);
+                willPayload[willPayload.Length + 2 + 1] = (byte)(ConnectionOptions.WillMessage.Length & 0xFF);
+                Array.Copy(ConnectionOptions.WillMessage, 0, willPayload, willTopicBytes.Length + 2 + 2, ConnectionOptions.WillMessage.Length);
+
+                // Setting appropriate flag bits.
+                flags |= 1 << 2;
+                flags |= (byte)ConnectionOptions.WillQosLevel << 3;
+                flags |= (ConnectionOptions.IsWillRetained ? 1 : 0) << 5;
             }
-            // willflag not set, retain must be 0 and will topic and message MUST NOT be present
-            else if (!WillFlag && (WillRetain || (willTopicUtf8 != null) || (willMessageUtf8 != null) || ((willTopicUtf8 != null) && (willTopicUtf8.Length != 0)) || ((willMessageUtf8 != null) && (willMessageUtf8.Length != 0)))) {
-                throw new MqttClientException(MqttClientErrorCode.WillWrong);
-            }
 
-            if (KeepAlivePeriod > KeepAliveMaximumValue) {
-                throw new MqttClientException(MqttClientErrorCode.KeepAliveWrong);
-            }
+            // Final variable section - credentials.
+            var credentialsPayload = new byte[0];
+            if (string.IsNullOrEmpty(ConnectionOptions.Username) == false) {
+                var credentialsPayloadSize = 0;
 
-            // check on will QoS Level
-            if ((WillQosLevel < QosLevel.AtMostOnce) || (WillQosLevel > QosLevel.ExactlyOnce)) {
-                throw new MqttClientException(MqttClientErrorCode.WillWrong);
+                // Technically, MQTT 3.1.1 specification does not tell if username string can be empty or not.
+                // But empty username would be kind of stupid, so I'll just assume it has at least a single symbol.
+                credentialsPayloadSize += ConnectionOptions.Username.Length + 2;
+
+                // However, password is allowed to be empty. See section 3.1.3.5.
+                // But even if it is empty, payload bytes are still present.
+                credentialsPayloadSize += ConnectionOptions.Password.Length + 2;
+
+                // Building the payload. Need to UTF-8 encode strings.
+                credentialsPayload = new byte[credentialsPayloadSize];
+
+                var usernameBytes = Encoding.UTF8.GetBytes(ConnectionOptions.Username);
+                credentialsPayload[0] = (byte)(usernameBytes.Length >> 8);
+                credentialsPayload[1] = (byte)(usernameBytes.Length & 0xFF);
+                Array.Copy(usernameBytes, 0, credentialsPayload, 2, usernameBytes.Length);
+
+                var passwordBytes = Encoding.UTF8.GetBytes(ConnectionOptions.Password);
+                credentialsPayload[usernameBytes.Length + 2 + 0] = (byte)(passwordBytes.Length >> 8);
+                credentialsPayload[usernameBytes.Length + 2 + 1] = (byte)(passwordBytes.Length & 0xFF);
+                Array.Copy(passwordBytes, 0, credentialsPayload, usernameBytes.Length + 2 + 2, passwordBytes.Length);
+
+                // Setting appropriate flag bits. Here, MQTT spec complicated things a bit, as it allows username to be present, but password missing.
+                // I will cheat here a bit, and will set password flag anyway, hoping that nobody really uses username only,
+                // password being not just empty, but completely missing altogether. If somebody complains, I'll fix it then...
+                flags |= 1 << 7;
+                flags |= 1 << 6;
             }
 
             // Variable header is always 10 bytes for 3.1.1.
-            var varHeaderSize = 10;
+            var varHeaderPayload = new byte[10];
+            varHeaderPayload[0] = 0;
+            varHeaderPayload[1] = 4;
+            varHeaderPayload[2] = (byte)'M';
+            varHeaderPayload[3] = (byte)'Q';
+            varHeaderPayload[4] = (byte)'T';
+            varHeaderPayload[5] = (byte)'T';
+            varHeaderPayload[6] = 4; // <-- Protocol ID. 
+            varHeaderPayload[7] = (byte)flags;
+            varHeaderPayload[8] = (byte)(ConnectionOptions.KeepAlivePeriod >> 8);
+            varHeaderPayload[9] = (byte)(ConnectionOptions.KeepAlivePeriod & 0xFF);
 
-            // client identifier field size
-            payloadSize += clientIdUtf8.Length + 2;
-            // will topic field size
-            payloadSize += (willTopicUtf8 != null) ? (willTopicUtf8.Length + 2) : 0;
-            // will message field size
-            payloadSize += (willMessageUtf8 != null) ? (willMessageUtf8.Length + 2) : 0;
-            // username field size
-            payloadSize += (usernameUtf8 != null) ? (usernameUtf8.Length + 2) : 0;
-            // password field size
-            payloadSize += (passwordUtf8 != null) ? (passwordUtf8.Length + 2) : 0;
-
-            var remainingLength = varHeaderSize + payloadSize;
-
+            // Now we have all the size, so we can calculate fixed header size.
+            var remainingLength = varHeaderPayload.Length + clientIdPayload.Length + credentialsPayload.Length + willPayload.Length;
             var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
 
-            // allocate buffer for message
-            buffer = new byte[fixedHeaderSize + varHeaderSize + payloadSize];
+            // Finally, building the resulting full payload.
+            var finalBuffer = new byte[fixedHeaderSize + remainingLength];
+            finalBuffer[0] = MessageType.Connect << 4;
+            EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            Array.Copy(varHeaderPayload, 0, finalBuffer, fixedHeaderSize, varHeaderPayload.Length);
+            Array.Copy(clientIdPayload, 0, finalBuffer, fixedHeaderSize + varHeaderPayload.Length, clientIdPayload.Length);
+            Array.Copy(willPayload, 0, finalBuffer, fixedHeaderSize + varHeaderPayload.Length + clientIdPayload.Length, willPayload.Length);
+            Array.Copy(credentialsPayload, 0, finalBuffer, fixedHeaderSize + varHeaderPayload.Length + clientIdPayload.Length + willPayload.Length, credentialsPayload.Length);
 
-            // first fixed header byte
-            buffer[index++] = (MessageType.Connect << FixedHeader.TypeOffset) | MessageFlags.Connect; // [v.3.1.1]
-
-            // encode remaining length
-            index = EncodeRemainingLength(remainingLength, buffer, index);
-
-            // Protocol name is fixed by the specification. Section 3.1.2.1.
-            buffer[index++] = 0;
-            buffer[index++] = 4;
-            buffer[index++] = (byte)'M';
-            buffer[index++] = (byte)'Q';
-            buffer[index++] = (byte)'T';
-            buffer[index++] = (byte)'T';
-
-            // Protocol version is 4 for 3.1.1.
-            buffer[index++] = 4;
-
-            // connect flags
-            byte connectFlags = 0x00;
-            connectFlags |= (usernameUtf8 != null) ? (byte)(1 << FlagOffset.Username) : (byte)0x00;
-            connectFlags |= (passwordUtf8 != null) ? (byte)(1 << FlagOffset.Password) : (byte)0x00;
-            connectFlags |= (WillRetain) ? (byte)(1 << FlagOffset.WillRetain) : (byte)0x00;
-            // only if will flag is set, we have to use will QoS level (otherwise is MUST be 0)
-            if (WillFlag) {
-                connectFlags |= (byte)(((byte)WillQosLevel) << FlagOffset.WillQoS);
-            }
-
-            connectFlags |= (WillFlag) ? (byte)(1 << FlagOffset.Will) : (byte)0x00;
-            connectFlags |= (CleanSession) ? (byte)(1 << FlagOffset.CleanSession) : (byte)0x00;
-            buffer[index++] = connectFlags;
-
-            // keep alive period
-            buffer[index++] = (byte)((KeepAlivePeriod >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(KeepAlivePeriod & 0x00FF); // LSB
-
-            // client identifier
-            buffer[index++] = (byte)((clientIdUtf8.Length >> 8) & 0x00FF); // MSB
-            buffer[index++] = (byte)(clientIdUtf8.Length & 0x00FF); // LSB
-            Array.Copy(clientIdUtf8, 0, buffer, index, clientIdUtf8.Length);
-            index += clientIdUtf8.Length;
-
-            // will topic
-            if (WillFlag && (willTopicUtf8 != null)) {
-                buffer[index++] = (byte)((willTopicUtf8.Length >> 8) & 0x00FF); // MSB
-                buffer[index++] = (byte)(willTopicUtf8.Length & 0x00FF); // LSB
-                Array.Copy(willTopicUtf8, 0, buffer, index, willTopicUtf8.Length);
-                index += willTopicUtf8.Length;
-            }
-
-            // will message
-            if (WillFlag && (willMessageUtf8 != null)) {
-                buffer[index++] = (byte)((willMessageUtf8.Length >> 8) & 0x00FF); // MSB
-                buffer[index++] = (byte)(willMessageUtf8.Length & 0x00FF); // LSB
-                Array.Copy(willMessageUtf8, 0, buffer, index, willMessageUtf8.Length);
-                index += willMessageUtf8.Length;
-            }
-
-            // username
-            if (usernameUtf8 != null) {
-                buffer[index++] = (byte)((usernameUtf8.Length >> 8) & 0x00FF); // MSB
-                buffer[index++] = (byte)(usernameUtf8.Length & 0x00FF); // LSB
-                Array.Copy(usernameUtf8, 0, buffer, index, usernameUtf8.Length);
-                index += usernameUtf8.Length;
-            }
-
-            // password
-            if (passwordUtf8 != null) {
-                buffer[index++] = (byte)((passwordUtf8.Length >> 8) & 0x00FF); // MSB
-                buffer[index++] = (byte)(passwordUtf8.Length & 0x00FF); // LSB
-                Array.Copy(passwordUtf8, 0, buffer, index, passwordUtf8.Length);
-            }
-
-            return buffer;
+            return finalBuffer;
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("CONNECT", new object[] { "protocolName", "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ProtocolName, ClientId, WillFlag, WillRetain, WillQosLevel, WillTopic, WillMessage, Username, Password, CleanSession, KeepAlivePeriod });
+            return Helpers.GetTraceString("CONNECT", new object[] { "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ConnectionOptions.ClientId, ConnectionOptions.IsWillUsed, ConnectionOptions.IsWillRetained, ConnectionOptions.WillQosLevel, ConnectionOptions.WillTopic, ConnectionOptions.WillMessage, ConnectionOptions.Username, ConnectionOptions.Password, ConnectionOptions.IsCleanSession, ConnectionOptions.KeepAlivePeriod });
         }
     }
 }
