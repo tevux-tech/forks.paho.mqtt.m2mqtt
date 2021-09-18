@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
-    /// Channel to communicate over the network
+    /// Secure channel to communicate over the network.
     /// </summary>
     public class SecureTcpChannel : IMqttNetworkChannel {
         private readonly RemoteCertificateValidationCallback _userCertificateValidationCallback;
@@ -32,29 +32,18 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         private Socket _socket;
 
-        // client certificate (on client)
         private readonly X509Certificate _clientCert;
-
-        // SSL/TLS protocol version
         private readonly MqttSslProtocols _sslProtocol;
 
         public string RemoteHostName { get; private set; }
         public IPAddress RemoteIpAddress { get; private set; }
         public int RemotePort { get; private set; }
 
-        // SSL stream
         private SslStream _sslStream;
         private NetworkStream _netStream;
 
-        /// <summary>
-        /// List of Protocol for ALPN
-        /// </summary>
         private readonly List<string> _alpnProtocols = new List<string>();
 
-
-        /// <summary>
-        /// Data available on the channel
-        /// </summary>
         public bool DataAvailable {
             get {
                 return _netStream.DataAvailable;
@@ -109,9 +98,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        /// <summary>
-        /// Connect to remote server
-        /// </summary>
         public void Connect() {
             _socket = new Socket(RemoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             // try connection to the broker
@@ -153,11 +139,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 #endif
         }
 
-        /// <summary>
-        /// Send data on the network channel
-        /// </summary>
-        /// <param name="buffer">Data buffer to send</param>
-        /// <returns>Number of byte sent</returns>
         public int Send(byte[] buffer) {
             _sslStream.Write(buffer, 0, buffer.Length);
             _sslStream.Flush();
@@ -185,11 +166,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             return isSent;
         }
 
-        /// <summary>
-        /// Receive data from the network
-        /// </summary>
-        /// <param name="buffer">Data buffer for receiving data</param>
-        /// <returns>Number of bytes received</returns>
         public int Receive(byte[] buffer) {
             // read all data needed (until fill buffer)
             var idx = 0;
@@ -206,12 +182,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             return buffer.Length;
         }
 
-        /// <summary>
-        /// Receive data from the network channel with a specified timeout
-        /// </summary>
-        /// <param name="buffer">Data buffer for receiving data</param>
-        /// <param name="timeout">Timeout on receiving (in milliseconds)</param>
-        /// <returns>Number of bytes received</returns>
         public int Receive(byte[] buffer, int timeout) {
             // check data availability (timeout is in microseconds)
             if (_socket.Poll(timeout * 1000, SelectMode.SelectRead)) {
@@ -222,9 +192,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        /// <summary>
-        /// Close the network channel
-        /// </summary>
         public void Close() {
             _netStream.Flush();
             _sslStream.Flush();
@@ -240,23 +207,24 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
     }
 
-    /// <summary>
-    /// MQTT SSL utility class
-    /// </summary>
     public static class MqttSslUtility {
         public static SslProtocols ToSslPlatformEnum(MqttSslProtocols mqttSslProtocol) {
             switch (mqttSslProtocol) {
                 case MqttSslProtocols.None:
                     return SslProtocols.None;
-                // CS0618: 'SslProtocols.Ssl3' is obsolete: 'This value has been deprecated.  It is no longer supported. https://go.microsoft.com/fwlink/?linkid=14202'
+
                 case MqttSslProtocols.SSLv3:
                     throw new ArgumentException("Ssl3 is obsolete. It is no longer supported. https://go.microsoft.com/fwlink/?linkid=14202");
+
                 case MqttSslProtocols.TLSv1_0:
                     return SslProtocols.Tls;
+
                 case MqttSslProtocols.TLSv1_1:
                     return SslProtocols.Tls11;
+
                 case MqttSslProtocols.TLSv1_2:
                     return SslProtocols.Tls12;
+
                 default:
                     throw new ArgumentException("SSL/TLS protocol version not supported");
             }

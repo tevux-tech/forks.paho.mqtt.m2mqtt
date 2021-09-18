@@ -20,7 +20,7 @@ using System.Net.Sockets;
 
 namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
-    /// Channel to communicate over the network
+    /// Unsecure channel to communicate over the network.
     /// </summary>
     public class UnsecureTcpChannel : IMqttNetworkChannel {
         private Socket _socket;
@@ -29,9 +29,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         public IPAddress RemoteIpAddress { get; private set; }
         public int RemotePort { get; private set; }
 
-        /// <summary>
-        /// Data available on the channel
-        /// </summary>
         public bool DataAvailable {
             get {
                 return _socket.Available > 0;
@@ -75,9 +72,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             RemotePort = remotePort;
         }
 
-        /// <summary>
-        /// Connect to remote server
-        /// </summary>
         public void Connect() {
             _socket = new Socket(RemoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             // try connection to the broker
@@ -85,11 +79,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         }
 
-        /// <summary>
-        /// Send data on the network channel
-        /// </summary>
-        /// <param name="buffer">Data buffer to send</param>
-        /// <returns>Number of byte sent</returns>
         public int Send(byte[] buffer) {
             return _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
         }
@@ -115,11 +104,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             return isSent;
         }
 
-        /// <summary>
-        /// Receive data from the network
-        /// </summary>
-        /// <param name="buffer">Data buffer for receiving data</param>
-        /// <returns>Number of bytes received</returns>
         public int Receive(byte[] buffer) {
             // read all data needed (until fill buffer)
             var idx = 0;
@@ -136,12 +120,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             return buffer.Length;
         }
 
-        /// <summary>
-        /// Receive data from the network channel with a specified timeout
-        /// </summary>
-        /// <param name="buffer">Data buffer for receiving data</param>
-        /// <param name="timeout">Timeout on receiving (in milliseconds)</param>
-        /// <returns>Number of bytes received</returns>
         public int Receive(byte[] buffer, int timeout) {
             // check data availability (timeout is in microseconds)
             if (_socket.Poll(timeout * 1000, SelectMode.SelectRead)) {
@@ -152,9 +130,6 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        /// <summary>
-        /// Close the network channel
-        /// </summary>
         public void Close() {
             try {
                 _socket.Shutdown(SocketShutdown.Both);
