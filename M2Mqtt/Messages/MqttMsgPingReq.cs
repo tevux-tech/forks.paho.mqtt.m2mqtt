@@ -26,7 +26,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public byte[] GetBytes() {
             // Message content is fixed, no variables here.
             var buffer = new byte[2];
-            buffer[0] = 0b1100_0000;
+            buffer[0] = MessageType.PingReq << 4;
             buffer[1] = 0;
 
             return buffer;
