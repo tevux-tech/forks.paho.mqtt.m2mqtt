@@ -41,7 +41,9 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
             // create network channel
-            _channel = new UnsecureTcpChannel(_brokerHostName, _brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, alpnProtocols);
+            if (secure == false) {
+                _channel = new UnsecureTcpChannel(_brokerHostName, _brokerPort);
+            }
 
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);

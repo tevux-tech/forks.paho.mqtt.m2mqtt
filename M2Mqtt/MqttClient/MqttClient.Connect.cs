@@ -71,12 +71,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                     // restore previous session
                     RestoreSession();
 
-                    // keep alive period equals zero means turning off keep alive mechanism
-                    if (connectionOptions.KeepAlivePeriod != 0) {
-                        // start thread for sending keep alive message to the broker
-                        Fx.StartThread(KeepAliveThread);
-                    }
-
                     IsConnected = true;
                 }
             }
