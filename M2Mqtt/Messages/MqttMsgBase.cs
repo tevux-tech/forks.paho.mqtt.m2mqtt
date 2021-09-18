@@ -19,25 +19,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Base class for all MQTT messages
     /// </summary>
     public abstract class MqttMsgBase {
-        // mask, offset and size for fixed header fields
-        public class FixedHeader {
-            public const byte TypeMask = 0xF0;
-            public const byte TypeOffset = 0x04;
-            public const byte TypeSize = 0x04;
-            public const byte FlagBitsMask = 0x0F;      // [v3.1.1]
-            public const byte FlagBitsOffset = 0x00;    // [v3.1.1]
-            public const byte FlagBitsSize = 0x04;      // [v3.1.1]
-            public const byte DuplicateFlagMask = 0x08;
-            public const byte DuplicateFlagOffset = 0x03;
-            public const byte DuplicateFlagSize = 0x01;
-            public const byte QosLevelMask = 0x06;
-            public const byte QosLevelOffset = 0x01;
-            public const byte QosLevelSize = 0x02;
-            public const byte RetainFlagMask = 0x01;
-            public const byte RetainFlagOffset = 0x00;
-            public const byte RetainFlagSize = 0x01;
-        }
-
         public class MessageType {
             public const byte Connect = 0x01;
             public const byte ConAck = 0x02;
@@ -55,17 +36,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             public const byte Disconnect = 0x0E;
         }
 
-        public class MessageFlags {
-            public const byte Subcribe = 0x02;
-            public const byte Unsubscribe = 0x02;
-        }
 
         // SUBSCRIBE QoS level granted failure [v3.1.1]
         public const byte QosLevelGrantedFailure = 0x80;
 
         public const ushort MaxTopicLength = 65535;
-        public const ushort MinTopicLength = 1;
-        public const byte MessageIdSize = 2;
 
         public byte Type { get; set; }
         public bool DupFlag { get; set; }

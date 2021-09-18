@@ -15,7 +15,6 @@ Contributors:
 */
 
 using System;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -26,7 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
             else {
 #warning this is temporary. Should get rid of exception altogether.
-                throw new MqttCommunicationException();
+                //throw new MqttCommunicationException();
             }
 
         }

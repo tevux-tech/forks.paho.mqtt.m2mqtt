@@ -106,7 +106,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             parsedMessage.DupFlag = (flags >> 3) == 0x01;
 
             // read retain flag from fixed header
-            parsedMessage.Retain = ((flags & 0x01) >> FixedHeader.RetainFlagOffset) == 0x01;
+            parsedMessage.Retain = ((flags & 0x01) >> 0) == 0x01;
 
             // message id is valid only with QOS level 1 or QOS level 2
             if ((parsedMessage.QosLevel == QosLevel.AtLeastOnce) || (parsedMessage.QosLevel == QosLevel.ExactlyOnce)) {

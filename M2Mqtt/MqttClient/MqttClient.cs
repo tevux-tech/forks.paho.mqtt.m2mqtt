@@ -54,11 +54,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // running status of threads
         private bool _isRunning;
-
-
-        // keep alive period (in ms)
-        private int _keepAlivePeriod;
-        // last communication time in ticks
         public int LastCommTime { get; private set; }
 
         public event MqttMsgPublishEventHandler MqttMsgPublishReceived = delegate { };
@@ -79,37 +74,18 @@ namespace uPLibrary.Networking.M2Mqtt {
         // connection is closing due to peer
         private bool _isConnectionClosing;
 
-        private PingStateMachine _pingStateMachine = new PingStateMachine();
-        private ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
-        private UnsubscribeStateMachine _unsubscribeStateMachine = new UnsubscribeStateMachine();
-        private SubscribeStateMachine _subscribeStateMachine = new SubscribeStateMachine();
-        private OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
-        private IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
+        private readonly PingStateMachine _pingStateMachine = new PingStateMachine();
+        private readonly ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
+        private readonly UnsubscribeStateMachine _unsubscribeStateMachine = new UnsubscribeStateMachine();
+        private readonly SubscribeStateMachine _subscribeStateMachine = new SubscribeStateMachine();
+        private readonly OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
+        private readonly IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
 
         public ConnectionOptions ConnectionOptions { get; private set; }
         public bool IsConnected { get; private set; }
 
         public MqttSettings Settings {
             get { return _settings; }
-        }
-
-
-        /// <summary>
-        /// Finder class for PUBLISH message inside a queue
-        /// </summary>
-        internal class MqttMsgContextFinder {
-            // PUBLISH message id
-            internal ushort MessageId { get; set; }
-
-            internal MqttMsgContextFinder(ushort messageId) {
-                MessageId = messageId;
-
-            }
-
-            internal bool Find(object item) {
-                var msgCtx = (MqttMsgContext)item;
-                return (msgCtx.Message.Type == MqttMsgBase.MessageType.Publish) && (msgCtx.Message.MessageId == MessageId);
-            }
         }
     }
 }
