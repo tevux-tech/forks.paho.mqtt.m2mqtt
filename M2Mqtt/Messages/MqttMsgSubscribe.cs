@@ -60,8 +60,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // Finally, building the resulting full payload.
             var finalBuffer = new byte[fixedHeaderSize + remainingLength];
-            finalBuffer[0] = (MessageType.Subscribe << 4) + 2;
-            EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            finalBuffer[0] = (byte)((Type << 4) + 2);
+            Helpers.EncodeRemainingLength(remainingLength, finalBuffer, 1);
             Array.Copy(variableHeaderBytes, 0, finalBuffer, fixedHeaderSize, variableHeaderBytes.Length);
             Array.Copy(payloadBytes, 0, finalBuffer, fixedHeaderSize + variableHeaderBytes.Length, payloadBytes.Length);
 

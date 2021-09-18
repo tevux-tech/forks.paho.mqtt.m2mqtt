@@ -34,7 +34,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="publish">PUBLISH message received</param>
         internal void OnMqttMsgPublishReceived(MqttMsgPublish publish) {
-            MqttMsgPublishReceived?.Invoke(this, new MqttMsgPublishEventArgs(publish.Topic, publish.Message, publish.DupFlag, publish.QosLevel, publish.Retain));
+            MqttMsgPublishReceived?.Invoke(this, new MqttMsgPublishEventArgs(publish.Topic, publish.Message, publish.DupFlag, publish.QosLevel, publish.RetainFlag));
         }
 
         /// <summary>

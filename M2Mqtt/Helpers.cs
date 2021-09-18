@@ -18,6 +18,43 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         /// <summary>
+        /// Decode remaining length reading bytes from socket
+        /// </summary>
+        public static int DecodeRemainingLength(IMqttNetworkChannel channel) {
+            var multiplier = 1;
+            var value = 0;
+            var nextByte = new byte[1];
+            int digit;
+            do {
+                // next digit from stream
+                channel.Receive(nextByte);
+                digit = nextByte[0];
+                value += ((digit & 127) * multiplier);
+                multiplier *= 128;
+            } while ((digit & 128) != 0);
+
+            return value;
+        }
+
+        /// <summary>
+        /// Encode remaining length and insert it into message buffer
+        /// </summary>
+        /// <param name="index">Index from which insert encoded value into buffer</param>
+        /// <returns>Index updated</returns>
+        public static int EncodeRemainingLength(int remainingLength, byte[] buffer, int index) {
+            do {
+                var digit = remainingLength % 128;
+                remainingLength /= 128;
+                if (remainingLength > 0) {
+                    digit |= 0x80;
+                }
+                buffer[index++] = (byte)digit;
+            } while (remainingLength > 0);
+
+            return index;
+        }
+
+        /// <summary>
         /// Returns a string representation of the message for tracing
         /// </summary>
         public static string GetTraceString(string name, object[] fieldNames, object[] fieldValues) {

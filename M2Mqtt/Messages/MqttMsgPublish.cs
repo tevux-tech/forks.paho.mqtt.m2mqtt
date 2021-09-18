@@ -22,9 +22,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for PUBLISH message from client to broker. See section 3.3.
     /// </summary>
     public class MqttMsgPublish : MqttMsgBase, ISentToBroker {
-        public string Topic { get; set; }
-
-        public byte[] Message { get; set; }
+        public string Topic { get; private set; }
+        public byte[] Message { get; private set; }
+        public QosLevel QosLevel { get; private set; }
+        public bool DupFlag { get; internal set; }
+        public bool RetainFlag { get; private set; }
 
         internal MqttMsgPublish() {
             Type = MessageType.Publish;
@@ -40,7 +42,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Message = message;
             DupFlag = dupFlag;
             QosLevel = qosLevel;
-            Retain = retain;
+            RetainFlag = retain;
             MessageId = 0;
         }
 
@@ -70,11 +72,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // Finally, building the resulting full payload.
             var finalBuffer = new byte[fixedHeaderSize + remainingLength];
-            finalBuffer[0] = MessageType.Publish << 4;
+            finalBuffer[0] = (byte)(Type << 4);
             finalBuffer[0] += (byte)((DupFlag ? 1 : 0) << 3);
             finalBuffer[0] += (byte)(((byte)QosLevel) << 1);
-            finalBuffer[0] += (byte)((Retain ? 1 : 0) << 0);
-            EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            finalBuffer[0] += (byte)((RetainFlag ? 1 : 0) << 0);
+            Helpers.EncodeRemainingLength(remainingLength, finalBuffer, 1);
             Array.Copy(variableHeaderBytes, 0, finalBuffer, fixedHeaderSize, variableHeaderBytes.Length);
             Array.Copy(Message, 0, finalBuffer, fixedHeaderSize + variableHeaderBytes.Length, Message.Length);
 
@@ -106,7 +108,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             parsedMessage.DupFlag = (flags >> 3) == 0x01;
 
             // read retain flag from fixed header
-            parsedMessage.Retain = ((flags & 0x01) >> 0) == 0x01;
+            parsedMessage.RetainFlag = ((flags & 0x01) >> 0) == 0x01;
 
             // message id is valid only with QOS level 1 or QOS level 2
             if ((parsedMessage.QosLevel == QosLevel.AtLeastOnce) || (parsedMessage.QosLevel == QosLevel.ExactlyOnce)) {

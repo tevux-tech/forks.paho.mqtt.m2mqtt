@@ -28,7 +28,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             var buffer = new byte[4];
 
             // Fixed header is fixed, no variables here.
-            buffer[0] = MessageType.PubComp << 4;
+            buffer[0] = (byte)(Type << 4);
             buffer[1] = 2;
 
             // Variable header is always two bytes - packet ID.

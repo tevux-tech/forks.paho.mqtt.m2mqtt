@@ -19,13 +19,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for PUBREL message from client top broker. See section 3.6.
     /// </summary>
     public class MqttMsgPubrel : MqttMsgBase, ISentToBroker {
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public MqttMsgPubrel() {
             Type = MessageType.PubRel;
-            // PUBREL message use QoS Level 1 (not "officially" in 3.1.1)
-            QosLevel = QosLevel.AtLeastOnce;
         }
 
         public byte[] GetBytes() {
