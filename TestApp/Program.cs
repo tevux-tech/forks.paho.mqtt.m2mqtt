@@ -35,7 +35,7 @@ namespace TestApp {
 
             Thread.Sleep(5000);
 
-            //client.Unsubscribe(new[] { "temp/testapp" });
+            client.Unsubscribe("temp/testapp");
 
             Thread.Sleep(1000);
 

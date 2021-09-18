@@ -14,6 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
@@ -23,14 +24,16 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="topics">List of topics to unsubscribe</param>
         /// <returns>Message Id in UNSUBACK message from broker</returns>
-        public ushort Unsubscribe(string[] topics) {
-            var unsubscribe = new MqttMsgUnsubscribe(topics) {
+        public ushort Unsubscribe(string topic) {
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
+
+            var unsubscribeMessage = new MqttMsgUnsubscribe(topic) {
                 MessageId = GetNewMessageId()
             };
 
-            _unsubscribeStateMachine.Unsubscribe(unsubscribe);
+            _unsubscribeStateMachine.Unsubscribe(unsubscribeMessage);
 
-            return unsubscribe.MessageId;
+            return unsubscribeMessage.MessageId;
         }
     }
 }
