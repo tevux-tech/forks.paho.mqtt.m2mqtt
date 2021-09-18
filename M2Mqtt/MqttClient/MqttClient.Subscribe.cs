@@ -14,28 +14,21 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Subscribe for message topics
-        /// </summary>
-        /// <param name="topics">List of topics to subscribe</param>
-        /// <param name="qosLevels">QOS levels related to topics</param>
-        /// <returns>Message Id related to SUBSCRIBE message</returns>
-        public ushort Subscribe(string[] topics, QosLevel[] qosLevels) {
-            var subscribe = new MqttMsgSubscribe(topics, qosLevels) {
+        public ushort Subscribe(string topic, QosLevel qosLevel) {
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
+
+            var subscribeMessage = new MqttMsgSubscribe(topic, qosLevel) {
                 MessageId = GetNewMessageId()
             };
 
-            _subscribeStateMachine.Subscribe(subscribe);
+            _subscribeStateMachine.Subscribe(subscribeMessage);
 
-            return subscribe.MessageId;
-        }
-
-        public ushort Subscribe(string topic, QosLevel qosLevel) {
-            return Subscribe(new[] { topic }, new[] { qosLevel });
+            return subscribeMessage.MessageId;
         }
     }
 }

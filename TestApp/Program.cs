@@ -24,8 +24,8 @@ namespace TestApp {
             connectionOptions.SetClientId("TestApp");
             client.Connect(connectionOptions);
 
-            client.Subscribe(new[] { "temp/testapp" }, new[] { QosLevel.AtMostOnce });
-            client.Subscribe(new[] { "temp/test-publish2" }, new[] { QosLevel.ExactlyOnce });
+            client.Subscribe("temp/testapp", QosLevel.AtMostOnce);
+            client.Subscribe("temp/test-publish2", QosLevel.ExactlyOnce);
 
             Thread.Sleep(1000);
 

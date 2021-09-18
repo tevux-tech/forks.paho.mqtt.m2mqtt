@@ -56,21 +56,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public class MessageFlags {
-            // [v3.1.1] MQTT flag bits. See section 2.2.2.
-            public const byte Connect = 0x00;
-            public const byte ConAck = 0x00;
-            public const byte Publish = 0x00; // just defined as 0x00 but depends on publish props (dup, qos, retain) 
-            public const byte PubAck = 0x00;
-            public const byte PubRec = 0x00;
-            public const byte PubRel = 0x02;
-            public const byte PubComp = 0x00;
             public const byte Subcribe = 0x02;
-            public const byte SubAck = 0x00;
             public const byte Unsubscribe = 0x02;
-            public const byte UnsubAck = 0x00;
-            public const byte PingReq = 0x00;
-            public const byte PingResp = 0x00;
-            public const byte Disconnect = 0x00;
         }
 
         // SUBSCRIBE QoS level granted failure [v3.1.1]
