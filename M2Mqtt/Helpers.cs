@@ -20,20 +20,21 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <summary>
         /// Decode remaining length reading bytes from socket
         /// </summary>
-        public static int DecodeRemainingLength(IMqttNetworkChannel channel) {
+        public static bool TryDecodeRemainingLength(IMqttNetworkChannel channel, out int remainingLength) {
+            var isOk = true;
             var multiplier = 1;
-            var value = 0;
+            remainingLength = 0;
             var nextByte = new byte[1];
             int digit;
             do {
                 // next digit from stream
-                channel.TryReceive(nextByte);
+                isOk &= channel.TryReceive(nextByte);
                 digit = nextByte[0];
-                value += ((digit & 127) * multiplier);
+                remainingLength += ((digit & 127) * multiplier);
                 multiplier *= 128;
             } while ((digit & 128) != 0);
 
-            return value;
+            return isOk;
         }
 
         /// <summary>

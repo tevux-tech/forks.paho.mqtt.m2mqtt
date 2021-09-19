@@ -39,19 +39,18 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // PUBLISH is the only packet that actually uses any flags, and it uses all 4 of them, see section 3.3.
                             // Remaining length is variable header (variable number bytes) plus the length of the payload.
                             // Thus, need to decode remaining length field itself first.
-                            var remainingLength = Helpers.DecodeRemainingLength(_channel);
+                            isOk = Helpers.TryDecodeRemainingLength(_channel, out var remainingLength);
 
-                            var variableHeaderAndPayloadBytes = new byte[remainingLength];
-                            isOk = _channel.TryReceive(variableHeaderAndPayloadBytes);
-
-
+                            byte[] variableHeaderAndPayloadBytes = null;
                             if (isOk) {
-                                isOk = MqttMsgPublish.TryParse(flags, variableHeaderAndPayloadBytes, out var parsedMessage);
-
-                                if (isOk) {
-                                    _incomingPublishStateMachine.ProcessMessage(parsedMessage);
-                                }
+                                variableHeaderAndPayloadBytes = new byte[remainingLength];
+                                isOk = _channel.TryReceive(variableHeaderAndPayloadBytes);
                             }
+
+                            MqttMsgPublish parsedMessage = null;
+                            if (isOk) { isOk = MqttMsgPublish.TryParse(flags, variableHeaderAndPayloadBytes, out parsedMessage); }
+
+                            if (isOk) { _incomingPublishStateMachine.ProcessMessage(parsedMessage); }
                         }
                         else if ((msgType == MqttMsgBase.MessageType.ConAck) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.2.1.
@@ -78,7 +77,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                         else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
                             // Remaining length is variable header (2 bytes) plus the length of the payload, see section 3.9.
                             // Thus, need to decode remaining length field itself first.
-                            var remainingLength = Helpers.DecodeRemainingLength(_channel);
+                            isOk = Helpers.TryDecodeRemainingLength(_channel, out var remainingLength);
 
                             var variableHeaderBytes = new byte[2];
                             _channel.TryReceive(variableHeaderBytes);
