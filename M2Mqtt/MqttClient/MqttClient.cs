@@ -33,10 +33,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         public delegate void MqttMsgPublishedEventHandler(object sender, MqttMsgPublishedEventArgs e);
 
-        /// <summary>
-        /// Delagate that defines event handler for subscribed topic
-        /// </summary>
-        public delegate void MqttMsgSubscribedEventHandler(object sender, MqttMsgSubscribedEventArgs e);
 
         /// <summary>
         /// Delagate that defines event handler for unsubscribed topic

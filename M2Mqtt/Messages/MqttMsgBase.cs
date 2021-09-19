@@ -36,10 +36,6 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             public const byte Disconnect = 0x0E;
         }
 
-
-        // SUBSCRIBE QoS level granted failure [v3.1.1]
-        public const byte QosLevelGrantedFailure = 0x80;
-
         public byte Type { get; set; }
 
         public ushort MessageId { get; set; }

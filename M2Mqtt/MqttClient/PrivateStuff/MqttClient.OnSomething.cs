@@ -41,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="suback">SUBACK message received</param>
         internal void OnMqttMsgSubscribed(MqttMsgSuback suback) {
-            MqttMsgSubscribed?.Invoke(this, new MqttMsgSubscribedEventArgs(suback.MessageId, suback.GrantedQoSLevels));
+            MqttMsgSubscribed?.Invoke(this, new MqttMsgSubscribedEventArgs(suback.MessageId, suback.GrantedQosLevels));
         }
 
         /// <summary>

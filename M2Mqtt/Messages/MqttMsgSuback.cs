@@ -19,7 +19,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// Class for SUBACK message from broker to client. See section 3.9.
     /// </summary>
     public class MqttMsgSuback : MqttMsgBase {
-        public byte[] GrantedQoSLevels { get; set; }
+        public GrantedQosLevel[] GrantedQosLevels { get; set; }
 
         public MqttMsgSuback() {
             Type = MessageType.SubAck;
@@ -33,15 +33,15 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             parsedMessage.MessageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
 
             // Remaining bytes: QoS levels granted.
-            parsedMessage.GrantedQoSLevels = new byte[payloadBytes.Length];
+            parsedMessage.GrantedQosLevels = new GrantedQosLevel[payloadBytes.Length];
             for (var i = 0; i < payloadBytes.Length; i++) {
                 if ((payloadBytes[i] & 0x80) == 0x80) {
                     // QoS was not granted for that topic, but that's a valid payload.
-                    parsedMessage.GrantedQoSLevels[i] = payloadBytes[i];
+                    parsedMessage.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
                 }
                 else if ((payloadBytes[i] & 0x03) < 0x03) {
                     // QoS was granted.
-                    parsedMessage.GrantedQoSLevels[i] = payloadBytes[i];
+                    parsedMessage.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
                 }
                 else {
                     // That's a protocol violation.
@@ -53,7 +53,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("SUBACK", new object[] { "messageId", "grantedQosLevels" }, new object[] { MessageId, GrantedQoSLevels });
+            return Helpers.GetTraceString("SUBACK", new object[] { "messageId", "grantedQosLevels" }, new object[] { MessageId, GrantedQosLevels });
         }
     }
 }
