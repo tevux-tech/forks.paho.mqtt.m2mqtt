@@ -17,11 +17,9 @@ Contributors:
 using System;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
-    /// <summary>
-    /// Event Args class for PUBLISH message received from broker
-    /// </summary>
-    public class MqttMsgPublishEventArgs : EventArgs {
+    public delegate void MqttMsgPublishEventHandler(object sender, MqttMsgPublishEventArgs e);
 
+    public class MqttMsgPublishEventArgs : EventArgs {
         public string Topic { get; internal set; }
         public byte[] Message { get; internal set; }
         public bool DupFlag { get; set; }

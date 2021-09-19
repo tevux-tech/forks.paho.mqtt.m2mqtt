@@ -23,21 +23,6 @@ namespace uPLibrary.Networking.M2Mqtt {
     /// MQTT Client
     /// </summary>
     public partial class MqttClient {
-        /// <summary>
-        /// Delagate that defines event handler for PUBLISH message received
-        /// </summary>
-        public delegate void MqttMsgPublishEventHandler(object sender, MqttMsgPublishEventArgs e);
-
-        /// <summary>
-        /// Delegate that defines event handler for published message
-        /// </summary>
-        public delegate void MqttMsgPublishedEventHandler(object sender, MqttMsgPublishedEventArgs e);
-
-
-        /// <summary>
-        /// Delagate that defines event handler for unsubscribed topic
-        /// </summary>
-        public delegate void MqttMsgUnsubscribedEventHandler(object sender, MqttMsgUnsubscribedEventArgs e);
 
         /// <summary>
         /// Delegate that defines event handler for cliet/peer disconnection

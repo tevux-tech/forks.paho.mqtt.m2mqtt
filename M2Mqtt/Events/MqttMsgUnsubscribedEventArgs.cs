@@ -17,9 +17,8 @@ Contributors:
 using System;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
-    /// <summary>
-    /// Event Args class for unsubscribed topic
-    /// </summary>
+    public delegate void MqttMsgUnsubscribedEventHandler(object sender, MqttMsgUnsubscribedEventArgs e);
+
     public class MqttMsgUnsubscribedEventArgs : EventArgs {
         public ushort MessageId { get; internal set; }
 
