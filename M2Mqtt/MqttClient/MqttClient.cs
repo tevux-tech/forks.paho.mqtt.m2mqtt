@@ -48,10 +48,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         public delegate void ConnectionClosedEventHandler(object sender, EventArgs e);
 
-        // broker hostname (or ip address) and port
-        private string _brokerHostName;
-        private ushort _brokerPort;
-
         public int LastCommTime { get; private set; }
 
         public event MqttMsgPublishEventHandler MqttMsgPublishReceived = delegate { };
@@ -62,9 +58,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // channel to communicate over the network
         private IMqttNetworkChannel _channel;
-
-        // reference to avoid access to singleton via property
-        private MqttSettings _settings;
 
         // current message identifier generated
         private static ushort _messageIdCounter = 0;
@@ -79,11 +72,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         private readonly OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
         private readonly IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
 
-        public ConnectionOptions ConnectionOptions { get; private set; }
+        public MqttConnectionOptions ConnectionOptions { get; private set; }
         public bool IsConnected { get; private set; }
-
-        public MqttSettings Settings {
-            get { return _settings; }
-        }
     }
 }

@@ -34,13 +34,13 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             public const byte CleanSession = 0x01;
         }
 
-        public ConnectionOptions ConnectionOptions { get; private set; }
+        public MqttConnectionOptions ConnectionOptions { get; private set; }
 
         public MqttMsgConnect() {
             Type = MessageType.Connect;
         }
 
-        public MqttMsgConnect(ConnectionOptions connectionOptions) : this() {
+        public MqttMsgConnect(MqttConnectionOptions connectionOptions) : this() {
             ConnectionOptions = connectionOptions;
         }
 

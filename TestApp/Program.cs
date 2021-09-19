@@ -18,11 +18,16 @@ namespace TestApp {
     public class MyTest {
         public MyTest() {
 
-            var client = new MqttClient("172.16.0.2");
+            var client = new MqttClient();
             client.MqttMsgPublishReceived += HandlePublishReceived;
-            var connectionOptions = new ConnectionOptions();
-            connectionOptions.SetClientId("TestApp");
-            client.Connect(connectionOptions);
+
+            var networkOptions = new ChannelConnectionOptions();
+            networkOptions.SetHostname("172.16.0.2");
+
+            var brokerOptions = new MqttConnectionOptions();
+            brokerOptions.SetClientId("TestApp");
+
+            client.Connect(networkOptions, brokerOptions);
 
             client.Subscribe("temp/testapp", QosLevel.AtMostOnce);
             client.Subscribe("temp/test-publish2", QosLevel.ExactlyOnce);

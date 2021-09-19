@@ -19,9 +19,6 @@ namespace uPLibrary.Networking.M2Mqtt {
     /// Settings class for the MQTT broker
     /// </summary>
     public class MqttSettings {
-        // default port for MQTT protocol
-        public const int BrokerDefaultPort = 1883;
-        public const int BrokerDefaultSecurePort = 8883;
         // default timeout on receiving from client
         public const int DefaultTimeout = 30000;
         // max publish, subscribe and unsubscribe retry for QoS Level 1 or 2
@@ -52,8 +49,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         public static MqttSettings Instance { get; } = new MqttSettings();
 
         private MqttSettings() {
-            UnsecurePort = BrokerDefaultPort;
-            SecurePort = BrokerDefaultSecurePort;
             TimeoutOnReceiving = DefaultTimeout;
             AttemptsOnRetry = AttemptsRetry;
             DelayOnRetry = DelayRetry;

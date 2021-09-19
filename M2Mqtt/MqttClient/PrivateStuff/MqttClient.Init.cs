@@ -20,23 +20,10 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        private void Init(string brokerHostName, ushort brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
+        private void Init(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
             RemoteCertificateValidationCallback userCertificateValidationCallback,
             LocalCertificateSelectionCallback userCertificateSelectionCallback,
             List<string> alpnProtocols = null) {
-
-            _brokerHostName = brokerHostName;
-            _brokerPort = brokerPort;
-
-            // reference to MQTT settings
-            _settings = MqttSettings.Instance;
-            // set settings port based on secure connection or not
-            if (!secure) {
-                _settings.UnsecurePort = _brokerPort;
-            }
-            else {
-                _settings.SecurePort = _brokerPort;
-            }
 
             // create network channel
             if (secure == false) {

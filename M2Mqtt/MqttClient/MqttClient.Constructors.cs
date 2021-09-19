@@ -20,21 +20,21 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        public MqttClient(string brokerHostName) : this(brokerHostName, MqttSettings.BrokerDefaultPort, false, null, null, MqttSslProtocols.None) {
+        public MqttClient() : this(false, null, null, MqttSslProtocols.None) {
         }
 
-        public MqttClient(string brokerHostName, ushort brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol) {
-            Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, null, null);
+        public MqttClient(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol) {
+            Init(secure, caCert, clientCert, sslProtocol, null, null);
         }
 
-        public MqttClient(string brokerHostName, ushort brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback) : this(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, null) {
+        public MqttClient(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback) : this(secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, null) {
         }
 
-        public MqttClient(string brokerHostName, ushort brokerPort, bool secure, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback) : this(brokerHostName, brokerPort, secure, null, null, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback) {
+        public MqttClient(bool secure, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback) : this(secure, null, null, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback) {
         }
 
-        public MqttClient(string brokerHostName, ushort brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> ALPNProtocols = null) {
-            Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, ALPNProtocols);
+        public MqttClient(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> ALPNProtocols = null) {
+            Init(secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, ALPNProtocols);
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class ConnectionOptions {
-        public string ClientId { get; private set; } = Guid.NewGuid().ToString();
+    public class MqttConnectionOptions {
+        public string ClientId { get; private set; } = "";
         public string Username { get; private set; }
         public string Password { get; private set; }
         public bool IsCleanSession { get; private set; } = true;
@@ -12,6 +12,10 @@ namespace uPLibrary.Networking.M2Mqtt {
         public byte[] WillMessage { get; private set; } = new byte[0];
         public QosLevel WillQosLevel { get; private set; } = QosLevel.AtMostOnce;
         public bool IsWillRetained { get; private set; }
+
+        public MqttConnectionOptions() {
+            ClientId = Guid.NewGuid().ToString();
+        }
 
         public void SetClientId(string clientId) {
             if (string.IsNullOrEmpty(clientId)) { throw new ArgumentException($"Argument '{nameof(clientId)}' has to be a valid non-empty string", nameof(clientId)); }

@@ -25,7 +25,11 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public ReturnCodes Connect() {
-            return Connect(new ConnectionOptions());
+            return Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
+        }
+
+        public ReturnCodes Connect(ChannelConnectionOptions channelConnectionOptions) {
+            return Connect(channelConnectionOptions, new MqttConnectionOptions());
         }
 
 
@@ -33,12 +37,12 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(ConnectionOptions connectionOptions) {
-            var connectMessage = new MqttMsgConnect(connectionOptions);
+        public ReturnCodes Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
+            var connectMessage = new MqttMsgConnect(mqttConnectionOptions);
 
             var isOk = true;
 
-            if (_channel.TryConnect(_brokerHostName, _brokerPort) == false) {
+            if (_channel.TryConnect(channelConnectionOptions.Hostname, channelConnectionOptions.Port) == false) {
                 isOk = false;
             };
 
@@ -55,7 +59,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
 
             if (_connectStateMachine.ConnectionResult == ReturnCodes.Accepted) {
-                ConnectionOptions = connectionOptions;
+                ConnectionOptions = mqttConnectionOptions;
 
                 _pingStateMachine.Reset();
                 _connectStateMachine.Reset();
