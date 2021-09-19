@@ -20,7 +20,7 @@ namespace TestApp {
 
             var client = new MqttClient();
             client.Initialize();
-            client.MqttMsgPublishReceived += HandlePublishReceived;
+            client.PublishReceived += HandlePublishReceived;
 
             var networkOptions = new ChannelConnectionOptions();
             networkOptions.SetHostname("172.16.0.2");
@@ -47,7 +47,7 @@ namespace TestApp {
 
             // client.Disconnect();
         }
-        private void HandlePublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.MqttMsgPublishEventArgs e) {
+        private void HandlePublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.PublishReceivedEventArgs e) {
 
         }
     }

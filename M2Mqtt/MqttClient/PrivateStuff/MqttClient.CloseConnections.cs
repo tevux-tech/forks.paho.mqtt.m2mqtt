@@ -24,6 +24,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             IsConnected = false;
 
             _channel.Close();
+
+            OnConnectionClosed();
         }
     }
 }
