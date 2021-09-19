@@ -8,7 +8,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         private int _requestTimestamp;
         private MqttClient _client;
 
-        public bool IsServerLost { get; private set; }
+        public bool IsBrokerAlive { get; private set; } = true;
 
         public void Initialize(MqttClient client) {
             _client = client;
@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 if (currentTime - _requestTimestamp > MqttSettings.KeepAlivePeriod) {
                     // Problem. Server does not respond.
                     _isWaitingForPingResponse = false;
-                    IsServerLost = true;
+                    IsBrokerAlive = false;
                 }
             }
             else {
@@ -39,11 +39,12 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         public void ProcessMessage(MqttMsgPingResp message) {
             Trace.WriteLine(TraceLevel.Frame, "                        <-PngRes");
+            IsBrokerAlive = true;
             _isWaitingForPingResponse = false;
         }
 
         public void Reset() {
-            IsServerLost = false;
+            IsBrokerAlive = true;
             _isWaitingForPingResponse = false;
         }
     }

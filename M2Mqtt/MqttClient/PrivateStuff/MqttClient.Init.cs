@@ -17,12 +17,10 @@ Contributors:
 using System.Collections.Generic;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        private void Init(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
+        private void Init(string brokerHostName, ushort brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
             RemoteCertificateValidationCallback userCertificateValidationCallback,
             LocalCertificateSelectionCallback userCertificateSelectionCallback,
             List<string> alpnProtocols = null) {
@@ -42,7 +40,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             // create network channel
             if (secure == false) {
-                _channel = new UnsecureTcpChannel(_brokerHostName, _brokerPort);
+                _channel = new UnsecureTcpChannel();
             }
 
             _pingStateMachine.Initialize(this);
@@ -52,30 +50,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _outgoingPublishStateMachine.Initialize(this);
             _incomingPublishStateMachine.Initialize(this);
 
-            new Thread(() => {
-
-                while (true) {
-                    if (IsConnected) {
-                        _pingStateMachine.Tick();
-                        if (_pingStateMachine.IsServerLost) {
-                            Trace.WriteLine(TraceLevel.Error, "PING timeouted, beginning shutdown.");
-                            OnConnectionClosing();
-                        }
-
-                        _unsubscribeStateMachine.Tick();
-                        _subscribeStateMachine.Tick();
-                        _outgoingPublishStateMachine.Tick();
-                        _incomingPublishStateMachine.Tick();
-                    }
-                    else {
-                        _connectStateMachine.Tick();
-                    }
-
-
-                    Thread.Sleep(1000);
-                }
-
-            }).Start();
+            Fx.StartThread(MasterTickThread);
+            Fx.StartThread(ReceiveThread);
         }
     }
 }

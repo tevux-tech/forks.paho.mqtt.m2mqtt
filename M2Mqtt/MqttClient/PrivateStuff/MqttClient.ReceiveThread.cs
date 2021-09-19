@@ -14,12 +14,9 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
-using System.IO;
-using System.Net.Sockets;
+using System.Threading;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
-using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -27,12 +24,12 @@ namespace uPLibrary.Networking.M2Mqtt {
             var fixedHeaderFirstByte = new byte[1];
             byte msgType;
 
-            while (_isRunning) {
-                try {
+            while (true) {
+                if (_channel.IsConnected) {
                     // read first byte (fixed header)
-                    var readBytes = _channel.Receive(fixedHeaderFirstByte);
+                    var isOk = _channel.TryReceive(fixedHeaderFirstByte);
 
-                    if (readBytes > 0) {
+                    if (isOk) {
                         // extract message type from received byte
                         msgType = (byte)(fixedHeaderFirstByte[0] >> 4);
                         var flags = (byte)(fixedHeaderFirstByte[0] & 0x0F);
@@ -45,21 +42,26 @@ namespace uPLibrary.Networking.M2Mqtt {
                             var remainingLength = Helpers.DecodeRemainingLength(_channel);
 
                             var variableHeaderAndPayloadBytes = new byte[remainingLength];
-                            _channel.Receive(variableHeaderAndPayloadBytes);
+                            isOk = _channel.TryReceive(variableHeaderAndPayloadBytes);
 
-                            var isOk = MqttMsgPublish.TryParse(flags, variableHeaderAndPayloadBytes, out var parsedMessage);
 
-                            _incomingPublishStateMachine.ProcessMessage(parsedMessage);
+                            if (isOk) {
+                                isOk = MqttMsgPublish.TryParse(flags, variableHeaderAndPayloadBytes, out var parsedMessage);
+
+                                if (isOk) {
+                                    _incomingPublishStateMachine.ProcessMessage(parsedMessage);
+                                }
+                            }
                         }
                         else if ((msgType == MqttMsgBase.MessageType.ConAck) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.2.1.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
-                            var isOk = MqttMsgConnack.TryParse(variableHeaderBytes, out var parsedMessage);
+                            isOk = MqttMsgConnack.TryParse(variableHeaderBytes, out var parsedMessage);
 
                             _connectStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -67,9 +69,9 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Remaining length is always 0, see section 3.13.
                             // Thus, need to read 1 more byte, and discard it.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
 
-                            var isOk = MqttMsgPingResp.TryParse(out var parsedMessage);
+                            isOk = MqttMsgPingResp.TryParse(out var parsedMessage);
 
                             _pingStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -79,13 +81,13 @@ namespace uPLibrary.Networking.M2Mqtt {
                             var remainingLength = Helpers.DecodeRemainingLength(_channel);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
                             var payloadBytes = new byte[remainingLength - 2];
-                            _channel.Receive(payloadBytes);
+                            _channel.TryReceive(payloadBytes);
 
                             // enqueue SUBACK message received (for QoS Level 1) into the internal queue
-                            var isOk = MqttMsgSuback.TryParse(variableHeaderBytes, payloadBytes, out var parsedMessage);
+                            isOk = MqttMsgSuback.TryParse(variableHeaderBytes, payloadBytes, out var parsedMessage);
 
                             _subscribeStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -93,12 +95,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Remaining length is always 2, see section 3.4.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
-                            var isOk = MqttMsgPuback.TryParse(variableHeaderBytes, out var parsedMessage);
+                            isOk = MqttMsgPuback.TryParse(variableHeaderBytes, out var parsedMessage);
 
                             _outgoingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -106,12 +108,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Remaining length is always 2, see section 3.5.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
-                            var isOk = MqttMsgPubrec.TryParse(variableHeaderBytes, out var parsedMessage);
+                            isOk = MqttMsgPubrec.TryParse(variableHeaderBytes, out var parsedMessage);
 
                             _outgoingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -119,12 +121,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Remaining length is always 2, see section 3.6.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
-                            var isOk = MqttMsgPubrel.TryParse(variableHeaderBytes, out var parsedMessage);
+                            isOk = MqttMsgPubrel.TryParse(variableHeaderBytes, out var parsedMessage);
 
                             _incomingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -132,12 +134,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Remaining length is always 2, see section 3.7.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
-                            var isOk = MqttMsgPubcomp.TryParse(variableHeaderBytes, out var parsedMessage);
+                            isOk = MqttMsgPubcomp.TryParse(variableHeaderBytes, out var parsedMessage);
 
                             _outgoingPublishStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -145,12 +147,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Remaining length is always 2, see section 3.11.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.Receive(lengthBytes);
+                            _channel.TryReceive(lengthBytes);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.Receive(variableHeaderBytes);
+                            _channel.TryReceive(variableHeaderBytes);
 
-                            var isOk = MqttMsgUnsuback.TryParse(variableHeaderBytes, out var parsedMessage);
+                            isOk = MqttMsgUnsuback.TryParse(variableHeaderBytes, out var parsedMessage);
 
                             _unsubscribeStateMachine.ProcessMessage(parsedMessage);
                         }
@@ -167,29 +169,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                     }
                     // zero bytes read, peer gracefully closed socket
                     else {
-                        // wake up thread that will notify connection is closing
-                        OnConnectionClosing();
+                        // Cannot receive needed data. Something is wrong with the data channel.
+                        CloseConnections();
                     }
                 }
-                catch (Exception e) {
-
-                    Trace.WriteLine(TraceLevel.Error, "Exception occurred: {0}", e.ToString());
-
-                    var close = false;
-                    if (e.GetType() == typeof(MqttClientException)) {
-                        // [v3.1.1] scenarios the receiver MUST close the network connection
-                        var ex = e as MqttClientException;
-                        close = ((ex.ErrorCode == MqttClientErrorCode.InvalidFlagBits) || (ex.ErrorCode == MqttClientErrorCode.InvalidProtocolName) || (ex.ErrorCode == MqttClientErrorCode.InvalidConnectFlags));
-                    }
-                    else if ((e.GetType() == typeof(IOException)) || (e.GetType() == typeof(SocketException)) || ((e.InnerException != null) && (e.InnerException.GetType() == typeof(SocketException)))) // added for SSL/TLS incoming connection that use SslStream that wraps SocketException
-                    {
-                        close = true;
-                    }
-
-                    if (close) {
-                        // wake up thread that will notify connection is closing
-                        OnConnectionClosing();
-                    }
+                else {
+                    Thread.Sleep(100);
                 }
             }
         }

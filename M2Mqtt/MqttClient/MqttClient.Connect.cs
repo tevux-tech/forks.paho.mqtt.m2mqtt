@@ -14,9 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
 using System.Threading;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
 
@@ -38,41 +36,34 @@ namespace uPLibrary.Networking.M2Mqtt {
         public ReturnCodes Connect(ConnectionOptions connectionOptions) {
             var connectMessage = new MqttMsgConnect(connectionOptions);
 
-            try {
-                _channel.Connect();
-            }
-            catch (Exception ex) {
-                throw new MqttConnectionException("Exception connecting to the broker", ex);
-            }
+            var isOk = true;
 
-            LastCommTime = 0;
-            _isRunning = true;
-            _isConnectionClosing = false;
-            // start thread for receiving messages from broker
-            Fx.StartThread(ReceiveThread);
+            if (_channel.TryConnect(_brokerHostName, _brokerPort) == false) {
+                isOk = false;
+            };
+
+            if (isOk) {
+                LastCommTime = 0;
+                _isConnectionClosing = false;
+            }
 
             _connectStateMachine.Connect(connectMessage);
             while (_connectStateMachine.IsConnectionCompleted == false) {
+                _connectStateMachine.Tick();
                 Thread.Sleep(1000);
             }
 
-            if (_connectStateMachine.IsServerLost) {
-                _isRunning = false;
-            }
-            else {
-                // if connection accepted, start keep alive timer and 
-                if (_connectStateMachine.ConnectionResult == ReturnCodes.Accepted) {
-                    // set all client properties
 
-                    ConnectionOptions = connectionOptions;
+            if (_connectStateMachine.ConnectionResult == ReturnCodes.Accepted) {
+                ConnectionOptions = connectionOptions;
 
-                    _pingStateMachine.Reset();
+                _pingStateMachine.Reset();
+                _connectStateMachine.Reset();
 
-                    // restore previous session
-                    RestoreSession();
+                // restore previous session
+                RestoreSession();
 
-                    IsConnected = true;
-                }
+                IsConnected = true;
             }
 
             return _connectStateMachine.ConnectionResult;

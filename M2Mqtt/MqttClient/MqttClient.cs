@@ -50,10 +50,8 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         // broker hostname (or ip address) and port
         private string _brokerHostName;
-        private int _brokerPort;
+        private ushort _brokerPort;
 
-        // running status of threads
-        private bool _isRunning;
         public int LastCommTime { get; private set; }
 
         public event MqttMsgPublishEventHandler MqttMsgPublishReceived = delegate { };

@@ -9,7 +9,6 @@ namespace uPLibrary.Networking.M2Mqtt {
         private int _requestTimestamp;
         private MqttClient _client;
 
-        public bool IsServerLost { get; private set; }
         public bool IsConnectionCompleted { get; private set; }
         public ReturnCodes ConnectionResult { get; private set; }
 
@@ -26,7 +25,6 @@ namespace uPLibrary.Networking.M2Mqtt {
                 if (currentTime - _requestTimestamp > MqttSettings.ConnectTimeout) {
                     // Problem. Server does not respond.
                     _isWaitingForConnack = false;
-                    IsServerLost = true;
                     IsConnectionCompleted = true;
                 }
             }
@@ -53,7 +51,6 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         public void Reset() {
             _isWaitingForConnack = false;
-            IsServerLost = false;
             IsConnectionCompleted = false;
         }
     }

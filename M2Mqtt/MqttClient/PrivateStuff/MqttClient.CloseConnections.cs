@@ -17,14 +17,13 @@ Contributors:
 namespace uPLibrary.Networking.M2Mqtt {
 
     public partial class MqttClient {
-        private void Close() {
-            // stop receiving thread
-            _isRunning = false;
+        private void CloseConnections() {
+            if (_isConnectionClosing) { return; }
 
-            // close network channel
-            _channel.Close();
-
+            _isConnectionClosing = true;
             IsConnected = false;
+
+            _channel.Close();
         }
     }
 }

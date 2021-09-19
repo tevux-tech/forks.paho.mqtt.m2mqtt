@@ -35,102 +35,106 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
         }
 
-        public UnsecureTcpChannel(Socket socket) {
-            _socket = socket;
+        public bool IsConnected { get; private set; }
+
+        public UnsecureTcpChannel() {
+
         }
 
-        public UnsecureTcpChannel(string remoteHostName, int remotePort) {
-            IPAddress remoteIpAddress = null;
-            try {
-                // check if remoteHostName is a valid IP address and get it
-                remoteIpAddress = IPAddress.Parse(remoteHostName);
-            }
-            catch {
-            }
+        public bool TryConnect(string remoteHostName, ushort remotePort) {
+            bool isOk;
 
-            // in this case the parameter remoteHostName isn't a valid IP address
-            if (remoteIpAddress == null) {
+            if (IPAddress.TryParse(remoteHostName, out var remoteIpAddress)) {
+                // Hostname is actually a valid IP address.
+                RemoteIpAddress = remoteIpAddress;
+                isOk = true;
+            }
+            else {
+                // Maybe it is a valid hostname? We can get IP address from DNS cache then.
                 var hostEntry = Dns.GetHostEntryAsync(remoteHostName).Result;
 
                 if ((hostEntry != null) && (hostEntry.AddressList.Length > 0)) {
-                    // check for the first address not null
-                    // it seems that with .Net Micro Framework, the IPV6 addresses aren't supported and return "null"
+                    // Check for the first address not null.
                     var i = 0;
                     while (hostEntry.AddressList[i] == null) {
                         i++;
                     }
 
-                    remoteIpAddress = hostEntry.AddressList[i];
+                    RemoteIpAddress = hostEntry.AddressList[i];
+                    isOk = true;
                 }
                 else {
-                    throw new Exception("No address found for the remote host name");
+                    isOk = false;
                 }
             }
 
             RemoteHostName = remoteHostName;
-            RemoteIpAddress = remoteIpAddress;
             RemotePort = remotePort;
-        }
 
-        public void Connect() {
-            _socket = new Socket(RemoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            // try connection to the broker
-            _socket.Connect(RemoteHostName, RemotePort);
+            if (isOk) {
+                try {
+                    _socket = new Socket(RemoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    // try connection to the broker
+                    _socket.Connect(RemoteHostName, RemotePort);
 
-        }
+                    isOk = true;
+                    IsConnected = true;
+                }
+                catch {
+                    isOk = false;
+                    Close();
+                }
+            }
 
-        public int Send(byte[] buffer) {
-            return _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
+            return isOk;
         }
 
         public bool TrySend(byte[] buffer) {
-            var isSent = false;
+            bool isSent;
 
             try {
-                Send(buffer);
+                _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
                 isSent = true;
             }
             catch (Exception) {
-#warning maybe need to to some specific exception handling?
-
-                //if (typeof(SocketException) == e.GetType()) {
-                //    // connection reset by broker
-                //    if (((SocketException)e).SocketErrorCode == SocketError.ConnectionReset) {
-                //        IsConnected = false;
-                //    }
-                //}
+                isSent = false;
+                Close();
             }
 
             return isSent;
         }
 
-        public int Receive(byte[] buffer) {
-            // read all data needed (until fill buffer)
+        /// <summary>
+        /// Read channel until provided buffer is full, or some error occurs.
+        /// </summary>
+        public bool TryReceive(byte[] buffer) {
+            var isSocketAlright = true;
             var idx = 0;
-            while (idx < buffer.Length) {
-                // fixed scenario with socket closed gracefully by peer/broker and
-                // Read return 0. Avoid infinite loop.
-                var read = _socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
-                if (read == 0) {
-                    return 0;
+            while ((idx < buffer.Length) && isSocketAlright) {
+                var bytesReceived = 0;
+                try {
+                    bytesReceived = _socket.Receive(buffer, idx, buffer.Length - idx, SocketFlags.None);
+                }
+                catch (Exception) {
+                    isSocketAlright = false;
                 }
 
-                idx += read;
-            }
-            return buffer.Length;
-        }
+                if (bytesReceived == 0) {
+                    // Socket closed gracefully by peer / broker.
+                    isSocketAlright = false;
+                }
 
-        public int Receive(byte[] buffer, int timeout) {
-            // check data availability (timeout is in microseconds)
-            if (_socket.Poll(timeout * 1000, SelectMode.SelectRead)) {
-                return Receive(buffer);
+                idx += bytesReceived;
             }
-            else {
-                return 0;
-            }
+
+            if (isSocketAlright == false) { Close(); }
+
+            return isSocketAlright;
         }
 
         public void Close() {
+            IsConnected = false;
+
             try {
                 _socket.Shutdown(SocketShutdown.Both);
             }
@@ -138,6 +142,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 // An error occurred when attempting to access the socket or socket has been closed
                 // Refer to: https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.shutdown(v=vs.110).aspx
             }
+
             _socket.Dispose();
         }
     }

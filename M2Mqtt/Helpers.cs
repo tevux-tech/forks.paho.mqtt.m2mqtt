@@ -27,7 +27,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             int digit;
             do {
                 // next digit from stream
-                channel.Receive(nextByte);
+                channel.TryReceive(nextByte);
                 digit = nextByte[0];
                 value += ((digit & 127) * multiplier);
                 multiplier *= 128;

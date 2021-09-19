@@ -24,8 +24,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             var disconnect = new MqttMsgDisconnect();
             Send(disconnect);
 
-            // close client
-            OnConnectionClosing();
+            CloseConnections();
         }
     }
 }

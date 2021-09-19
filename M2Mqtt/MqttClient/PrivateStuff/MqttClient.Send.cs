@@ -19,13 +19,11 @@ using System;
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
         internal void Send(byte[] msgBytes) {
-
             if (_channel.TrySend(msgBytes)) {
                 LastCommTime = Environment.TickCount;
             }
             else {
-#warning this is temporary. Should get rid of exception altogether.
-                //throw new MqttCommunicationException();
+                CloseConnections();
             }
 
         }

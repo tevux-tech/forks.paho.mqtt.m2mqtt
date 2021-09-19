@@ -20,16 +20,6 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
         /// <summary>
-        /// Wrapper method for raising closing connection event
-        /// </summary>
-        private void OnConnectionClosing() {
-            if (!_isConnectionClosing) {
-                _isConnectionClosing = true;
-
-            }
-        }
-
-        /// <summary>
         /// Wrapper method for raising PUBLISH message received event
         /// </summary>
         /// <param name="publish">PUBLISH message received</param>
