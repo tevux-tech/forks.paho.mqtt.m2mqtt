@@ -14,7 +14,9 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt {
+using System.Threading;
+
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public void Initialize() {
 #warning Add secure communication
@@ -27,8 +29,8 @@ namespace uPLibrary.Networking.M2Mqtt {
             _outgoingPublishStateMachine.Initialize(this);
             _incomingPublishStateMachine.Initialize(this);
 
-            Fx.StartThread(MasterTickThread);
-            Fx.StartThread(ReceiveThread);
+            new Thread(MasterTickThread).Start();
+            new Thread(ReceiveThread).Start();
 
             _isInitialized = true;
         }

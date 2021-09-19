@@ -3,8 +3,8 @@
   <PropertyGroup>
     <VersionPrefix>4.3.0.0</VersionPrefix>
     <TargetFrameworks>netcoreapp3.1;netstandard1.6</TargetFrameworks>
-    <AssemblyName>M2Mqtt</AssemblyName>
-    <PackageId>M2Mqtt</PackageId>
+    <AssemblyName>Tevux.Protocols.Mqtt.M2MqttClient</AssemblyName>
+    <PackageId>Tevux.Mqtt.Client</PackageId>
 
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -15,6 +15,9 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RootNamespace>Tevux.Protocols.Mqtt</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Paolo Patierno, Simonas Greicius</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">

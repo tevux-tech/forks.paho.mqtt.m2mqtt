@@ -14,7 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for PUBCOMP message from broker to client. See section 3.7.
     /// </summary>
@@ -49,7 +49,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { MessageId });
+            return GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { MessageId });
         }
     }
 }

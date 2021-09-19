@@ -14,7 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     internal class MqttMsgContext {
         public MqttMsgBase Message { get; set; }
 

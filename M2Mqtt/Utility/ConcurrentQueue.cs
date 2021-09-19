@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace uPLibrary.Networking.M2Mqtt.Utility {
+namespace Tevux.Protocols.Mqtt.Utility {
 
     public class ConcurrentQueue : Queue {
 

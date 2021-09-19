@@ -15,9 +15,8 @@ Contributors:
 */
 
 using System;
-using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         /// <summary>
         /// Publish a message asynchronously (QoS Level 0 and not retained)

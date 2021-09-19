@@ -18,7 +18,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Unsecure channel to communicate over the network.
     /// </summary>

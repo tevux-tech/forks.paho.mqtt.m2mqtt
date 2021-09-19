@@ -17,7 +17,7 @@ Contributors:
 using System;
 using System.Text;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for PUBLISH message from client to broker. See section 3.3.
     /// </summary>
@@ -68,7 +68,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // Now we have all the sizes, so we can calculate fixed header size.
             var remainingLength = variableHeaderBytes.Length + Message.Length;
-            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
+            var fixedHeaderSize = CalculateFixedHeaderSize(remainingLength);
 
             // Finally, building the resulting full payload.
             var finalBuffer = new byte[fixedHeaderSize + remainingLength];
@@ -76,7 +76,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             finalBuffer[0] += (byte)((DupFlag ? 1 : 0) << 3);
             finalBuffer[0] += (byte)(((byte)QosLevel) << 1);
             finalBuffer[0] += (byte)((RetainFlag ? 1 : 0) << 0);
-            Helpers.EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            EncodeRemainingLength(remainingLength, finalBuffer, 1);
             Array.Copy(variableHeaderBytes, 0, finalBuffer, fixedHeaderSize, variableHeaderBytes.Length);
             Array.Copy(Message, 0, finalBuffer, fixedHeaderSize + variableHeaderBytes.Length, Message.Length);
 
@@ -131,7 +131,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("PUBLISH", new object[] { "messageId", "topic", "message" }, new object[] { MessageId, Topic, Message });
+            return GetTraceString("PUBLISH", new object[] { "messageId", "topic", "message" }, new object[] { MessageId, Topic, Message });
         }
     }
 }

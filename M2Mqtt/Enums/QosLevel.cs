@@ -1,4 +1,4 @@
-﻿namespace uPLibrary.Networking.M2Mqtt {
+﻿namespace Tevux.Protocols.Mqtt {
     public enum QosLevel : byte {
         AtMostOnce = 0x00,
         AtLeastOnce = 0x01,

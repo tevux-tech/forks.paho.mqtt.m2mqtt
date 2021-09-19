@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
 using System.Threading;
-using uPLibrary.Networking.M2Mqtt;
-using uPLibrary.Networking.M2Mqtt.Utility;
+using Tevux.Protocols.Mqtt;
+using Tevux.Protocols.Mqtt.Utility;
 
 namespace TestApp {
     class Program {
@@ -47,7 +47,7 @@ namespace TestApp {
 
             // client.Disconnect();
         }
-        private void HandlePublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.PublishReceivedEventArgs e) {
+        private void HandlePublishReceived(object sender, PublishReceivedEventArgs e) {
 
         }
     }

@@ -14,7 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for PUBREC message from broker to client. See section 3.5.
     /// </summary>
@@ -49,7 +49,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("PUBREC", new object[] { "messageId" }, new object[] { MessageId });
+            return GetTraceString("PUBREC", new object[] { "messageId" }, new object[] { MessageId });
         }
     }
 }

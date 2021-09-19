@@ -1,8 +1,7 @@
 ﻿using System.Collections;
-using uPLibrary.Networking.M2Mqtt.Messages;
-using uPLibrary.Networking.M2Mqtt.Utility;
+using Tevux.Protocols.Mqtt.Utility;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     internal class UnsubscribeStateMachine {
         private ArrayList _unacknowledgedMessages = new ArrayList();
         private double _lastAck;

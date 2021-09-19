@@ -1,15 +1,13 @@
-﻿using uPLibrary.Networking.M2Mqtt.Messages;
-using uPLibrary.Networking.M2Mqtt.Utility;
-using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
+﻿using Tevux.Protocols.Mqtt.Utility;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     internal class ConnectStateMachine {
         private bool _isWaitingForConnack;
         private double _requestTimestamp;
         private MqttClient _client;
 
         public bool IsConnectionCompleted { get; private set; }
-        public ReturnCodes ConnectionResult { get; private set; }
+        public MqttMsgConnack.ReturnCodes ConnectionResult { get; private set; }
 
 
         public void Initialize(MqttClient client) {

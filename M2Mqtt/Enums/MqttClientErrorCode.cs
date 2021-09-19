@@ -14,7 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt.Exceptions {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// MQTT client error code
     /// </summary>

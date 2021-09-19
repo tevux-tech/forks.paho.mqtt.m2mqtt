@@ -16,7 +16,7 @@ Contributors:
 
 using System;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     public delegate void PublishedEventHandler(object sender, PublishFinishedEventArgs e);
 
     public class PublishFinishedEventArgs : EventArgs {

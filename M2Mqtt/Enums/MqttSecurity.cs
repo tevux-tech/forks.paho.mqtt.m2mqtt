@@ -14,19 +14,15 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System.Threading;
-
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Support methods fos specific framework
+    /// Supported SSL/TLS protocol versions
     /// </summary>
-    public class Fx {
-        public static void StartThread(ThreadStart threadStart) {
-            new Thread(threadStart).Start();
-        }
-
-        public static void SleepThread(int millisecondsTimeout) {
-            Thread.Sleep(millisecondsTimeout);
-        }
+    public enum MqttSslProtocols {
+        None,
+        SSLv3,
+        TLSv1_0,
+        TLSv1_1,
+        TLSv1_2
     }
 }

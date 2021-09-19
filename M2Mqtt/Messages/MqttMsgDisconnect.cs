@@ -14,7 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for DISCONNECT message from client to broker. See section 3.14.
     /// </summary>
@@ -33,7 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("DISCONNECT", null, null);
+            return GetTraceString("DISCONNECT", null, null);
         }
     }
 }

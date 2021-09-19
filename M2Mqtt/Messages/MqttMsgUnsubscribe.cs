@@ -18,7 +18,7 @@ using System;
 // if NOT .Net Micro Framework
 using System.Text;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for UNSUBSCRIBE message from client to broker
     /// </summary>
@@ -53,12 +53,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // Now we have all the sizes, so we can calculate fixed header size.
             var remainingLength = variableHeaderBytes.Length + payloadBytes.Length;
-            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
+            var fixedHeaderSize = CalculateFixedHeaderSize(remainingLength);
 
             // Finally, building the resulting full payload.
             var finalBuffer = new byte[fixedHeaderSize + remainingLength];
             finalBuffer[0] = (byte)((Type << 4) + 2);
-            Helpers.EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            EncodeRemainingLength(remainingLength, finalBuffer, 1);
             Array.Copy(variableHeaderBytes, 0, finalBuffer, fixedHeaderSize, variableHeaderBytes.Length);
             Array.Copy(payloadBytes, 0, finalBuffer, fixedHeaderSize + variableHeaderBytes.Length, payloadBytes.Length);
 
@@ -66,7 +66,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { MessageId, Topic });
+            return GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { MessageId, Topic });
         }
     }
 }

@@ -16,10 +16,8 @@ Contributors:
 
 using System;
 using System.Threading;
-using uPLibrary.Networking.M2Mqtt.Messages;
-using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         /// <summary>
         /// Connect to broker
@@ -41,6 +39,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         public void Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
+            ConnectionOptions = mqttConnectionOptions;
+
             var connectMessage = new MqttMsgConnect(mqttConnectionOptions);
 
             var isOk = true;
@@ -61,9 +61,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
 
 
-            if (_connectStateMachine.ConnectionResult == ReturnCodes.Accepted) {
-                ConnectionOptions = mqttConnectionOptions;
-
+            if (_connectStateMachine.ConnectionResult == MqttMsgConnack.ReturnCodes.Accepted) {
                 _pingStateMachine.Reset();
                 _connectStateMachine.Reset();
 

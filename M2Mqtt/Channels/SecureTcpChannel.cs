@@ -22,7 +22,7 @@
 //using System;
 //using System.Collections.Generic;
 
-//namespace uPLibrary.Networking.M2Mqtt {
+//namespace Tevux.Protocols.Mqtt {
 //    /// <summary>
 //    /// Secure channel to communicate over the network.
 //    /// </summary>

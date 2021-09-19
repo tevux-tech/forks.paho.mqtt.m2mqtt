@@ -15,9 +15,8 @@ Contributors:
 */
 
 using System.Threading;
-using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         private void ReceiveThread() {
             var fixedHeaderFirstByte = new byte[1];
@@ -38,7 +37,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // PUBLISH is the only packet that actually uses any flags, and it uses all 4 of them, see section 3.3.
                             // Remaining length is variable header (variable number bytes) plus the length of the payload.
                             // Thus, need to decode remaining length field itself first.
-                            isOk = Helpers.TryDecodeRemainingLength(_channel, out var remainingLength);
+                            isOk = MqttMsgBase.TryDecodeRemainingLength(_channel, out var remainingLength);
 
                             byte[] variableHeaderAndPayloadBytes = null;
                             if (isOk) {
@@ -76,7 +75,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                         else if ((msgType == MqttMsgBase.MessageType.SubAck) && (flags == 0x00)) {
                             // Remaining length is variable header (2 bytes) plus the length of the payload, see section 3.9.
                             // Thus, need to decode remaining length field itself first.
-                            isOk = Helpers.TryDecodeRemainingLength(_channel, out var remainingLength);
+                            isOk = MqttMsgBase.TryDecodeRemainingLength(_channel, out var remainingLength);
 
                             var variableHeaderBytes = new byte[2];
                             _channel.TryReceive(variableHeaderBytes);

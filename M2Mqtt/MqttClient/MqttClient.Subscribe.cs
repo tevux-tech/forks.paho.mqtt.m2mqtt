@@ -15,9 +15,8 @@ Contributors:
 */
 
 using System;
-using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public ushort Subscribe(string topic, QosLevel qosLevel) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }

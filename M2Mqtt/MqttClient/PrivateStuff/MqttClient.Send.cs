@@ -14,9 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using uPLibrary.Networking.M2Mqtt.Messages;
-
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         internal void Send(byte[] msgBytes) {
             if (_channel.TrySend(msgBytes)) {

@@ -16,7 +16,7 @@ Contributors:
 
 using System.Collections;
 
-namespace uPLibrary.Networking.M2Mqtt.Utility {
+namespace Tevux.Protocols.Mqtt.Utility {
     /// <summary>
     /// Extension class for a Queue
     /// </summary>

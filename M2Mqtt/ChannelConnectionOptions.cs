@@ -2,7 +2,7 @@
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public class ChannelConnectionOptions {
         public string Hostname { get; private set; } = "localhost";
         public ushort Port { get; private set; } = 1883;

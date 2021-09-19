@@ -16,7 +16,7 @@ Contributors:
 
 using System.Diagnostics;
 
-namespace uPLibrary.Networking.M2Mqtt.Utility {
+namespace Tevux.Protocols.Mqtt.Utility {
     public enum TraceLevel {
         Error = 0x01,
         Warning = 0x02,
@@ -61,5 +61,6 @@ namespace uPLibrary.Networking.M2Mqtt.Utility {
                 TraceListener(format, arg1, arg2, arg3);
             }
         }
+
     }
 }

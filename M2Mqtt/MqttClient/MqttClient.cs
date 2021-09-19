@@ -14,11 +14,9 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-#warning Maybe remove LINQ usage?
 using System;
-using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// MQTT Client
     /// </summary>

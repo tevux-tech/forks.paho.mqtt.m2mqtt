@@ -14,7 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for CONNACK message from broker to client. See section 3.2.
     /// </summary>
@@ -71,7 +71,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("CONNACK", new object[] { "returnCode" }, new object[] { (ReturnCodes)ReturnCode });
+            return GetTraceString("CONNACK", new object[] { "returnCode" }, new object[] { (ReturnCodes)ReturnCode });
         }
     }
 }

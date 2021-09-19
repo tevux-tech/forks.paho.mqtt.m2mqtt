@@ -17,7 +17,7 @@ Contributors:
 using System;
 using System.Text;
 
-namespace uPLibrary.Networking.M2Mqtt.Messages {
+namespace Tevux.Protocols.Mqtt {
     /// <summary>
     /// Class for CONNECT message from client to broker. See section 3.1.
     /// </summary>
@@ -140,12 +140,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
 
             // Now we have all the size, so we can calculate fixed header size.
             var remainingLength = varHeaderPayload.Length + clientIdPayload.Length + credentialsPayload.Length + willPayload.Length;
-            var fixedHeaderSize = Helpers.CalculateFixedHeaderSize(remainingLength);
+            var fixedHeaderSize = CalculateFixedHeaderSize(remainingLength);
 
             // Finally, building the resulting full payload.
             var finalBuffer = new byte[fixedHeaderSize + remainingLength];
             finalBuffer[0] = (byte)(Type << 4);
-            Helpers.EncodeRemainingLength(remainingLength, finalBuffer, 1);
+            EncodeRemainingLength(remainingLength, finalBuffer, 1);
             Array.Copy(varHeaderPayload, 0, finalBuffer, fixedHeaderSize, varHeaderPayload.Length);
             Array.Copy(clientIdPayload, 0, finalBuffer, fixedHeaderSize + varHeaderPayload.Length, clientIdPayload.Length);
             Array.Copy(willPayload, 0, finalBuffer, fixedHeaderSize + varHeaderPayload.Length + clientIdPayload.Length, willPayload.Length);
@@ -155,7 +155,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         }
 
         public override string ToString() {
-            return Helpers.GetTraceString("CONNECT", new object[] { "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ConnectionOptions.ClientId, ConnectionOptions.IsWillUsed, ConnectionOptions.IsWillRetained, ConnectionOptions.WillQosLevel, ConnectionOptions.WillTopic, ConnectionOptions.WillMessage, ConnectionOptions.Username, ConnectionOptions.Password, ConnectionOptions.IsCleanSession, ConnectionOptions.KeepAlivePeriod });
+            return GetTraceString("CONNECT", new object[] { "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ConnectionOptions.ClientId, ConnectionOptions.IsWillUsed, ConnectionOptions.IsWillRetained, ConnectionOptions.WillQosLevel, ConnectionOptions.WillTopic, ConnectionOptions.WillMessage, ConnectionOptions.Username, ConnectionOptions.Password, ConnectionOptions.IsCleanSession, ConnectionOptions.KeepAlivePeriod });
         }
     }
 }

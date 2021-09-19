@@ -15,9 +15,9 @@ Contributors:
 */
 
 using System.Threading;
-using uPLibrary.Networking.M2Mqtt.Utility;
+using Tevux.Protocols.Mqtt.Utility;
 
-namespace uPLibrary.Networking.M2Mqtt {
+namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         private void MasterTickThread() {
             while (true) {
