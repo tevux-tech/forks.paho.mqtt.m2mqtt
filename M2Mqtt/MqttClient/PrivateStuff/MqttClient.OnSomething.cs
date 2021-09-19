@@ -24,7 +24,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="publish">PUBLISH message received</param>
         internal void OnMqttMsgPublishReceived(MqttMsgPublish publish) {
-            MqttMsgPublishReceived?.Invoke(this, new MqttMsgPublishEventArgs(publish.Topic, publish.Message, publish.DupFlag, publish.QosLevel, publish.RetainFlag));
+            PublishReceived?.Invoke(this, new PublishReceivedEventArgs(publish.Topic, publish.Message));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <param name="messageId">Message identifier for published message</param>
         /// <param name="isPublished">Publish flag</param>
         internal void OnMqttMsgPublished(ushort messageId, bool isPublished) {
-            MqttMsgPublished?.Invoke(this, new MqttMsgPublishedEventArgs(messageId, isPublished));
+            Published?.Invoke(this, new PublishFinishedEventArgs(messageId, isPublished));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="suback">SUBACK message received</param>
         internal void OnMqttMsgSubscribed(MqttMsgSuback suback) {
-            MqttMsgSubscribed?.Invoke(this, new MqttMsgSubscribedEventArgs(suback.MessageId, suback.GrantedQosLevels));
+            Subscribed?.Invoke(this, new SubscribedEventArgs(suback.MessageId, suback.GrantedQosLevels));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <param name="messageId">Message identifier for unsubscribed topic</param>
         internal void OnMqttMsgUnsubscribed(ushort messageId) {
-            MqttMsgUnsubscribed?.Invoke(this, new MqttMsgUnsubscribedEventArgs(messageId));
+            Unsubscribed?.Invoke(this, new UnsubscribedEventArgs(messageId));
         }
 
         /// <summary>

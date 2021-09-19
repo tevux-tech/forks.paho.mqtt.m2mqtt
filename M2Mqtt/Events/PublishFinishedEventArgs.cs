@@ -17,13 +17,13 @@ Contributors:
 using System;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
-    public delegate void MqttMsgPublishedEventHandler(object sender, MqttMsgPublishedEventArgs e);
+    public delegate void PublishedEventHandler(object sender, PublishFinishedEventArgs e);
 
-    public class MqttMsgPublishedEventArgs : EventArgs {
+    public class PublishFinishedEventArgs : EventArgs {
         public ushort MessageId { get; internal set; }
         public bool IsPublished { get; internal set; }
 
-        public MqttMsgPublishedEventArgs(ushort messageId, bool isPublished) {
+        public PublishFinishedEventArgs(ushort messageId, bool isPublished) {
             MessageId = messageId;
             IsPublished = isPublished;
         }

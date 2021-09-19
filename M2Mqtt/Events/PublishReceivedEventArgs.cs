@@ -17,21 +17,15 @@ Contributors:
 using System;
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
-    public delegate void MqttMsgPublishEventHandler(object sender, MqttMsgPublishEventArgs e);
+    public delegate void PublishReceivedEventHandler(object sender, PublishReceivedEventArgs e);
 
-    public class MqttMsgPublishEventArgs : EventArgs {
+    public class PublishReceivedEventArgs : EventArgs {
         public string Topic { get; internal set; }
         public byte[] Message { get; internal set; }
-        public bool DupFlag { get; set; }
-        public QosLevel QosLevel { get; internal set; }
-        public bool Retain { get; internal set; }
 
-        public MqttMsgPublishEventArgs(string topic, byte[] message, bool dupFlag, QosLevel qosLevel, bool retain) {
+        public PublishReceivedEventArgs(string topic, byte[] message) {
             Topic = topic;
             Message = message;
-            DupFlag = dupFlag;
-            QosLevel = qosLevel;
-            Retain = retain;
         }
     }
 }

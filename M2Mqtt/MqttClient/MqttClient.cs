@@ -31,10 +31,10 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         public int LastCommTime { get; private set; }
 
-        public event MqttMsgPublishEventHandler MqttMsgPublishReceived = delegate { };
-        public event MqttMsgPublishedEventHandler MqttMsgPublished = delegate { };
-        public event MqttMsgSubscribedEventHandler MqttMsgSubscribed = delegate { };
-        public event MqttMsgUnsubscribedEventHandler MqttMsgUnsubscribed = delegate { };
+        public event PublishReceivedEventHandler PublishReceived = delegate { };
+        public event PublishedEventHandler Published = delegate { };
+        public event SubscribedEventHandler Subscribed = delegate { };
+        public event UnsubscribedEventHandler Unsubscribed = delegate { };
         public event ConnectionClosedEventHandler ConnectionClosed = delegate { };
 
         // channel to communicate over the network
