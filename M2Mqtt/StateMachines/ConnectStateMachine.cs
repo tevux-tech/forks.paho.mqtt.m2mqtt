@@ -1,12 +1,11 @@
-﻿using System;
-using uPLibrary.Networking.M2Mqtt.Messages;
+﻿using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
 
 namespace uPLibrary.Networking.M2Mqtt {
     internal class ConnectStateMachine {
         private bool _isWaitingForConnack;
-        private int _requestTimestamp;
+        private double _requestTimestamp;
         private MqttClient _client;
 
         public bool IsConnectionCompleted { get; private set; }
@@ -19,10 +18,10 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void Tick() {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             if (_isWaitingForConnack) {
-                if (currentTime - _requestTimestamp > MqttSettings.ConnectTimeout) {
+                if (currentTime - _requestTimestamp > _client.ConnectionOptions.KeepAlivePeriod) {
                     // Problem. Server does not respond.
                     _isWaitingForConnack = false;
                     IsConnectionCompleted = true;
@@ -42,7 +41,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void Connect(MqttMsgConnect message) {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
             _client.Send(message);
             _isWaitingForConnack = true;
             _requestTimestamp = currentTime;

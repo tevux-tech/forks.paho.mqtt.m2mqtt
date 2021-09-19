@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     internal class UnsubscribeStateMachine {
         private ArrayList _unacknowledgedMessages = new ArrayList();
-        private int _lastAck;
+        private double _lastAck;
         private MqttClient _client;
 
         public bool IsServerLost { get; private set; }
@@ -16,7 +15,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void Tick() {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             if (currentTime - _lastAck > _client.DelayOnRetry) {
                 if (_unacknowledgedMessages.Count > 0) {
@@ -41,7 +40,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public void ProcessMessage(MqttMsgUnsuback message) {
             Trace.WriteLine(TraceLevel.Frame, $"                <-Unsubs {message.MessageId.ToString("X4")}");
 
-            _lastAck = Environment.TickCount;
+            _lastAck = Helpers.GetCurrentTime();
 
             lock (_unacknowledgedMessages.SyncRoot) {
                 MqttMsgUnsubscribe foundMessage = null;

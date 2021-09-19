@@ -32,7 +32,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         public delegate void ConnectionClosedEventHandler(object sender, EventArgs e);
 
-        public int LastCommTime { get; private set; }
+        public double LastCommTime { get; private set; }
 
         public event PublishReceivedEventHandler PublishReceived = delegate { };
         public event PublishedEventHandler Published = delegate { };

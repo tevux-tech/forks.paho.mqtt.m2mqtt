@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
@@ -25,7 +24,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public void ProcessMessage(MqttMsgPublish message) {
             Trace.WriteLine(TraceLevel.Frame, $"        <-Publis {message.MessageId.ToString("X4")}");
 
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             if (message.QosLevel == QosLevel.AtMostOnce) {
                 // Those are the best messages - just sending no responses!
@@ -53,7 +52,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void ProcessMessage(MqttMsgPubrel message) {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
             Trace.WriteLine(TraceLevel.Frame, $"        <-PubRel {message.MessageId.ToString("X4")}");
 
             var isOk = true;
@@ -83,7 +82,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         private void ResendAndClean(Hashtable messageTable) {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             lock (messageTable.SyncRoot) {
                 foreach (DictionaryEntry item in messageTable) {

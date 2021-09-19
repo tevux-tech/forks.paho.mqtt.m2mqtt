@@ -14,14 +14,13 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
         internal void Send(byte[] msgBytes) {
             if (_channel.TrySend(msgBytes)) {
-                LastCommTime = Environment.TickCount;
+                LastCommTime = Helpers.GetCurrentTime();
             }
             else {
                 CloseConnections();

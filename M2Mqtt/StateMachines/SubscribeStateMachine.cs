@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
@@ -14,7 +13,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void Tick() {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             lock (_messagesWaitingForAck.SyncRoot) {
                 foreach (DictionaryEntry item in _messagesWaitingForAck) {
@@ -47,7 +46,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void Subscribe(MqttMsgSubscribe message) {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             lock (_messagesWaitingForAck.SyncRoot) {
                 _messagesWaitingForAck.Add(message.MessageId, new MqttMsgContext() { Message = message, Attempt = 1, Timestamp = currentTime });

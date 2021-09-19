@@ -1,11 +1,10 @@
-﻿using System;
-using uPLibrary.Networking.M2Mqtt.Messages;
+﻿using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
     internal class PingStateMachine {
         private bool _isWaitingForPingResponse;
-        private int _requestTimestamp;
+        private double _requestTimestamp;
         private MqttClient _client;
 
         public bool IsBrokerAlive { get; private set; } = true;
@@ -16,7 +15,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         }
 
         public void Tick() {
-            var currentTime = Environment.TickCount;
+            var currentTime = Helpers.GetCurrentTime();
 
             if (_isWaitingForPingResponse) {
                 if (currentTime - _requestTimestamp > _client.DelayOnRetry) {

@@ -21,7 +21,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         /// <summary>
         /// Timestamp in ticks (for retry)
         /// </summary>
-        public int Timestamp { get; set; }
+        public double Timestamp { get; set; }
 
         /// <summary>
         /// Attempt (for retry)

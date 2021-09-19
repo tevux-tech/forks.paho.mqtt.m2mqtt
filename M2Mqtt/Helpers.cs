@@ -114,5 +114,13 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             return outputBuilder.ToString();
         }
+
+        /// <summary>
+        /// Returns current time in seconds (since 0000-01-01).
+        /// </summary>
+        /// <returns></returns>
+        public static double GetCurrentTime() {
+            return System.DateTime.Now.Ticks / System.TimeSpan.TicksPerSecond;
+        }
     }
 }
