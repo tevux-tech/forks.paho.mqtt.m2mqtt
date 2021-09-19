@@ -20,12 +20,12 @@ namespace uPLibrary.Networking.M2Mqtt {
                 foreach (DictionaryEntry item in _messagesWaitingForAck) {
                     var message = (MqttMsgContext)item.Value;
 
-                    if (currentTime - message.Timestamp > MqttSettings.KeepAlivePeriod) {
+                    if (currentTime - message.Timestamp > _client.DelayOnRetry) {
                         _client.Send(message.Message);
                         message.Attempt++;
                     }
 
-                    if (message.Attempt >= MqttSettings.AttemptsRetry) {
+                    if (message.Attempt >= _client.RetryAttemps) {
                         _tempList.Enqueue(item.Key);
                         Trace.WriteLine(TraceLevel.Queuing, $"                Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
                     }

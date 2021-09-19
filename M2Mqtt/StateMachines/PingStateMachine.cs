@@ -19,7 +19,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             var currentTime = Environment.TickCount;
 
             if (_isWaitingForPingResponse) {
-                if (currentTime - _requestTimestamp > MqttSettings.KeepAlivePeriod) {
+                if (currentTime - _requestTimestamp > _client.DelayOnRetry) {
                     // Problem. Server does not respond.
                     _isWaitingForPingResponse = false;
                     IsBrokerAlive = false;
@@ -27,7 +27,7 @@ namespace uPLibrary.Networking.M2Mqtt {
             }
             else {
                 // Keep alive period equals zero means turning off keep alive mechanism.
-                if ((currentTime - _client.LastCommTime > MqttSettings.KeepAlivePeriod) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
+                if ((currentTime - _client.LastCommTime > _client.DelayOnRetry) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
                     var pingreq = new MqttMsgPingReq();
                     _client.Send(pingreq);
                     Trace.WriteLine(TraceLevel.Frame, "                        PngReq->");

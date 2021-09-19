@@ -23,6 +23,9 @@ namespace uPLibrary.Networking.M2Mqtt {
     /// MQTT Client
     /// </summary>
     public partial class MqttClient {
+        public int RetryAttemps { get; private set; } = 3;
+        public int DelayOnRetry { get; private set; } = 10;
+
 
         /// <summary>
         /// Delegate that defines event handler for cliet/peer disconnection

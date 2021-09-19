@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         public void Tick() {
             var currentTime = Environment.TickCount;
 
-            if (currentTime - _lastAck > MqttSettings.KeepAlivePeriod) {
+            if (currentTime - _lastAck > _client.DelayOnRetry) {
                 if (_unacknowledgedMessages.Count > 0) {
                     Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Unsubscribe message.");
 #warning Server did not acknowledged all unsubscribe messages. Is this a protocol violation?..
