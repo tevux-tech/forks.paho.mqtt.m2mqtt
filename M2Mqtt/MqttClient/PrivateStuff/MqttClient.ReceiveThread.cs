@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -15,7 +15,6 @@ Contributors:
 */
 
 using System.Threading;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
@@ -160,13 +159,10 @@ namespace uPLibrary.Networking.M2Mqtt {
                             // Either way, it is a protocol violation, so network connection should be closed.
                             // Although specification is not entirely clear what to do if a client receives a messages which is meant for a server.
                             // But I will go with section 4.8 and close the connection anyway.
-#warning add some error propagation here to close connection
 
-                            // These message are meant for the broker, not client.
-                            throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
+                            CloseConnections();
                         }
                     }
-                    // zero bytes read, peer gracefully closed socket
                     else {
                         // Cannot receive needed data. Something is wrong with the data channel.
                         CloseConnections();

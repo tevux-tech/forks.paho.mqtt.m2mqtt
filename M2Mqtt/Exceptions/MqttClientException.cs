@@ -14,19 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System;
-
 namespace uPLibrary.Networking.M2Mqtt.Exceptions {
-    /// <summary>
-    /// MQTT client exception
-    /// </summary>
-    public class MqttClientException : Exception {
-        public MqttClientErrorCode ErrorCode { get; set; }
-        public MqttClientException(MqttClientErrorCode errorCode) {
-            ErrorCode = errorCode;
-        }
-    }
-
     /// <summary>
     /// MQTT client error code
     /// </summary>
