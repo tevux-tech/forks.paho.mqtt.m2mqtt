@@ -23,7 +23,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public ushort MessageId { get; private set; }
         public GrantedQosLevel[] GrantedQosLevels { get; private set; }
 
-        public SubscribedEventArgs(ushort messageId, GrantedQosLevel[] grantedQosLevels) {
+        internal SubscribedEventArgs(ushort messageId, GrantedQosLevel[] grantedQosLevels) {
             MessageId = messageId;
             GrantedQosLevels = grantedQosLevels;
         }

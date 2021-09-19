@@ -20,10 +20,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     public delegate void PublishedEventHandler(object sender, PublishFinishedEventArgs e);
 
     public class PublishFinishedEventArgs : EventArgs {
-        public ushort MessageId { get; internal set; }
-        public bool IsPublished { get; internal set; }
+        public ushort MessageId { get; private set; }
+        public bool IsPublished { get; private set; }
 
-        public PublishFinishedEventArgs(ushort messageId, bool isPublished) {
+        internal PublishFinishedEventArgs(ushort messageId, bool isPublished) {
             MessageId = messageId;
             IsPublished = isPublished;
         }

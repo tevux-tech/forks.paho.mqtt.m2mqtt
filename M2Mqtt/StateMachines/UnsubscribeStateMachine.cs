@@ -4,7 +4,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class UnsubscribeStateMachine {
+    internal class UnsubscribeStateMachine {
         private ArrayList _unacknowledgedMessages = new ArrayList();
         private int _lastAck;
         private MqttClient _client;

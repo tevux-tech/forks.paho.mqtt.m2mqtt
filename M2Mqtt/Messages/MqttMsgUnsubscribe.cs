@@ -22,9 +22,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for UNSUBSCRIBE message from client to broker
     /// </summary>
-    public class MqttMsgUnsubscribe : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgUnsubscribe : MqttMsgBase, ISentToBroker {
 
-        public string Topic { get; set; }
+        public string Topic { get; private set; }
 
         internal MqttMsgUnsubscribe() {
             Type = MessageType.Unsubscribe;

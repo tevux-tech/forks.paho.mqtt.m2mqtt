@@ -4,7 +4,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class OutgoingPublishStateMachine {
+    internal class OutgoingPublishStateMachine {
         private MqttClient _client;
         private readonly ConcurrentQueue _tempList = new ConcurrentQueue();
 

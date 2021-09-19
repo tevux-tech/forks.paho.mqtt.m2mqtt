@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBACK message from broker to client. See section 3.4.
     /// </summary>
-    public class MqttMsgPuback : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPuback : MqttMsgBase, ISentToBroker {
         public MqttMsgPuback() {
             Type = MessageType.PubAck;
         }

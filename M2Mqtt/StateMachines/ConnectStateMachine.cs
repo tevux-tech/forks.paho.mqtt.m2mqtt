@@ -4,7 +4,7 @@ using uPLibrary.Networking.M2Mqtt.Utility;
 using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class ConnectStateMachine {
+    internal class ConnectStateMachine {
         private bool _isWaitingForConnack;
         private int _requestTimestamp;
         private MqttClient _client;

@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBCOMP message from broker to client. See section 3.7.
     /// </summary>
-    public class MqttMsgPubcomp : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPubcomp : MqttMsgBase, ISentToBroker {
         public MqttMsgPubcomp() {
             Type = MessageType.PubComp;
         }

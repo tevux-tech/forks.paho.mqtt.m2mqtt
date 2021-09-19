@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt {
     /// <summary>
     /// Unsecure channel to communicate over the network.
     /// </summary>
-    public class UnsecureTcpChannel : IMqttNetworkChannel {
+    internal class UnsecureTcpChannel : IMqttNetworkChannel {
         private Socket _socket;
 
         public string RemoteHostName { get; private set; }

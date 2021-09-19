@@ -1,7 +1,7 @@
 ﻿using System.Text;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class Helpers {
+    internal class Helpers {
         /// <summary>
         /// Calculates the size of the fixed header, which depends on the remaining length. See section 2.2.3.
         /// </summary>

@@ -21,7 +21,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for CONNECT message from client to broker. See section 3.1.
     /// </summary>
-    public class MqttMsgConnect : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgConnect : MqttMsgBase, ISentToBroker {
+#warning should get that from connection options
         public const ushort KeepAliveDefaultValue = 15; // seconds
 
         // connect flags

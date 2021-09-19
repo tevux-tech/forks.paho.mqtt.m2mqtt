@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PINGREQ message from client to broker. See section 3.12.
     /// </summary>
-    public class MqttMsgPingReq : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPingReq : MqttMsgBase, ISentToBroker {
         public MqttMsgPingReq() {
             Type = MessageType.PingReq;
         }

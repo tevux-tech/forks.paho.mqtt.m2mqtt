@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for UNSUBACK message from broker to client. See section 3.11.
     /// </summary>
-    public class MqttMsgUnsuback : MqttMsgBase {
+    internal class MqttMsgUnsuback : MqttMsgBase {
         public MqttMsgUnsuback() {
             Type = MessageType.UnsubAck;
         }

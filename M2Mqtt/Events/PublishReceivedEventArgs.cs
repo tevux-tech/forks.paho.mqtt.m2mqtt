@@ -20,10 +20,10 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     public delegate void PublishReceivedEventHandler(object sender, PublishReceivedEventArgs e);
 
     public class PublishReceivedEventArgs : EventArgs {
-        public string Topic { get; internal set; }
-        public byte[] Message { get; internal set; }
+        public string Topic { get; private set; }
+        public byte[] Message { get; private set; }
 
-        public PublishReceivedEventArgs(string topic, byte[] message) {
+        internal PublishReceivedEventArgs(string topic, byte[] message) {
             Topic = topic;
             Message = message;
         }

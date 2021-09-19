@@ -25,12 +25,12 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect() {
-            return Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
+        public void Connect() {
+            Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
         }
 
-        public ReturnCodes Connect(ChannelConnectionOptions channelConnectionOptions) {
-            return Connect(channelConnectionOptions, new MqttConnectionOptions());
+        public void Connect(ChannelConnectionOptions channelConnectionOptions) {
+            Connect(channelConnectionOptions, new MqttConnectionOptions());
         }
 
 
@@ -38,7 +38,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// Connect to broker
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
-        public ReturnCodes Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
+        public void Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             var connectMessage = new MqttMsgConnect(mqttConnectionOptions);
@@ -73,7 +73,8 @@ namespace uPLibrary.Networking.M2Mqtt {
                 IsConnected = true;
             }
 
-            return _connectStateMachine.ConnectionResult;
+#warning needto use other constructs to return connection success. going for void temporarily.
+            // return _connectStateMachine.ConnectionResult;
         }
     }
 }

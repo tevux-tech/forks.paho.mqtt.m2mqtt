@@ -46,6 +46,7 @@ namespace TestApp {
             Thread.Sleep(1000);
 
             // client.Disconnect();
+
         }
         private void HandlePublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.PublishReceivedEventArgs e) {
 

@@ -20,9 +20,9 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     public delegate void UnsubscribedEventHandler(object sender, UnsubscribedEventArgs e);
 
     public class UnsubscribedEventArgs : EventArgs {
-        public ushort MessageId { get; internal set; }
+        public ushort MessageId { get; private set; }
 
-        public UnsubscribedEventArgs(ushort messageId) {
+        internal UnsubscribedEventArgs(ushort messageId) {
             MessageId = messageId;
         }
     }

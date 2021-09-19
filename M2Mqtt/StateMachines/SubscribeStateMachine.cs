@@ -4,7 +4,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class SubscribeStateMachine {
+    internal class SubscribeStateMachine {
         private MqttClient _client;
         private Hashtable _messagesWaitingForAck = new Hashtable();
         private ConcurrentQueue _tempList = new ConcurrentQueue();

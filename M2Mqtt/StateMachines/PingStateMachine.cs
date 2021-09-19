@@ -3,7 +3,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 
 namespace uPLibrary.Networking.M2Mqtt {
-    public class PingStateMachine {
+    internal class PingStateMachine {
         private bool _isWaitingForPingResponse;
         private int _requestTimestamp;
         private MqttClient _client;

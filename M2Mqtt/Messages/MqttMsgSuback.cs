@@ -18,8 +18,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for SUBACK message from broker to client. See section 3.9.
     /// </summary>
-    public class MqttMsgSuback : MqttMsgBase {
-        public GrantedQosLevel[] GrantedQosLevels { get; set; }
+    internal class MqttMsgSuback : MqttMsgBase {
+        public GrantedQosLevel[] GrantedQosLevels { get; private set; }
 
         public MqttMsgSuback() {
             Type = MessageType.SubAck;

@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PINGRESP message from client to broker. See section 3.13.
     /// </summary>
-    public class MqttMsgPingResp : MqttMsgBase {
+    internal class MqttMsgPingResp : MqttMsgBase {
         public MqttMsgPingResp() {
             Type = MessageType.PingResp;
         }

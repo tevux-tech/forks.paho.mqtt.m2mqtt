@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBREL message from client top broker. See section 3.6.
     /// </summary>
-    public class MqttMsgPubrel : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPubrel : MqttMsgBase, ISentToBroker {
         public MqttMsgPubrel() {
             Type = MessageType.PubRel;
         }

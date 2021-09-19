@@ -21,7 +21,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBLISH message from client to broker. See section 3.3.
     /// </summary>
-    public class MqttMsgPublish : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPublish : MqttMsgBase, ISentToBroker {
         public string Topic { get; private set; }
         public byte[] Message { get; private set; }
         public QosLevel QosLevel { get; private set; }

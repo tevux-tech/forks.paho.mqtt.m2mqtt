@@ -21,11 +21,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for SUBSCRIBE message from client to broker
     /// </summary>
-    public class MqttMsgSubscribe : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgSubscribe : MqttMsgBase, ISentToBroker {
 
         public string Topic { get; private set; }
 
-        public new QosLevel QosLevel { get; private set; }
+        public QosLevel QosLevel { get; private set; }
 
         internal MqttMsgSubscribe() {
             Type = MessageType.Subscribe;

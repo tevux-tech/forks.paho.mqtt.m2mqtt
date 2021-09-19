@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for DISCONNECT message from client to broker. See section 3.14.
     /// </summary>
-    public class MqttMsgDisconnect : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgDisconnect : MqttMsgBase, ISentToBroker {
         public MqttMsgDisconnect() {
             Type = MessageType.Disconnect;
         }

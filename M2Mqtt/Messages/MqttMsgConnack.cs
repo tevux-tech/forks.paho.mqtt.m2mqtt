@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for CONNACK message from broker to client. See section 3.2.
     /// </summary>
-    public class MqttMsgConnack : MqttMsgBase {
+    internal class MqttMsgConnack : MqttMsgBase {
 
         public enum ReturnCodes : byte {
             Accepted = 0x00,
@@ -29,8 +29,8 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             RefusedNotAuthorized = 0x05
         }
 
-        public bool SessionPresent { get; set; }
-        public ReturnCodes ReturnCode { get; set; }
+        public bool SessionPresent { get; private set; }
+        public ReturnCodes ReturnCode { get; private set; }
 
         public MqttMsgConnack() {
             Type = MessageType.ConAck;

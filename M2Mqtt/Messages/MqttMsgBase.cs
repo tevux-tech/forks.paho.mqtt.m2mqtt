@@ -18,7 +18,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Base class for all MQTT messages
     /// </summary>
-    public abstract class MqttMsgBase {
+    internal abstract class MqttMsgBase {
         public class MessageType {
             public const byte Connect = 0x01;
             public const byte ConAck = 0x02;

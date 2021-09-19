@@ -15,7 +15,7 @@ Contributors:
 */
 
 namespace uPLibrary.Networking.M2Mqtt.Messages {
-    public class MqttMsgContext {
+    internal class MqttMsgContext {
         public MqttMsgBase Message { get; set; }
 
         /// <summary>
