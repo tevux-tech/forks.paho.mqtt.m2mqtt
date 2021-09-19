@@ -19,6 +19,7 @@ namespace TestApp {
         public MyTest() {
 
             var client = new MqttClient();
+            client.Initialize();
             client.MqttMsgPublishReceived += HandlePublishReceived;
 
             var networkOptions = new ChannelConnectionOptions();

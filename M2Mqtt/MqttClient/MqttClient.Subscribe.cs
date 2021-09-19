@@ -20,6 +20,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
         public ushort Subscribe(string topic, QosLevel qosLevel) {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
 
             var subscribeMessage = new MqttMsgSubscribe(topic, qosLevel) {

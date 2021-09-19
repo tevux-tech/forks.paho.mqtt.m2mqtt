@@ -72,6 +72,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         private readonly OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
         private readonly IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
 
+        private bool _isInitialized;
+
         public MqttConnectionOptions ConnectionOptions { get; private set; }
         public bool IsConnected { get; private set; }
     }

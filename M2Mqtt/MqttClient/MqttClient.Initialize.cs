@@ -14,21 +14,11 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System.Collections.Generic;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        private void Init(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
-            RemoteCertificateValidationCallback userCertificateValidationCallback,
-            LocalCertificateSelectionCallback userCertificateSelectionCallback,
-            List<string> alpnProtocols = null) {
-
-            // create network channel
-            if (secure == false) {
-                _channel = new UnsecureTcpChannel();
-            }
+        public void Initialize() {
+#warning Add secure communication
+            _channel = new UnsecureTcpChannel();
 
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);
@@ -39,6 +29,8 @@ namespace uPLibrary.Networking.M2Mqtt {
 
             Fx.StartThread(MasterTickThread);
             Fx.StartThread(ReceiveThread);
+
+            _isInitialized = true;
         }
     }
 }

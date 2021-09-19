@@ -24,6 +24,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Message Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message) {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+
             return Publish(topic, message, QosLevel.AtMostOnce, false);
         }
 
@@ -32,6 +34,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Message Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+
             // topic can't contain wildcards
             if ((topic.IndexOf('#') != -1) || (topic.IndexOf('+') != -1)) { throw new ArgumentException("Topic cannot contain wildcards in Publish message"); }
 

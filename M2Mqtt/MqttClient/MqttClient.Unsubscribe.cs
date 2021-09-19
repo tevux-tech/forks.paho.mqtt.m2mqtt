@@ -25,6 +25,7 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// <param name="topics">List of topics to unsubscribe</param>
         /// <returns>Message Id in UNSUBACK message from broker</returns>
         public ushort Unsubscribe(string topic) {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
 
             var unsubscribeMessage = new MqttMsgUnsubscribe(topic) {

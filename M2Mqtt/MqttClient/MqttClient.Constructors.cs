@@ -14,27 +14,8 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
-using System.Collections.Generic;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
-        public MqttClient() : this(false, null, null, MqttSslProtocols.None) {
-        }
-
-        public MqttClient(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol) {
-            Init(secure, caCert, clientCert, sslProtocol, null, null);
-        }
-
-        public MqttClient(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback) : this(secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, null) {
-        }
-
-        public MqttClient(bool secure, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback) : this(secure, null, null, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback) {
-        }
-
-        public MqttClient(bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol, RemoteCertificateValidationCallback userCertificateValidationCallback, LocalCertificateSelectionCallback userCertificateSelectionCallback, List<string> ALPNProtocols = null) {
-            Init(secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback, ALPNProtocols);
-        }
+        public MqttClient() { }
     }
 }

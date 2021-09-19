@@ -14,6 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using System.Threading;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using static uPLibrary.Networking.M2Mqtt.Messages.MqttMsgConnack;
@@ -38,6 +39,8 @@ namespace uPLibrary.Networking.M2Mqtt {
         /// </summary>
         /// <returns>Return code of CONNACK message from broker</returns>
         public ReturnCodes Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+
             var connectMessage = new MqttMsgConnect(mqttConnectionOptions);
 
             var isOk = true;

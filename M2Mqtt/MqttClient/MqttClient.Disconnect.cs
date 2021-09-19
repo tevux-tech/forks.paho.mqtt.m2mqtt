@@ -14,6 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
@@ -21,6 +22,8 @@ namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
 
         public void Disconnect() {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+
             var disconnect = new MqttMsgDisconnect();
             Send(disconnect);
 
