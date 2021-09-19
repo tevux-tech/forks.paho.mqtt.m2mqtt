@@ -21,7 +21,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBLISH message from client to broker. See section 3.3.
     /// </summary>
-    internal class MqttMsgPublish : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPublish : MqttMsgBase {
         public string Topic { get; private set; }
         public byte[] Message { get; private set; }
         public QosLevel QosLevel { get; private set; }
@@ -46,7 +46,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             MessageId = 0;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // Variable header section.
             var topicBytes = Encoding.UTF8.GetBytes(Topic);
             var variableHeaderSize = topicBytes.Length + 2;

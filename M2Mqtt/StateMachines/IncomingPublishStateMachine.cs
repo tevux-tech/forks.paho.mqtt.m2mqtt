@@ -77,7 +77,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                 var pubcompMessage = new MqttMsgPubcomp() { MessageId = message.MessageId };
 #warning server may ask resend PubRel if for some reason this PubComp is lost. Need to handle that, too.
 
-                _client.Send((ISentToBroker)pubcompMessage);
+                _client.Send(pubcompMessage);
                 Trace.WriteLine(TraceLevel.Frame, $"        PubCom-> {message.MessageId.ToString("X4")}");
             }
         }
@@ -90,7 +90,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     var queuedItem = (MqttMsgContext)item.Value;
 
                     if (currentTime - queuedItem.Timestamp > MqttSettings.KeepAlivePeriod) {
-                        _client.Send((ISentToBroker)queuedItem.Message);
+                        _client.Send(queuedItem.Message);
                         queuedItem.Attempt++;
                     }
 

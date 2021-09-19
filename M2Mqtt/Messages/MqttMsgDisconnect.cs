@@ -18,12 +18,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for DISCONNECT message from client to broker. See section 3.14.
     /// </summary>
-    internal class MqttMsgDisconnect : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgDisconnect : MqttMsgBase {
         public MqttMsgDisconnect() {
             Type = MessageType.Disconnect;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // Message content is fixed, no variables here.
             var buffer = new byte[2];
             buffer[0] = 0b1110_0000;

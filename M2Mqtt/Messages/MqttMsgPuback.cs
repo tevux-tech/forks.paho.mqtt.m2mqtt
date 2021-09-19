@@ -18,12 +18,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBACK message from broker to client. See section 3.4.
     /// </summary>
-    internal class MqttMsgPuback : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPuback : MqttMsgBase {
         public MqttMsgPuback() {
             Type = MessageType.PubAck;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // PubAck packet is always 4 bytes long.
             var buffer = new byte[4];
 

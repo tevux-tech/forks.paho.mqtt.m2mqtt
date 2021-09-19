@@ -83,7 +83,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     _messagesWaitingForQoS2Pubcomp.Add(message.MessageId, pubrelContext);
                 }
 
-                _client.Send((ISentToBroker)pubrelMessage);
+                _client.Send(pubrelMessage);
                 Trace.WriteLine(TraceLevel.Frame, $"        PubRel-> {message.MessageId.ToString("X4")}");
             }
         }
@@ -111,7 +111,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     var queuedItem = (MqttMsgContext)item.Value;
 
                     if (currentTime - queuedItem.Timestamp > MqttSettings.KeepAlivePeriod) {
-                        _client.Send((ISentToBroker)queuedItem.Message);
+                        _client.Send(queuedItem.Message);
                         queuedItem.Attempt++;
                     }
 

@@ -21,7 +21,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for SUBSCRIBE message from client to broker
     /// </summary>
-    internal class MqttMsgSubscribe : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgSubscribe : MqttMsgBase {
 
         public string Topic { get; private set; }
 
@@ -36,7 +36,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             QosLevel = qosLevels;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // Currently this class was simplified to contain a single topic, although protocol supports multiple topics per packet.
             // This greatly simplifies buffer construction.
 

@@ -15,6 +15,7 @@ Contributors:
 */
 
 using System;
+using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace uPLibrary.Networking.M2Mqtt {
     public partial class MqttClient {
@@ -28,7 +29,7 @@ namespace uPLibrary.Networking.M2Mqtt {
 
         }
 
-        internal void Send(ISentToBroker msg) {
+        internal void Send(MqttMsgBase msg) {
             Send(msg.GetBytes());
         }
     }

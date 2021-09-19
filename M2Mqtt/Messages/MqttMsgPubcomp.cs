@@ -18,12 +18,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBCOMP message from broker to client. See section 3.7.
     /// </summary>
-    internal class MqttMsgPubcomp : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPubcomp : MqttMsgBase {
         public MqttMsgPubcomp() {
             Type = MessageType.PubComp;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // PubComp packet is always 4 bytes long.
             var buffer = new byte[4];
 

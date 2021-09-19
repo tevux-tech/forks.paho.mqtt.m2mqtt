@@ -23,6 +23,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Type = MessageType.PingResp;
         }
 
+        public override byte[] GetBytes() {
+            // Not relevant for the client side, so just leaving it empty.
+            return new byte[0];
+        }
+
         public static bool TryParse(out MqttMsgPingResp parsedMessage) {
             // Nothing to parse here.
             parsedMessage = new MqttMsgPingResp();

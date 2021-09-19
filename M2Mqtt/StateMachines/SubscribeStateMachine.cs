@@ -21,7 +21,7 @@ namespace uPLibrary.Networking.M2Mqtt {
                     var message = (MqttMsgContext)item.Value;
 
                     if (currentTime - message.Timestamp > MqttSettings.KeepAlivePeriod) {
-                        _client.Send((ISentToBroker)message.Message);
+                        _client.Send(message.Message);
                         message.Attempt++;
                     }
 

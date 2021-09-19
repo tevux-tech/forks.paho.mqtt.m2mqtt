@@ -22,7 +22,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for UNSUBSCRIBE message from client to broker
     /// </summary>
-    internal class MqttMsgUnsubscribe : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgUnsubscribe : MqttMsgBase {
 
         public string Topic { get; private set; }
 
@@ -34,7 +34,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Topic = topicToUnsubscribe;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // Currently this class was simplified to contain a single topic, although protocol supports multiple topics per packet.
             // This greatly simplifies buffer construction.
 

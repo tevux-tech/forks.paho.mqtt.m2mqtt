@@ -18,12 +18,12 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for PUBREL message from client top broker. See section 3.6.
     /// </summary>
-    internal class MqttMsgPubrel : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgPubrel : MqttMsgBase {
         public MqttMsgPubrel() {
             Type = MessageType.PubRel;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // PubRel packet is always 4 bytes long.
             var buffer = new byte[4];
 

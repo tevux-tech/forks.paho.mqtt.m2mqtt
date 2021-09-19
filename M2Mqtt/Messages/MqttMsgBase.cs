@@ -39,5 +39,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
         public byte Type { get; set; }
 
         public ushort MessageId { get; set; }
+
+        public abstract byte[] GetBytes();
     }
 }

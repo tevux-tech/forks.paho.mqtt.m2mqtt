@@ -21,7 +21,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
     /// <summary>
     /// Class for CONNECT message from client to broker. See section 3.1.
     /// </summary>
-    internal class MqttMsgConnect : MqttMsgBase, ISentToBroker {
+    internal class MqttMsgConnect : MqttMsgBase {
 #warning should get that from connection options
         public const ushort KeepAliveDefaultValue = 15; // seconds
 
@@ -45,7 +45,7 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             ConnectionOptions = connectionOptions;
         }
 
-        public byte[] GetBytes() {
+        public override byte[] GetBytes() {
             // This is the most complicated packet of them all, with multiple sections:
             // 1. Fixed header (mandatory, variable length)
             // 2. Variable header (mandatory, fixed length)

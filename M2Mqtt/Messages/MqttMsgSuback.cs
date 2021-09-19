@@ -25,6 +25,11 @@ namespace uPLibrary.Networking.M2Mqtt.Messages {
             Type = MessageType.SubAck;
         }
 
+        public override byte[] GetBytes() {
+            // Not relevant for the client side, so just leaving it empty.
+            return new byte[0];
+        }
+
         public static bool TryParse(byte[] variableHeaderBytes, byte[] payloadBytes, out MqttMsgSuback parsedMessage) {
             var isOk = true;
             parsedMessage = new MqttMsgSuback();
