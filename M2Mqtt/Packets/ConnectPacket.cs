@@ -19,16 +19,16 @@ using System.Text;
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for CONNECT message from client to broker. See section 3.1.
+    /// Class for CONNECT packet from client to broker. See section 3.1.
     /// </summary>
-    internal class MqttMsgConnect : MqttMsgBase {
+    internal class ConnectPacket : ControlPacketBase {
         public MqttConnectionOptions ConnectionOptions { get; private set; }
 
-        public MqttMsgConnect() {
-            Type = MessageType.Connect;
+        public ConnectPacket() {
+            Type = PacketTypes.Connect;
         }
 
-        public MqttMsgConnect(MqttConnectionOptions connectionOptions) : this() {
+        public ConnectPacket(MqttConnectionOptions connectionOptions) : this() {
             ConnectionOptions = connectionOptions;
         }
 

@@ -22,33 +22,33 @@ namespace Tevux.Protocols.Mqtt {
         /// Wrapper method for raising PUBLISH message received event
         /// </summary>
         /// <param name="publish">PUBLISH message received</param>
-        internal void OnMqttMsgPublishReceived(MqttMsgPublish publish) {
+        internal void OnMqttMsgPublishReceived(PublishPacket publish) {
             PublishReceived?.Invoke(this, new PublishReceivedEventArgs(publish.Topic, publish.Message));
         }
 
         /// <summary>
         /// Wrapper method for raising published message event
         /// </summary>
-        /// <param name="messageId">Message identifier for published message</param>
+        /// <param name="packetId">Message identifier for published message</param>
         /// <param name="isPublished">Publish flag</param>
-        internal void OnMqttMsgPublished(ushort messageId, bool isPublished) {
-            Published?.Invoke(this, new PublishFinishedEventArgs(messageId, isPublished));
+        internal void OnMqttMsgPublished(ushort packetId, bool isPublished) {
+            Published?.Invoke(this, new PublishFinishedEventArgs(packetId, isPublished));
         }
 
         /// <summary>
         /// Wrapper method for raising subscribed topic event
         /// </summary>
-        /// <param name="suback">SUBACK message received</param>
-        internal void OnMqttMsgSubscribed(MqttMsgSuback suback) {
-            Subscribed?.Invoke(this, new SubscribedEventArgs(suback.MessageId, suback.GrantedQosLevels));
+        /// <param name="suback">SUBACK packet received</param>
+        internal void OnMqttMsgSubscribed(SubackPacket suback) {
+            Subscribed?.Invoke(this, new SubscribedEventArgs(suback.PacketId, suback.GrantedQosLevels));
         }
 
         /// <summary>
         /// Wrapper method for raising unsubscribed topic event
         /// </summary>
-        /// <param name="messageId">Message identifier for unsubscribed topic</param>
-        internal void OnMqttMsgUnsubscribed(ushort messageId) {
-            Unsubscribed?.Invoke(this, new UnsubscribedEventArgs(messageId));
+        /// <param name="packetId">Packet identifier for unsubscribed topic</param>
+        internal void OnMqttMsgUnsubscribed(ushort packetId) {
+            Unsubscribed?.Invoke(this, new UnsubscribedEventArgs(packetId));
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ namespace Tevux.Protocols.Mqtt {
         private MqttClient _client;
 
         public bool IsConnectionCompleted { get; private set; }
-        public MqttMsgConnack.ReturnCodes ConnectionResult { get; private set; }
+        public ConnackPacket.ReturnCodes ConnectionResult { get; private set; }
 
 
         public void Initialize(MqttClient client) {
@@ -30,17 +30,17 @@ namespace Tevux.Protocols.Mqtt {
             }
         }
 
-        public void ProcessMessage(MqttMsgConnack message) {
+        public void ProcessPacket(ConnackPacket packet) {
             Trace.WriteLine(TraceLevel.Frame, "<-ConAck");
 
             _isWaitingForConnack = false;
             IsConnectionCompleted = true;
-            ConnectionResult = message.ReturnCode;
+            ConnectionResult = packet.ReturnCode;
         }
 
-        public void Connect(MqttMsgConnect message) {
+        public void Connect(ConnectPacket packet) {
             var currentTime = Helpers.GetCurrentTime();
-            _client.Send(message);
+            _client.Send(packet);
             _isWaitingForConnack = true;
             _requestTimestamp = currentTime;
             Trace.WriteLine(TraceLevel.Frame, "Connec->");

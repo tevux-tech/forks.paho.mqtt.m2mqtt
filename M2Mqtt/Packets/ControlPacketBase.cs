@@ -16,31 +16,31 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Base class for all MQTT messages
+    /// Base class for all MQTT packets.
     /// </summary>
-    internal abstract class MqttMsgBase {
-        public class MessageType {
+    internal abstract class ControlPacketBase {
+        public class PacketTypes {
             public const byte Connect = 0x01;
-            public const byte ConAck = 0x02;
+            public const byte Conack = 0x02;
             public const byte Publish = 0x03;
-            public const byte PubAck = 0x04;
-            public const byte PubRec = 0x05;
-            public const byte PubRel = 0x06;
-            public const byte PubComp = 0x07;
+            public const byte Puback = 0x04;
+            public const byte Pubrec = 0x05;
+            public const byte Pubrel = 0x06;
+            public const byte Pubcomp = 0x07;
             public const byte Subscribe = 0x08;
-            public const byte SubAck = 0x09;
+            public const byte Suback = 0x09;
             public const byte Unsubscribe = 0x0A;
-            public const byte UnsubAck = 0x0B;
-            public const byte PingReq = 0x0C;
-            public const byte PingResp = 0x0D;
+            public const byte Unsuback = 0x0B;
+            public const byte Pingreq = 0x0C;
+            public const byte Pingresp = 0x0D;
             public const byte Disconnect = 0x0E;
         }
 
-        private static ushort _messageIdCounter = 0;
+        private static ushort _packetIdCounter = 0;
 
         public byte Type { get; protected set; }
 
-        public ushort MessageId { get; protected set; }
+        public ushort PacketId { get; protected set; }
 
         public abstract byte[] GetBytes();
 
@@ -80,7 +80,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         /// <summary>
-        /// Encode remaining length and insert it into message buffer
+        /// Encode remaining length and insert it into packet buffer
         /// </summary>
         /// <param name="index">Index from which insert encoded value into buffer</param>
         /// <returns>Index updated</returns>
@@ -98,16 +98,16 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         /// <summary>
-        /// Generate the next message identifier.
+        /// Generates the next packet identifier.
         /// </summary>
-        protected static ushort GetNewMessageId() {
-            // if 0 or max UInt16, it becomes 1 (first valid messageId)
-            _messageIdCounter = ((_messageIdCounter % ushort.MaxValue) != 0) ? (ushort)(_messageIdCounter + 1) : (ushort)1;
-            return _messageIdCounter;
+        protected static ushort GetNewPacketId() {
+            // if 0 or max UInt16, it becomes 1 (first valid packet ID)
+            _packetIdCounter = ((_packetIdCounter % ushort.MaxValue) != 0) ? (ushort)(_packetIdCounter + 1) : (ushort)1;
+            return _packetIdCounter;
         }
 
         /// <summary>
-        /// Returns a string representation of the message for tracing
+        /// Returns a string representation of the message for tracing.
         /// </summary>
         public static string GetTraceString(string name, object[] fieldNames, object[] fieldValues) {
             object GetStringObject(object value) {

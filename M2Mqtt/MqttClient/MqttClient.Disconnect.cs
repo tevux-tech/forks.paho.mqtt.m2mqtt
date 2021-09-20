@@ -23,7 +23,7 @@ namespace Tevux.Protocols.Mqtt {
         public void Disconnect() {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
-            var disconnect = new MqttMsgDisconnect();
+            var disconnect = new DisconnectPacket();
             Send(disconnect);
 
             CloseConnections();

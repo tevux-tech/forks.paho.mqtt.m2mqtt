@@ -16,11 +16,11 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for PINGRESP message from client to broker. See section 3.13.
+    /// Class for PINGRESP packet from client to broker. See section 3.13.
     /// </summary>
-    internal class MqttMsgPingResp : MqttMsgBase {
-        public MqttMsgPingResp() {
-            Type = MessageType.PingResp;
+    internal class PingrespPacket : ControlPacketBase {
+        public PingrespPacket() {
+            Type = PacketTypes.Pingresp;
         }
 
         public override byte[] GetBytes() {
@@ -28,9 +28,9 @@ namespace Tevux.Protocols.Mqtt {
             return new byte[0];
         }
 
-        public static bool TryParse(out MqttMsgPingResp parsedMessage) {
+        public static bool TryParse(out PingrespPacket parsedPacket) {
             // Nothing to parse here.
-            parsedMessage = new MqttMsgPingResp();
+            parsedPacket = new PingrespPacket();
 
             return true;
         }

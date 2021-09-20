@@ -20,21 +20,21 @@ using System.Text;
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for UNSUBSCRIBE message from client to broker
+    /// Class for UNSUBSCRIBE packet from client to broker
     /// </summary>
-    internal class MqttMsgUnsubscribe : MqttMsgBase {
+    internal class UnsubscribePacket : ControlPacketBase {
 
         public string Topic { get; private set; }
 
-        internal MqttMsgUnsubscribe() {
-            Type = MessageType.Unsubscribe;
+        internal UnsubscribePacket() {
+            Type = PacketTypes.Unsubscribe;
         }
 
-        public MqttMsgUnsubscribe(string topic) : this() {
+        public UnsubscribePacket(string topic) : this() {
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
             if (Encoding.UTF8.GetByteCount(topic) > 65535) { throw new ArgumentException("Topic is too long. Maximum length is 65535."); }
 
-            MessageId = GetNewMessageId();
+            PacketId = GetNewPacketId();
             Topic = topic;
         }
 
@@ -52,8 +52,8 @@ namespace Tevux.Protocols.Mqtt {
 
             // Variable header section.
             var variableHeaderBytes = new byte[2];
-            variableHeaderBytes[0] = (byte)(MessageId >> 8);
-            variableHeaderBytes[1] = (byte)(MessageId & 0xFF);
+            variableHeaderBytes[0] = (byte)(PacketId >> 8);
+            variableHeaderBytes[1] = (byte)(PacketId & 0xFF);
 
             // Now we have all the sizes, so we can calculate fixed header size.
             var remainingLength = variableHeaderBytes.Length + payloadBytes.Length;
@@ -70,7 +70,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public override string ToString() {
-            return GetTraceString("UNSUBSCRIBE", new object[] { "messageId", "topics" }, new object[] { MessageId, Topic });
+            return GetTraceString("UNSUBSCRIBE", new object[] { "packetId", "topics" }, new object[] { PacketId, Topic });
         }
     }
 }

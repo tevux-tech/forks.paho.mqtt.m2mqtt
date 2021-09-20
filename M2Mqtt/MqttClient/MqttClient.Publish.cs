@@ -21,7 +21,7 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Publish a message asynchronously (QoS Level 0 and not retained)
         /// </summary>
-        /// <returns>Message Id related to PUBLISH message</returns>
+        /// <returns>Packet Id related to PUBLISH message</returns>
         public ushort Publish(string topic, byte[] message) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
@@ -31,15 +31,15 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Publish a message asynchronously
         /// </summary>
-        /// <returns>Message Id related to PUBLISH message</returns>
+        /// <returns>Packet Id related to PUBLISH packet</returns>
         public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
-            var publishPacket = new MqttMsgPublish(topic, message, qosLevel, retain);
+            var publishPacket = new PublishPacket(topic, message, qosLevel, retain);
 
             _outgoingPublishStateMachine.Publish(publishPacket);
 
-            return publishPacket.MessageId;
+            return publishPacket.PacketId;
         }
     }
 }

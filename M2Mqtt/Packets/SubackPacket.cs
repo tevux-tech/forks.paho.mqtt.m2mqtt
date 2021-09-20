@@ -16,13 +16,13 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for SUBACK message from broker to client. See section 3.9.
+    /// Class for SUBACK packet from broker to client. See section 3.9.
     /// </summary>
-    internal class MqttMsgSuback : MqttMsgBase {
+    internal class SubackPacket : ControlPacketBase {
         public GrantedQosLevel[] GrantedQosLevels { get; private set; }
 
-        public MqttMsgSuback() {
-            Type = MessageType.SubAck;
+        public SubackPacket() {
+            Type = PacketTypes.Suback;
         }
 
         public override byte[] GetBytes() {
@@ -30,23 +30,23 @@ namespace Tevux.Protocols.Mqtt {
             return new byte[0];
         }
 
-        public static bool TryParse(byte[] variableHeaderBytes, byte[] payloadBytes, out MqttMsgSuback parsedMessage) {
+        public static bool TryParse(byte[] variableHeaderBytes, byte[] payloadBytes, out SubackPacket parsedPacket) {
             var isOk = true;
-            parsedMessage = new MqttMsgSuback();
+            parsedPacket = new SubackPacket();
 
             // Bytes 1-2: Packet Identifier. Can be anything.
-            parsedMessage.MessageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            parsedPacket.PacketId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
 
             // Remaining bytes: QoS levels granted.
-            parsedMessage.GrantedQosLevels = new GrantedQosLevel[payloadBytes.Length];
+            parsedPacket.GrantedQosLevels = new GrantedQosLevel[payloadBytes.Length];
             for (var i = 0; i < payloadBytes.Length; i++) {
                 if ((payloadBytes[i] & 0x80) == 0x80) {
                     // QoS was not granted for that topic, but that's a valid payload.
-                    parsedMessage.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
+                    parsedPacket.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
                 }
                 else if ((payloadBytes[i] & 0x03) < 0x03) {
                     // QoS was granted.
-                    parsedMessage.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
+                    parsedPacket.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
                 }
                 else {
                     // That's a protocol violation.
@@ -58,7 +58,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public override string ToString() {
-            return GetTraceString("SUBACK", new object[] { "messageId", "grantedQosLevels" }, new object[] { MessageId, GrantedQosLevels });
+            return GetTraceString("SUBACK", new object[] { "packetId", "grantedQosLevels" }, new object[] { PacketId, GrantedQosLevels });
         }
     }
 }

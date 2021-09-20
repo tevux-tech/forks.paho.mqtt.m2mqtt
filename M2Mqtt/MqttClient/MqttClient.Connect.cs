@@ -22,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Connect to broker
         /// </summary>
-        /// <returns>Return code of CONNACK message from broker</returns>
+        /// <returns>Return code of CONNACK packet from broker</returns>
         public void Connect() {
             Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
         }
@@ -35,13 +35,13 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Connect to broker
         /// </summary>
-        /// <returns>Return code of CONNACK message from broker</returns>
+        /// <returns>Return code of CONNACK packet from broker</returns>
         public void Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             ConnectionOptions = mqttConnectionOptions;
 
-            var connectMessage = new MqttMsgConnect(mqttConnectionOptions);
+            var connectPacket = new ConnectPacket(mqttConnectionOptions);
 
             var isOk = true;
 
@@ -54,14 +54,14 @@ namespace Tevux.Protocols.Mqtt {
                 _isConnectionClosing = false;
             }
 
-            _connectStateMachine.Connect(connectMessage);
+            _connectStateMachine.Connect(connectPacket);
             while (_connectStateMachine.IsConnectionCompleted == false) {
                 _connectStateMachine.Tick();
                 Thread.Sleep(1000);
             }
 
 
-            if (_connectStateMachine.ConnectionResult == MqttMsgConnack.ReturnCodes.Accepted) {
+            if (_connectStateMachine.ConnectionResult == ConnackPacket.ReturnCodes.Accepted) {
                 _pingStateMachine.Reset();
                 _connectStateMachine.Reset();
 

@@ -16,24 +16,24 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for PINGREQ message from client to broker. See section 3.12.
+    /// Class for DISCONNECT packet from client to broker. See section 3.14.
     /// </summary>
-    internal class MqttMsgPingReq : MqttMsgBase {
-        public MqttMsgPingReq() {
-            Type = MessageType.PingReq;
+    internal class DisconnectPacket : ControlPacketBase {
+        public DisconnectPacket() {
+            Type = PacketTypes.Disconnect;
         }
 
         public override byte[] GetBytes() {
-            // Message content is fixed, no variables here.
+            // Packet content is fixed, no variables here.
             var buffer = new byte[2];
-            buffer[0] = (byte)(Type << 4);
+            buffer[0] = 0b1110_0000;
             buffer[1] = 0;
 
             return buffer;
         }
 
         public override string ToString() {
-            return GetTraceString("PINGREQ", null, null);
+            return GetTraceString("DISCONNECT", null, null);
         }
     }
 }

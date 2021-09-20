@@ -22,15 +22,15 @@ namespace Tevux.Protocols.Mqtt {
         /// Unsubscribe for message topics
         /// </summary>
         /// <param name="topics">List of topics to unsubscribe</param>
-        /// <returns>Message Id in UNSUBACK message from broker</returns>
+        /// <returns>Packet Id in UNSUBACK packet from broker</returns>
         public ushort Unsubscribe(string topic) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
-            var unsubscribePacket = new MqttMsgUnsubscribe(topic);
+            var unsubscribePacket = new UnsubscribePacket(topic);
 
             _unsubscribeStateMachine.Unsubscribe(unsubscribePacket);
 
-            return unsubscribePacket.MessageId;
+            return unsubscribePacket.PacketId;
         }
     }
 }

@@ -19,23 +19,23 @@ using System.Text;
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for SUBSCRIBE message from client to broker
+    /// Class for SUBSCRIBE packet from client to broker. See section 3.22.
     /// </summary>
-    internal class MqttMsgSubscribe : MqttMsgBase {
+    internal class SubscribePacket : ControlPacketBase {
 
         public string Topic { get; private set; }
 
         public QosLevel QosLevel { get; private set; }
 
-        internal MqttMsgSubscribe() {
-            Type = MessageType.Subscribe;
+        internal SubscribePacket() {
+            Type = PacketTypes.Subscribe;
         }
 
-        public MqttMsgSubscribe(string topic, QosLevel qosLevel) : this() {
+        public SubscribePacket(string topic, QosLevel qosLevel) : this() {
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
             if (Encoding.UTF8.GetByteCount(topic) > 65535) { throw new ArgumentException("Topic is too long. Maximum length is 65535."); }
 
-            MessageId = GetNewMessageId();
+            PacketId = GetNewPacketId();
             Topic = topic;
             QosLevel = qosLevel;
         }
@@ -55,8 +55,8 @@ namespace Tevux.Protocols.Mqtt {
 
             // Variable header section.
             var variableHeaderBytes = new byte[2];
-            variableHeaderBytes[0] = (byte)(MessageId >> 8);
-            variableHeaderBytes[1] = (byte)(MessageId & 0xFF);
+            variableHeaderBytes[0] = (byte)(PacketId >> 8);
+            variableHeaderBytes[1] = (byte)(PacketId & 0xFF);
 
             // Now we have all the sizes, so we can calculate fixed header size.
             var remainingLength = variableHeaderBytes.Length + payloadBytes.Length;
@@ -73,7 +73,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public override string ToString() {
-            return GetTraceString("SUBSCRIBE", new object[] { "messageId", "topic", "qosLevel" }, new object[] { MessageId, Topic, QosLevel });
+            return GetTraceString("SUBSCRIBE", new object[] { "packetId", "topic", "qosLevel" }, new object[] { PacketId, Topic, QosLevel });
         }
     }
 }

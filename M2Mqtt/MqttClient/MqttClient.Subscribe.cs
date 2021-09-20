@@ -21,11 +21,11 @@ namespace Tevux.Protocols.Mqtt {
         public ushort Subscribe(string topic, QosLevel qosLevel) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
-            var subscribePacket = new MqttMsgSubscribe(topic, qosLevel);
+            var subscribePacket = new SubscribePacket(topic, qosLevel);
 
             _subscribeStateMachine.Subscribe(subscribePacket);
 
-            return subscribePacket.MessageId;
+            return subscribePacket.PacketId;
         }
     }
 }

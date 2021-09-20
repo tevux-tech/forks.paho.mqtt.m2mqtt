@@ -16,11 +16,11 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for UNSUBACK message from broker to client. See section 3.11.
+    /// Class for UNSUBACK packet from broker to client. See section 3.11.
     /// </summary>
-    internal class MqttMsgUnsuback : MqttMsgBase {
-        public MqttMsgUnsuback() {
-            Type = MessageType.UnsubAck;
+    internal class UnsubackPacket : ControlPacketBase {
+        public UnsubackPacket() {
+            Type = PacketTypes.Unsuback;
         }
 
         public override byte[] GetBytes() {
@@ -28,18 +28,18 @@ namespace Tevux.Protocols.Mqtt {
             return new byte[0];
         }
 
-        public static bool TryParse(byte[] variableHeaderBytes, out MqttMsgUnsuback parsedMessage) {
+        public static bool TryParse(byte[] variableHeaderBytes, out UnsubackPacket parsedPacket) {
             var isOk = true;
-            parsedMessage = new MqttMsgUnsuback();
+            parsedPacket = new UnsubackPacket();
 
             // Bytes 1-2: Packet Identifier. Can be anything.
-            parsedMessage.MessageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            parsedPacket.PacketId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
 
             return isOk;
         }
 
         public override string ToString() {
-            return GetTraceString("UNSUBACK", new object[] { "messageId" }, new object[] { MessageId });
+            return GetTraceString("UNSUBACK", new object[] { "packetId" }, new object[] { PacketId });
         }
     }
 }

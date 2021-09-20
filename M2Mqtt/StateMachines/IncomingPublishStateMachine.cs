@@ -6,117 +6,117 @@ namespace Tevux.Protocols.Mqtt {
         private MqttClient _client;
         private readonly ConcurrentQueue _tempList = new ConcurrentQueue();
 
-        private readonly Hashtable _messagesQoS1PubAck = new Hashtable();
-        private readonly Hashtable _messagesQoS2PubRec = new Hashtable();
-        private readonly Hashtable _messagesQoS2PubComp = new Hashtable();
+        private readonly Hashtable _packetsQoS1PubAck = new Hashtable();
+        private readonly Hashtable _packetQoS2PubRec = new Hashtable();
+        private readonly Hashtable _packetQoS2PubComp = new Hashtable();
 
         public void Initialize(MqttClient client) {
             _client = client;
         }
 
         public void Tick() {
-            ResendAndClean(_messagesQoS1PubAck);
-            ResendAndClean(_messagesQoS2PubRec);
-            ResendAndClean(_messagesQoS2PubComp);
+            ResendAndClean(_packetsQoS1PubAck);
+            ResendAndClean(_packetQoS2PubRec);
+            ResendAndClean(_packetQoS2PubComp);
         }
 
-        public void ProcessMessage(MqttMsgPublish message) {
-            Trace.WriteLine(TraceLevel.Frame, $"                     {message.MessageId.ToString("X4")} <-Publis ");
+        public void ProcessPacket(PublishPacket packet) {
+            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId.ToString("X4")} <-Publis ");
 
             var currentTime = Helpers.GetCurrentTime();
 
-            if (message.QosLevel == QosLevel.AtMostOnce) {
-                // Those are the best messages - just sending no responses!
-                NotifyPublishReceived(message);
+            if (packet.QosLevel == QosLevel.AtMostOnce) {
+                // Those are the best packets - just sending no responses!
+                NotifyPublishReceived(packet);
 
             }
 
 #warning Should I check here for duplicate incoming messages? Which may already be in the pipeline?
-            else if (message.QosLevel == QosLevel.AtLeastOnce) {
-                var pubAckMessage = new MqttMsgPuback(message.MessageId);
-                lock (_messagesQoS1PubAck.SyncRoot) {
-                    _messagesQoS1PubAck.Add(message.MessageId, new MqttMsgContext() { Message = pubAckMessage, Attempt = 1, Timestamp = currentTime });
+            else if (packet.QosLevel == QosLevel.AtLeastOnce) {
+                var pubAckPacket = new PubackPacket(packet.PacketId);
+                lock (_packetsQoS1PubAck.SyncRoot) {
+                    _packetsQoS1PubAck.Add(packet.PacketId, new RetransmissionContext() { Packet = pubAckPacket, Attempt = 1, Timestamp = currentTime });
                 }
-                _client.Send(pubAckMessage.GetBytes());
-                Trace.WriteLine(TraceLevel.Frame, $"            PubAck-> {pubAckMessage.MessageId.ToString("X4")}");
+                _client.Send(pubAckPacket.GetBytes());
+                Trace.WriteLine(TraceLevel.Frame, $"            PubAck-> {pubAckPacket.PacketId.ToString("X4")}");
             }
-            else if (message.QosLevel == QosLevel.ExactlyOnce) {
-                var pubRecMessage = new MqttMsgPubrec(message.MessageId);
-                lock (_messagesQoS2PubRec.SyncRoot) {
-                    _messagesQoS2PubRec.Add(message.MessageId, new MqttMsgContext() { Message = pubRecMessage, Attempt = 1, Timestamp = currentTime });
+            else if (packet.QosLevel == QosLevel.ExactlyOnce) {
+                var pubRecPacket = new PubrecPacket(packet.PacketId);
+                lock (_packetQoS2PubRec.SyncRoot) {
+                    _packetQoS2PubRec.Add(packet.PacketId, new RetransmissionContext() { Packet = pubRecPacket, Attempt = 1, Timestamp = currentTime });
                 }
-                _client.Send(pubRecMessage.GetBytes());
-                Trace.WriteLine(TraceLevel.Frame, $"            PubRec-> {pubRecMessage.MessageId.ToString("X4")}");
+                _client.Send(pubRecPacket.GetBytes());
+                Trace.WriteLine(TraceLevel.Frame, $"            PubRec-> {pubRecPacket.PacketId.ToString("X4")}");
             }
         }
 
-        public void ProcessMessage(MqttMsgPubrel message) {
+        public void ProcessPacket(PubrelPacket packet) {
             var currentTime = Helpers.GetCurrentTime();
-            Trace.WriteLine(TraceLevel.Frame, $"                     {message.MessageId.ToString("X4")} <-PubRel");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId.ToString("X4")} <-PubRel");
 
             var isOk = true;
 
-            lock (_messagesQoS2PubRec.SyncRoot) {
-                if (_messagesQoS2PubRec.Contains(message.MessageId)) {
+            lock (_packetQoS2PubRec.SyncRoot) {
+                if (_packetQoS2PubRec.Contains(packet.PacketId)) {
                     // var originalMessage = (MqttMsgPublish)_messagesWaitingForQoS2Pubrel[message.MessageId];
-                    _messagesQoS2PubRec.Remove(message.MessageId);
+                    _packetQoS2PubRec.Remove(packet.PacketId);
 
 #warning need to extract original publish message here
                     // NotifyPublishReceived(message);
                 }
                 else {
                     isOk = false;
-                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue PubRel message for MessageId {message.MessageId.ToString("X4")}");
-                    NotifyRogueMessageReceived(message.MessageId);
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue PubRel packet for PacketId {packet.PacketId.ToString("X4")}");
+                    NotifyRoguePacketReceived(packet.PacketId);
                 }
             }
 
             if (isOk) {
-                var pubcompMessage = new MqttMsgPubcomp(message.MessageId);
+                var pubcompPacket = new PubcompPacket(packet.PacketId);
 #warning server may ask resend PubRel if for some reason this PubComp is lost. Need to handle that, too.
 
-                _client.Send(pubcompMessage);
-                Trace.WriteLine(TraceLevel.Frame, $"            PubCom-> {message.MessageId.ToString("X4")}");
+                _client.Send(pubcompPacket);
+                Trace.WriteLine(TraceLevel.Frame, $"            PubCom-> {packet.PacketId.ToString("X4")}");
             }
         }
 
-        private void ResendAndClean(Hashtable messageTable) {
+        private void ResendAndClean(Hashtable packetTable) {
             var currentTime = Helpers.GetCurrentTime();
 
-            lock (messageTable.SyncRoot) {
-                foreach (DictionaryEntry item in messageTable) {
-                    var queuedItem = (MqttMsgContext)item.Value;
+            lock (packetTable.SyncRoot) {
+                foreach (DictionaryEntry item in packetTable) {
+                    var queuedItem = (RetransmissionContext)item.Value;
 
                     if (currentTime - queuedItem.Timestamp > _client.DelayOnRetry) {
-                        _client.Send(queuedItem.Message);
+                        _client.Send(queuedItem.Packet);
                         queuedItem.Attempt++;
                     }
 
                     if (queuedItem.Attempt > _client.RetryAttemps) {
                         _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"            Message {queuedItem.Message.MessageId} could no be sent, even after retries.");
-                        NotifyPublishFailed(queuedItem.Message.MessageId);
+                        Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could no be sent, even after retries.");
+                        NotifyPublishFailed(queuedItem.Packet.PacketId);
                     }
                 }
             }
 
 
             while (_tempList.TryDequeue(out var item)) {
-                Trace.WriteLine(TraceLevel.Queuing, $"            Cleaning unacknowledged message {item}.");
-                lock (messageTable.SyncRoot) {
-                    messageTable.Remove(item);
+                Trace.WriteLine(TraceLevel.Queuing, $"            Cleaning unacknowledged packet {item}.");
+                lock (packetTable.SyncRoot) {
+                    packetTable.Remove(item);
                 }
             }
         }
 
 #warning of course, that's not the place to raise events.
-        private void NotifyPublishReceived(MqttMsgPublish message) {
-            _client.OnMqttMsgPublishReceived(message);
+        private void NotifyPublishReceived(PublishPacket packet) {
+            _client.OnMqttMsgPublishReceived(packet);
         }
-        private void NotifyPublishFailed(ushort messageId) {
+        private void NotifyPublishFailed(ushort packetId) {
             // _client.OnMqttMsgPublished(messageId, false);
         }
-        private void NotifyRogueMessageReceived(ushort messageId) { }
+        private void NotifyRoguePacketReceived(ushort packetId) { }
 
     }
 }

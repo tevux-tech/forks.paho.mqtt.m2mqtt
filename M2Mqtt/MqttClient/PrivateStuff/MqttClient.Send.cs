@@ -26,7 +26,7 @@ namespace Tevux.Protocols.Mqtt {
 
         }
 
-        internal void Send(MqttMsgBase msg) {
+        internal void Send(ControlPacketBase msg) {
             Send(msg.GetBytes());
         }
     }

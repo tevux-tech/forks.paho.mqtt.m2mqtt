@@ -20,11 +20,11 @@ namespace Tevux.Protocols.Mqtt {
     public delegate void PublishedEventHandler(object sender, PublishFinishedEventArgs e);
 
     public class PublishFinishedEventArgs : EventArgs {
-        public ushort MessageId { get; private set; }
+        public ushort PacketId { get; private set; }
         public bool IsPublished { get; private set; }
 
-        internal PublishFinishedEventArgs(ushort messageId, bool isPublished) {
-            MessageId = messageId;
+        internal PublishFinishedEventArgs(ushort packetId, bool isPublished) {
+            PacketId = packetId;
             IsPublished = isPublished;
         }
     }

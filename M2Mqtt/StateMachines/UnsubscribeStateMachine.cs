@@ -3,7 +3,7 @@ using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class UnsubscribeStateMachine {
-        private ArrayList _unacknowledgedMessages = new ArrayList();
+        private ArrayList _unacknowledgedPackets = new ArrayList();
         private double _lastAck;
         private MqttClient _client;
 
@@ -17,46 +17,46 @@ namespace Tevux.Protocols.Mqtt {
             var currentTime = Helpers.GetCurrentTime();
 
             if (currentTime - _lastAck > _client.DelayOnRetry) {
-                if (_unacknowledgedMessages.Count > 0) {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Unsubscribe message.");
+                if (_unacknowledgedPackets.Count > 0) {
+                    Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Unsubscribe packet.");
 #warning Server did not acknowledged all unsubscribe messages. Is this a protocol violation?..
-                    lock (_unacknowledgedMessages.SyncRoot) {
-                        _unacknowledgedMessages.Clear();
+                    lock (_unacknowledgedPackets.SyncRoot) {
+                        _unacknowledgedPackets.Clear();
                     }
                 }
             }
         }
 
-        public void Unsubscribe(MqttMsgUnsubscribe message) {
-            lock (_unacknowledgedMessages.SyncRoot) {
-                _unacknowledgedMessages.Add(message);
+        public void Unsubscribe(UnsubscribePacket packet) {
+            lock (_unacknowledgedPackets.SyncRoot) {
+                _unacknowledgedPackets.Add(packet);
             }
 
-            _client.Send(message);
-            Trace.WriteLine(TraceLevel.Frame, $"                                        UnsubA-> {message.MessageId.ToString("X4")}");
+            _client.Send(packet);
+            Trace.WriteLine(TraceLevel.Frame, $"                                        UnsubA-> {packet.PacketId.ToString("X4")}");
         }
 
-        public void ProcessMessage(MqttMsgUnsuback message) {
-            Trace.WriteLine(TraceLevel.Frame, $"                                                 {message.MessageId.ToString("X4")} <-Unsubs");
+        public void ProcessPacket(UnsubackPacket packet) {
+            Trace.WriteLine(TraceLevel.Frame, $"                                                 {packet.PacketId.ToString("X4")} <-Unsubs");
 
             _lastAck = Helpers.GetCurrentTime();
 
-            lock (_unacknowledgedMessages.SyncRoot) {
-                MqttMsgUnsubscribe foundMessage = null;
-                foreach (MqttMsgUnsubscribe unsubscribeMessage in _unacknowledgedMessages) {
-                    if (unsubscribeMessage.MessageId == message.MessageId) {
-                        foundMessage = unsubscribeMessage;
+            lock (_unacknowledgedPackets.SyncRoot) {
+                UnsubscribePacket foundPacket = null;
+                foreach (UnsubscribePacket unsubscribePacket in _unacknowledgedPackets) {
+                    if (unsubscribePacket.PacketId == packet.PacketId) {
+                        foundPacket = unsubscribePacket;
                         break;
                     }
                 }
 
-                if (foundMessage != null) {
-                    _unacknowledgedMessages.Remove(foundMessage);
+                if (foundPacket != null) {
+                    _unacknowledgedPackets.Remove(foundPacket);
 #warning of course, that's not the place to raise events.
-                    _client.OnMqttMsgUnsubscribed(message.MessageId);
+                    _client.OnMqttMsgUnsubscribed(packet.PacketId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Rogue UnsubAck message for MessageId {message.MessageId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"Rogue UnsubAck packet for PacketId {packet.PacketId.ToString("X4")}");
 #warning Rogue UnsubAck message?..
                 }
             }

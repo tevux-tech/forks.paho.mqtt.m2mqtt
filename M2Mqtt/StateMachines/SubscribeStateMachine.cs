@@ -4,7 +4,7 @@ using Tevux.Protocols.Mqtt.Utility;
 namespace Tevux.Protocols.Mqtt {
     internal class SubscribeStateMachine {
         private MqttClient _client;
-        private Hashtable _messagesWaitingForAck = new Hashtable();
+        private Hashtable _packetsWaitingForAck = new Hashtable();
         private ConcurrentQueue _tempList = new ConcurrentQueue();
 
         public void Initialize(MqttClient client) {
@@ -14,58 +14,58 @@ namespace Tevux.Protocols.Mqtt {
         public void Tick() {
             var currentTime = Helpers.GetCurrentTime();
 
-            lock (_messagesWaitingForAck.SyncRoot) {
-                foreach (DictionaryEntry item in _messagesWaitingForAck) {
-                    var message = (MqttMsgContext)item.Value;
+            lock (_packetsWaitingForAck.SyncRoot) {
+                foreach (DictionaryEntry item in _packetsWaitingForAck) {
+                    var packet = (RetransmissionContext)item.Value;
 
-                    if (currentTime - message.Timestamp > _client.DelayOnRetry) {
-                        _client.Send(message.Message);
-                        message.Attempt++;
+                    if (currentTime - packet.Timestamp > _client.DelayOnRetry) {
+                        _client.Send(packet.Packet);
+                        packet.Attempt++;
                     }
 
-                    if (message.Attempt >= _client.RetryAttemps) {
+                    if (packet.Attempt >= _client.RetryAttemps) {
                         _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"                                Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
+                        Trace.WriteLine(TraceLevel.Queuing, $"                                Subscribe packet {packet.Packet.PacketId} could no be sent, even after retries.");
                     }
                 }
             }
 
-            var areThereMessageToRemove = true;
-            while (areThereMessageToRemove) {
+            var areTherePacketsToRemove = true;
+            while (areTherePacketsToRemove) {
                 if (_tempList.TryDequeue(out var item)) {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                                        Cleaning unacknowledged Subscribe message {item.ToString()}.");
-                    lock (_messagesWaitingForAck.SyncRoot) {
-                        _messagesWaitingForAck.Remove(item);
+                    Trace.WriteLine(TraceLevel.Queuing, $"                                        Cleaning unacknowledged Subscribe packet {item.ToString()}.");
+                    lock (_packetsWaitingForAck.SyncRoot) {
+                        _packetsWaitingForAck.Remove(item);
                     }
                 }
                 else {
-                    areThereMessageToRemove = false;
+                    areTherePacketsToRemove = false;
                 }
             }
         }
 
-        public void Subscribe(MqttMsgSubscribe message) {
+        public void Subscribe(SubscribePacket packet) {
             var currentTime = Helpers.GetCurrentTime();
 
-            lock (_messagesWaitingForAck.SyncRoot) {
-                _messagesWaitingForAck.Add(message.MessageId, new MqttMsgContext() { Message = message, Attempt = 1, Timestamp = currentTime });
+            lock (_packetsWaitingForAck.SyncRoot) {
+                _packetsWaitingForAck.Add(packet.PacketId, new RetransmissionContext() { Packet = packet, Attempt = 1, Timestamp = currentTime });
             }
 
-            _client.Send(message);
-            Trace.WriteLine(TraceLevel.Frame, $"                                        Subscr-> {message.MessageId.ToString("X4")}");
+            _client.Send(packet);
+            Trace.WriteLine(TraceLevel.Frame, $"                                        Subscr-> {packet.PacketId.ToString("X4")}");
         }
 
-        public void ProcessMessage(MqttMsgSuback message) {
-            Trace.WriteLine(TraceLevel.Frame, $"                                                 {message.MessageId.ToString("X4")} <-SubAck");
+        public void ProcessPacket(SubackPacket packet) {
+            Trace.WriteLine(TraceLevel.Frame, $"                                                 {packet.PacketId.ToString("X4")} <-SubAck");
 
-            lock (_messagesWaitingForAck.SyncRoot) {
-                if (_messagesWaitingForAck.Contains(message.MessageId)) {
-                    _messagesWaitingForAck.Remove(message.MessageId);
+            lock (_packetsWaitingForAck.SyncRoot) {
+                if (_packetsWaitingForAck.Contains(packet.PacketId)) {
+                    _packetsWaitingForAck.Remove(packet.PacketId);
 #warning of course, that's not the place to raise events.
-                    _client.OnMqttMsgSubscribed(message);
+                    _client.OnMqttMsgSubscribed(packet);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                                Rogue SubAck message for MessageId {message.MessageId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                                Rogue SubAck packet for PacketId {packet.PacketId.ToString("X4")}");
 #warning Rogue SubAck message, what do I do now?..
                 }
             }

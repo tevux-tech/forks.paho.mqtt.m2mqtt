@@ -16,9 +16,9 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for CONNACK message from broker to client. See section 3.2.
+    /// Class for CONNACK packet from broker to client. See section 3.2.
     /// </summary>
-    internal class MqttMsgConnack : MqttMsgBase {
+    internal class ConnackPacket : ControlPacketBase {
 
         public enum ReturnCodes : byte {
             Accepted = 0x00,
@@ -32,8 +32,8 @@ namespace Tevux.Protocols.Mqtt {
         public bool SessionPresent { get; private set; }
         public ReturnCodes ReturnCode { get; private set; }
 
-        public MqttMsgConnack() {
-            Type = MessageType.ConAck;
+        public ConnackPacket() {
+            Type = PacketTypes.Conack;
         }
 
         public override byte[] GetBytes() {
@@ -41,17 +41,17 @@ namespace Tevux.Protocols.Mqtt {
             return new byte[0];
         }
 
-        public static bool TryParse(byte[] variableHeader, out MqttMsgConnack parsedMessage) {
+        public static bool TryParse(byte[] variableHeader, out ConnackPacket parsedPacket) {
             var isOk = true;
 
-            parsedMessage = new MqttMsgConnack();
+            parsedPacket = new ConnackPacket();
 
             // Byte 1: ConAck flags.
             if (variableHeader[0] == 0) {
-                parsedMessage.SessionPresent = false;
+                parsedPacket.SessionPresent = false;
             }
             else if (variableHeader[0] == 1) {
-                parsedMessage.SessionPresent = true;
+                parsedPacket.SessionPresent = true;
             }
             else {
                 // That's a protocol violation. 
@@ -60,7 +60,7 @@ namespace Tevux.Protocols.Mqtt {
 
             // Byte 2: Return code.
             if (variableHeader[1] < 6) {
-                parsedMessage.ReturnCode = (ReturnCodes)variableHeader[1];
+                parsedPacket.ReturnCode = (ReturnCodes)variableHeader[1];
             }
             else {
                 // That's a protocol violation. 

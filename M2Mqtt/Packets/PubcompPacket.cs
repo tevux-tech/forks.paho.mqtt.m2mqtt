@@ -16,39 +16,39 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for PUBACK message from broker to client. See section 3.4.
+    /// Class for PUBCOMP packet from broker to client. See section 3.7.
     /// </summary>
-    internal class MqttMsgPuback : MqttMsgBase {
-        public MqttMsgPuback(ushort messageId) {
-            Type = MessageType.PubAck;
-            MessageId = messageId;
+    internal class PubcompPacket : ControlPacketBase {
+        public PubcompPacket(ushort packetId) {
+            Type = PacketTypes.Pubcomp;
+            PacketId = packetId;
         }
 
         public override byte[] GetBytes() {
-            // PubAck packet is always 4 bytes long.
+            // Pubcomp packet is always 4 bytes long.
             var buffer = new byte[4];
 
             // Fixed header is fixed, no variables here.
-            buffer[0] = (byte)(Type << 4); ;
+            buffer[0] = (byte)(Type << 4);
             buffer[1] = 2;
 
             // Variable header is always two bytes - packet ID.
-            buffer[2] = (byte)(MessageId >> 8);
-            buffer[3] = (byte)(MessageId & 0xFF);
+            buffer[2] = (byte)(PacketId >> 8);
+            buffer[3] = (byte)(PacketId & 0xFF);
 
             return buffer;
         }
 
-        public static bool TryParse(byte[] variableHeaderBytes, out MqttMsgPuback parsedMessage) {
+        public static bool TryParse(byte[] variableHeaderBytes, out PubcompPacket parsedPacket) {
             // Bytes 1-2: Packet Identifier. Can be anything.
-            var messageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
-            parsedMessage = new MqttMsgPuback(messageId);
+            var packetId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            parsedPacket = new PubcompPacket(packetId);
 
             return true;
         }
 
         public override string ToString() {
-            return GetTraceString("PUBACK", new object[] { "messageId" }, new object[] { MessageId });
+            return GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { PacketId });
         }
     }
 }

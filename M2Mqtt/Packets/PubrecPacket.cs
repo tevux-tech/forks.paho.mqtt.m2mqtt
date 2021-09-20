@@ -16,16 +16,16 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
-    /// Class for PUBCOMP message from broker to client. See section 3.7.
+    /// Class for PUBREC packet from broker to client. See section 3.5.
     /// </summary>
-    internal class MqttMsgPubcomp : MqttMsgBase {
-        public MqttMsgPubcomp(ushort messageId) {
-            Type = MessageType.PubComp;
-            MessageId = messageId;
+    internal class PubrecPacket : ControlPacketBase {
+        public PubrecPacket(ushort packetId) {
+            Type = PacketTypes.Pubrec;
+            PacketId = packetId;
         }
 
         public override byte[] GetBytes() {
-            // PubComp packet is always 4 bytes long.
+            // Pubrec packet is always 4 bytes long.
             var buffer = new byte[4];
 
             // Fixed header is fixed, no variables here.
@@ -33,22 +33,22 @@ namespace Tevux.Protocols.Mqtt {
             buffer[1] = 2;
 
             // Variable header is always two bytes - packet ID.
-            buffer[2] = (byte)(MessageId >> 8);
-            buffer[3] = (byte)(MessageId & 0xFF);
+            buffer[2] = (byte)(PacketId >> 8);
+            buffer[3] = (byte)(PacketId & 0xFF);
 
             return buffer;
         }
 
-        public static bool TryParse(byte[] variableHeaderBytes, out MqttMsgPubcomp parsedMessage) {
+        public static bool TryParse(byte[] variableHeaderBytes, out PubrecPacket parsedPacket) {
             // Bytes 1-2: Packet Identifier. Can be anything.
-            var messageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
-            parsedMessage = new MqttMsgPubcomp(messageId);
+            var packetId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            parsedPacket = new PubrecPacket(packetId);
 
             return true;
         }
 
         public override string ToString() {
-            return GetTraceString("PUBCOMP", new object[] { "messageId" }, new object[] { MessageId });
+            return GetTraceString("PUBREC", new object[] { "packetId" }, new object[] { PacketId });
         }
     }
 }

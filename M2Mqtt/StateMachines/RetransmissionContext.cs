@@ -15,8 +15,8 @@ Contributors:
 */
 
 namespace Tevux.Protocols.Mqtt {
-    internal class MqttMsgContext {
-        public MqttMsgBase Message { get; set; }
+    internal class RetransmissionContext {
+        public ControlPacketBase Packet { get; set; }
 
         /// <summary>
         /// Timestamp in ticks (for retry)
