@@ -20,12 +20,12 @@ namespace Tevux.Protocols.Mqtt {
     public delegate void SubscribedEventHandler(object sender, SubscribedEventArgs e);
 
     public class SubscribedEventArgs : EventArgs {
-        public ushort PacketId { get; private set; }
-        public GrantedQosLevel[] GrantedQosLevels { get; private set; }
+        public string Topic { get; private set; }
+        public GrantedQosLevel GrantedQosLevel { get; private set; }
 
-        internal SubscribedEventArgs(ushort packetId, GrantedQosLevel[] grantedQosLevels) {
-            PacketId = packetId;
-            GrantedQosLevels = grantedQosLevels;
+        internal SubscribedEventArgs(string topic, GrantedQosLevel grantedQosLevel) {
+            Topic = topic;
+            GrantedQosLevel = grantedQosLevel;
         }
     }
 }

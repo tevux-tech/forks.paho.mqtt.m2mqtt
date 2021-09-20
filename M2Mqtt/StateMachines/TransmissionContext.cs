@@ -15,7 +15,7 @@ Contributors:
 */
 
 namespace Tevux.Protocols.Mqtt {
-    internal class RetransmissionContext {
+    internal class TransmissionContext {
         public ControlPacketBase Packet { get; set; }
 
         /// <summary>
@@ -26,6 +26,10 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Attempt (for retry)
         /// </summary>
-        public int Attempt { get; set; }
+        public int AttemptNumber { get; set; }
+
+        public bool IsFinished { get; set; }
+        public bool IsSucceeded { get; set; }
+        public ushort PacketId { get { return Packet.PacketId; } }
     }
 }

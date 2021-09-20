@@ -21,12 +21,14 @@ namespace TestApp {
             var client = new MqttClient();
             client.Initialize();
             client.PublishReceived += HandlePublishReceived;
+            client.Subscribed += HandleSubscribed;
 
             var networkOptions = new ChannelConnectionOptions();
             networkOptions.SetHostname("172.16.0.2");
 
             var brokerOptions = new MqttConnectionOptions();
             brokerOptions.SetClientId("TestApp");
+            brokerOptions.SetRetransmissionParameters(3, 3);
 
             client.Connect(networkOptions, brokerOptions);
 
@@ -47,6 +49,13 @@ namespace TestApp {
 
             // client.Disconnect();
         }
+
+        private void HandleSubscribed(object sender, SubscribedEventArgs e) {
+            Console.WriteLine($"Subscribed: {e.Topic}:{e.GrantedQosLevel}");
+            Thread.Sleep(5000);
+            Console.WriteLine("Onomnom");
+        }
+
         private void HandlePublishReceived(object sender, PublishReceivedEventArgs e) {
 
         }

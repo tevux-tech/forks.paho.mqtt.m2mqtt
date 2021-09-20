@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
@@ -35,7 +35,7 @@ namespace Tevux.Protocols.Mqtt {
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 var pubAckPacket = new PubackPacket(packet.PacketId);
                 lock (_packetsQoS1PubAck.SyncRoot) {
-                    _packetsQoS1PubAck.Add(packet.PacketId, new RetransmissionContext() { Packet = pubAckPacket, Attempt = 1, Timestamp = currentTime });
+                    _packetsQoS1PubAck.Add(packet.PacketId, new TransmissionContext() { Packet = pubAckPacket, AttemptNumber = 1, Timestamp = currentTime });
                 }
                 _client.Send(pubAckPacket.GetBytes());
                 Trace.WriteLine(TraceLevel.Frame, $"            PubAck-> {pubAckPacket.PacketId:X4}");
@@ -43,7 +43,7 @@ namespace Tevux.Protocols.Mqtt {
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
                 lock (_packetQoS2PubRec.SyncRoot) {
-                    _packetQoS2PubRec.Add(packet.PacketId, new RetransmissionContext() { Packet = pubRecPacket, Attempt = 1, Timestamp = currentTime });
+                    _packetQoS2PubRec.Add(packet.PacketId, new TransmissionContext() { Packet = pubRecPacket, AttemptNumber = 1, Timestamp = currentTime });
                 }
                 _client.Send(pubRecPacket.GetBytes());
                 Trace.WriteLine(TraceLevel.Frame, $"            PubRec-> {pubRecPacket.PacketId:X4}");
@@ -85,14 +85,14 @@ namespace Tevux.Protocols.Mqtt {
 
             lock (packetTable.SyncRoot) {
                 foreach (DictionaryEntry item in packetTable) {
-                    var queuedItem = (RetransmissionContext)item.Value;
+                    var queuedItem = (TransmissionContext)item.Value;
 
                     if (currentTime - queuedItem.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         _client.Send(queuedItem.Packet);
-                        queuedItem.Attempt++;
+                        queuedItem.AttemptNumber++;
                     }
 
-                    if (queuedItem.Attempt > _client.ConnectionOptions.MaxRetryCount) {
+                    if (queuedItem.AttemptNumber > _client.ConnectionOptions.MaxRetryCount) {
                         _tempList.Enqueue(item.Key);
                         Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could no be sent, even after retries.");
                         NotifyPublishFailed(queuedItem.Packet.PacketId);
@@ -114,7 +114,7 @@ namespace Tevux.Protocols.Mqtt {
             _client.OnMqttMsgPublishReceived(packet);
         }
         private void NotifyPublishFailed(ushort packetId) {
-            // _client.OnMqttMsgPublished(messageId, false);
+            // _client.OnMqttMsgPublished(packet, false);
         }
         private void NotifyRoguePacketReceived(ushort packetId) { }
 

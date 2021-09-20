@@ -15,6 +15,7 @@ Contributors:
 */
 
 using System;
+using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
@@ -39,8 +40,8 @@ namespace Tevux.Protocols.Mqtt {
         /// Wrapper method for raising subscribed topic event
         /// </summary>
         /// <param name="suback">SUBACK packet received</param>
-        internal void OnMqttMsgSubscribed(SubackPacket suback) {
-            Subscribed?.Invoke(this, new SubscribedEventArgs(suback.PacketId, suback.GrantedQosLevels));
+        internal void OnMqttMsgSubscribed(string topic, GrantedQosLevel grantedQosLevel) {
+            new Thread(() => Subscribed?.Invoke(this, new SubscribedEventArgs(topic, grantedQosLevel))).Start();
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
@@ -28,12 +28,12 @@ namespace Tevux.Protocols.Mqtt {
             }
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 lock (_packetsWaitingForQoS1PubAck.SyncRoot) {
-                    _packetsWaitingForQoS1PubAck.Add(packet.PacketId, new RetransmissionContext() { Packet = packet, Attempt = 1, Timestamp = currentTime });
+                    _packetsWaitingForQoS1PubAck.Add(packet.PacketId, new TransmissionContext() { Packet = packet, AttemptNumber = 1, Timestamp = currentTime });
                 }
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 lock (_packetsWaitingForQoS2Pubrec.SyncRoot) {
-                    _packetsWaitingForQoS2Pubrec.Add(packet.PacketId, new RetransmissionContext() { Packet = packet, Attempt = 1, Timestamp = currentTime });
+                    _packetsWaitingForQoS2Pubrec.Add(packet.PacketId, new TransmissionContext() { Packet = packet, AttemptNumber = 1, Timestamp = currentTime });
                 }
             }
 
@@ -76,7 +76,7 @@ namespace Tevux.Protocols.Mqtt {
 
             if (isOk) {
                 var pubrelPacket = new PubrelPacket(packet.PacketId);
-                var pubrelContext = new RetransmissionContext() { Packet = pubrelPacket, Attempt = 1, Timestamp = currentTime };
+                var pubrelContext = new TransmissionContext() { Packet = pubrelPacket, AttemptNumber = 1, Timestamp = currentTime };
                 lock (_packetsWaitingForQoS2Pubcomp.SyncRoot) {
                     _packetsWaitingForQoS2Pubcomp.Add(packet.PacketId, pubrelContext);
                 }
@@ -106,14 +106,14 @@ namespace Tevux.Protocols.Mqtt {
 
             lock (packetTable.SyncRoot) {
                 foreach (DictionaryEntry item in packetTable) {
-                    var queuedItem = (RetransmissionContext)item.Value;
+                    var queuedItem = (TransmissionContext)item.Value;
 
                     if (currentTime - queuedItem.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         _client.Send(queuedItem.Packet);
-                        queuedItem.Attempt++;
+                        queuedItem.AttemptNumber++;
                     }
 
-                    if (queuedItem.Attempt > _client.ConnectionOptions.MaxRetryCount) {
+                    if (queuedItem.AttemptNumber > _client.ConnectionOptions.MaxRetryCount) {
                         _tempList.Enqueue(item.Key);
                         Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could no be sent, even after retries.");
                         NotifyPublishFailed(queuedItem.Packet.PacketId);

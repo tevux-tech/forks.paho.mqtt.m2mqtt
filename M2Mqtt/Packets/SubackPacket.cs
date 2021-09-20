@@ -19,7 +19,7 @@ namespace Tevux.Protocols.Mqtt {
     /// Class for SUBACK packet from broker to client. See section 3.9.
     /// </summary>
     internal class SubackPacket : ControlPacketBase {
-        public GrantedQosLevel[] GrantedQosLevels { get; private set; }
+        public GrantedQosLevel GrantedQosLevel { get; private set; }
 
         public SubackPacket() {
             Type = PacketTypes.Suback;
@@ -37,28 +37,26 @@ namespace Tevux.Protocols.Mqtt {
             // Bytes 1-2: Packet Identifier. Can be anything.
             parsedPacket.PacketId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
 
-            // Remaining bytes: QoS levels granted.
-            parsedPacket.GrantedQosLevels = new GrantedQosLevel[payloadBytes.Length];
-            for (var i = 0; i < payloadBytes.Length; i++) {
-                if ((payloadBytes[i] & 0x80) == 0x80) {
-                    // QoS was not granted for that topic, but that's a valid payload.
-                    parsedPacket.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
-                }
-                else if ((payloadBytes[i] & 0x03) < 0x03) {
-                    // QoS was granted.
-                    parsedPacket.GrantedQosLevels[i] = (GrantedQosLevel)payloadBytes[i];
-                }
-                else {
-                    // That's a protocol violation.
-                    isOk = false;
-                }
+            // Remaining bytes: QoS level granted. MQTT supports multiple topics per packet,
+            // but this library simplifies everything to a single topic per packet.
+            if ((payloadBytes[0] & 0x80) == 0x80) {
+                // QoS was not granted for that topic, but that's a valid payload.
+                parsedPacket.GrantedQosLevel = (GrantedQosLevel)payloadBytes[0];
+            }
+            else if ((payloadBytes[0] & 0x03) < 0x03) {
+                // QoS was granted.
+                parsedPacket.GrantedQosLevel = (GrantedQosLevel)payloadBytes[0];
+            }
+            else {
+                // That's a protocol violation.
+                isOk = false;
             }
 
             return isOk;
         }
 
         public override string ToString() {
-            return GetTraceString("SUBACK", new object[] { "packetId", "grantedQosLevels" }, new object[] { PacketId, GrantedQosLevels });
+            return GetTraceString("SUBACK", new object[] { "packetId", "grantedQosLevel" }, new object[] { PacketId, GrantedQosLevel });
         }
     }
 }

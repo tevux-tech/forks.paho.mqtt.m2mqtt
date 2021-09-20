@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
@@ -7,8 +7,6 @@ namespace Tevux.Protocols.Mqtt {
         private ArrayList _unacknowledgedPackets = new ArrayList();
         private double _lastAck;
         private MqttClient _client;
-
-        public bool IsServerLost { get; private set; }
 
         public void Initialize(MqttClient client) {
             _client = client;

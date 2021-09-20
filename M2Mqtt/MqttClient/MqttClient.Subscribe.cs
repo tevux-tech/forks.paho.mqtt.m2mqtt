@@ -18,14 +18,20 @@ using System;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        public ushort Subscribe(string topic, QosLevel qosLevel) {
+        public bool SubscribeAndWait(string topic, QosLevel qosLevel) {
+            return InternalSubscribe(topic, qosLevel, true);
+        }
+        public void Subscribe(string topic, QosLevel qosLevel) {
+            InternalSubscribe(topic, qosLevel, false);
+        }
+        private bool InternalSubscribe(string topic, QosLevel qosLevel, bool waitForCompletion = false) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             var subscribePacket = new SubscribePacket(topic, qosLevel);
 
-            _subscribeStateMachine.Subscribe(subscribePacket);
+            var isSubscribed = _subscribeStateMachine.Subscribe(subscribePacket, waitForCompletion);
 
-            return subscribePacket.PacketId;
+            return isSubscribed;
         }
     }
 }
