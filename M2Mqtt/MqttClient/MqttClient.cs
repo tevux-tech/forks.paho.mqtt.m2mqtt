@@ -41,9 +41,6 @@ namespace Tevux.Protocols.Mqtt {
         // channel to communicate over the network
         private IMqttNetworkChannel _channel;
 
-        // current message identifier generated
-        private static ushort _messageIdCounter = 0;
-
         // connection is closing due to peer
         private bool _isConnectionClosing;
 

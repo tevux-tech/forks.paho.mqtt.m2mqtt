@@ -19,8 +19,9 @@ namespace Tevux.Protocols.Mqtt {
     /// Class for PUBCOMP message from broker to client. See section 3.7.
     /// </summary>
     internal class MqttMsgPubcomp : MqttMsgBase {
-        public MqttMsgPubcomp() {
+        public MqttMsgPubcomp(ushort messageId) {
             Type = MessageType.PubComp;
+            MessageId = messageId;
         }
 
         public override byte[] GetBytes() {
@@ -39,13 +40,11 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public static bool TryParse(byte[] variableHeaderBytes, out MqttMsgPubcomp parsedMessage) {
-            var isOk = true;
-            parsedMessage = new MqttMsgPubcomp();
-
             // Bytes 1-2: Packet Identifier. Can be anything.
-            parsedMessage.MessageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            var messageId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            parsedMessage = new MqttMsgPubcomp(messageId);
 
-            return isOk;
+            return true;
         }
 
         public override string ToString() {

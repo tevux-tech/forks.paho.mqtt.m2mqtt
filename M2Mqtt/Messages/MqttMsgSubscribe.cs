@@ -31,9 +31,13 @@ namespace Tevux.Protocols.Mqtt {
             Type = MessageType.Subscribe;
         }
 
-        public MqttMsgSubscribe(string topics, QosLevel qosLevels) : this() {
-            Topic = topics;
-            QosLevel = qosLevels;
+        public MqttMsgSubscribe(string topic, QosLevel qosLevel) : this() {
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
+            if (Encoding.UTF8.GetByteCount(topic) > 65535) { throw new ArgumentException("Topic is too long. Maximum length is 65535."); }
+
+            MessageId = GetNewMessageId();
+            Topic = topic;
+            QosLevel = qosLevel;
         }
 
         public override byte[] GetBytes() {

@@ -32,15 +32,15 @@ namespace Tevux.Protocols.Mqtt {
             Type = MessageType.Publish;
         }
 
-        public MqttMsgPublish(string topic, byte[] message) : this(topic, message, false, QosLevel.AtMostOnce, false) {
-        }
+        public MqttMsgPublish(string topic, byte[] message, QosLevel qosLevel, bool retain) : this() {
+            if ((topic.IndexOf('#') != -1) || (topic.IndexOf('+') != -1)) { throw new ArgumentException("Topic cannot contain wildcards in Publish message"); }
+            if (Encoding.UTF8.GetByteCount(topic) > 65535) { throw new ArgumentException("Topic is too long. Maximum length is 65535."); }
 
-        public MqttMsgPublish(string topic, byte[] message, bool dupFlag, QosLevel qosLevel, bool retain) : base() {
-            Type = MessageType.Publish;
-
+            MessageId = GetNewMessageId();
             Topic = topic;
             Message = message;
-            DupFlag = dupFlag;
+            // DupFlag will be set in the corresponding state machine, when retransmission occurs. This is why it has internal access.
+            // DupFlag = dupFlag;
             QosLevel = qosLevel;
             RetainFlag = retain;
             MessageId = 0;

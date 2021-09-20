@@ -30,8 +30,12 @@ namespace Tevux.Protocols.Mqtt {
             Type = MessageType.Unsubscribe;
         }
 
-        public MqttMsgUnsubscribe(string topicToUnsubscribe) : this() {
-            Topic = topicToUnsubscribe;
+        public MqttMsgUnsubscribe(string topic) : this() {
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
+            if (Encoding.UTF8.GetByteCount(topic) > 65535) { throw new ArgumentException("Topic is too long. Maximum length is 65535."); }
+
+            MessageId = GetNewMessageId();
+            Topic = topic;
         }
 
         public override byte[] GetBytes() {

@@ -20,15 +20,12 @@ namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public ushort Subscribe(string topic, QosLevel qosLevel) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
-            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
 
-            var subscribeMessage = new MqttMsgSubscribe(topic, qosLevel) {
-                MessageId = GetNewMessageId()
-            };
+            var subscribePacket = new MqttMsgSubscribe(topic, qosLevel);
 
-            _subscribeStateMachine.Subscribe(subscribeMessage);
+            _subscribeStateMachine.Subscribe(subscribePacket);
 
-            return subscribeMessage.MessageId;
+            return subscribePacket.MessageId;
         }
     }
 }

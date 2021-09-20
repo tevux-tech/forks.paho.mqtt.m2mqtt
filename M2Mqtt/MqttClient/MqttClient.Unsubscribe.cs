@@ -25,15 +25,12 @@ namespace Tevux.Protocols.Mqtt {
         /// <returns>Message Id in UNSUBACK message from broker</returns>
         public ushort Unsubscribe(string topic) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
-            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
 
-            var unsubscribeMessage = new MqttMsgUnsubscribe(topic) {
-                MessageId = GetNewMessageId()
-            };
+            var unsubscribePacket = new MqttMsgUnsubscribe(topic);
 
-            _unsubscribeStateMachine.Unsubscribe(unsubscribeMessage);
+            _unsubscribeStateMachine.Unsubscribe(unsubscribePacket);
 
-            return unsubscribeMessage.MessageId;
+            return unsubscribePacket.MessageId;
         }
     }
 }

@@ -36,16 +36,18 @@ namespace Tevux.Protocols.Mqtt {
             public const byte Disconnect = 0x0E;
         }
 
-        public byte Type { get; set; }
+        private static ushort _messageIdCounter = 0;
 
-        public ushort MessageId { get; set; }
+        public byte Type { get; protected set; }
+
+        public ushort MessageId { get; protected set; }
 
         public abstract byte[] GetBytes();
 
         /// <summary>
         /// Calculates the size of the fixed header, which depends on the remaining length. See section 2.2.3.
         /// </summary>
-        public static int CalculateFixedHeaderSize(int remainingLength) {
+        protected static int CalculateFixedHeaderSize(int remainingLength) {
             var fixedHeaderSize = 1;
             var temp = remainingLength;
 
@@ -60,7 +62,7 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Decode remaining length reading bytes from socket
         /// </summary>
-        public static bool TryDecodeRemainingLength(IMqttNetworkChannel channel, out int remainingLength) {
+        internal static bool TryDecodeRemainingLength(IMqttNetworkChannel channel, out int remainingLength) {
             var isOk = true;
             var multiplier = 1;
             remainingLength = 0;
@@ -82,7 +84,7 @@ namespace Tevux.Protocols.Mqtt {
         /// </summary>
         /// <param name="index">Index from which insert encoded value into buffer</param>
         /// <returns>Index updated</returns>
-        public static int EncodeRemainingLength(int remainingLength, byte[] buffer, int index) {
+        protected static int EncodeRemainingLength(int remainingLength, byte[] buffer, int index) {
             do {
                 var digit = remainingLength % 128;
                 remainingLength /= 128;
@@ -93,6 +95,15 @@ namespace Tevux.Protocols.Mqtt {
             } while (remainingLength > 0);
 
             return index;
+        }
+
+        /// <summary>
+        /// Generate the next message identifier.
+        /// </summary>
+        protected static ushort GetNewMessageId() {
+            // if 0 or max UInt16, it becomes 1 (first valid messageId)
+            _messageIdCounter = ((_messageIdCounter % ushort.MaxValue) != 0) ? (ushort)(_messageIdCounter + 1) : (ushort)1;
+            return _messageIdCounter;
         }
 
         /// <summary>

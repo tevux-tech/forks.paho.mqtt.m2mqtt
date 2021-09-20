@@ -33,7 +33,7 @@ namespace Tevux.Protocols.Mqtt {
 
 #warning Should I check here for duplicate incoming messages? Which may already be in the pipeline?
             else if (message.QosLevel == QosLevel.AtLeastOnce) {
-                var pubAckMessage = new MqttMsgPuback() { MessageId = message.MessageId };
+                var pubAckMessage = new MqttMsgPuback(message.MessageId);
                 lock (_messagesQoS1PubAck.SyncRoot) {
                     _messagesQoS1PubAck.Add(message.MessageId, new MqttMsgContext() { Message = pubAckMessage, Attempt = 1, Timestamp = currentTime });
                 }
@@ -41,7 +41,7 @@ namespace Tevux.Protocols.Mqtt {
                 Trace.WriteLine(TraceLevel.Frame, $"            PubAck-> {pubAckMessage.MessageId.ToString("X4")}");
             }
             else if (message.QosLevel == QosLevel.ExactlyOnce) {
-                var pubRecMessage = new MqttMsgPubrec() { MessageId = message.MessageId };
+                var pubRecMessage = new MqttMsgPubrec(message.MessageId);
                 lock (_messagesQoS2PubRec.SyncRoot) {
                     _messagesQoS2PubRec.Add(message.MessageId, new MqttMsgContext() { Message = pubRecMessage, Attempt = 1, Timestamp = currentTime });
                 }
@@ -72,7 +72,7 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             if (isOk) {
-                var pubcompMessage = new MqttMsgPubcomp() { MessageId = message.MessageId };
+                var pubcompMessage = new MqttMsgPubcomp(message.MessageId);
 #warning server may ask resend PubRel if for some reason this PubComp is lost. Need to handle that, too.
 
                 _client.Send(pubcompMessage);

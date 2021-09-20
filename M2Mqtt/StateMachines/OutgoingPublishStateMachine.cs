@@ -75,7 +75,7 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             if (isOk) {
-                var pubrelMessage = new MqttMsgPubrel() { MessageId = message.MessageId };
+                var pubrelMessage = new MqttMsgPubrel(message.MessageId);
                 var pubrelContext = new MqttMsgContext() { Message = pubrelMessage, Attempt = 1, Timestamp = currentTime };
                 lock (_messagesWaitingForQoS2Pubcomp.SyncRoot) {
                     _messagesWaitingForQoS2Pubcomp.Add(message.MessageId, pubrelContext);

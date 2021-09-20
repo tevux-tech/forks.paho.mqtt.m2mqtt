@@ -35,18 +35,11 @@ namespace Tevux.Protocols.Mqtt {
         public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
-            // topic can't contain wildcards
-            if ((topic.IndexOf('#') != -1) || (topic.IndexOf('+') != -1)) { throw new ArgumentException("Topic cannot contain wildcards in Publish message"); }
+            var publishPacket = new MqttMsgPublish(topic, message, qosLevel, retain);
 
-#warning check for topic length maybe?
+            _outgoingPublishStateMachine.Publish(publishPacket);
 
-            var publish = new MqttMsgPublish(topic, message, false, qosLevel, retain) {
-                MessageId = GetNewMessageId()
-            };
-
-            _outgoingPublishStateMachine.Publish(publish);
-
-            return publish.MessageId;
+            return publishPacket.MessageId;
         }
     }
 }
