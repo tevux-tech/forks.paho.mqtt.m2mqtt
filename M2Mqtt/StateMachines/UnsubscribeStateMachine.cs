@@ -16,7 +16,7 @@ namespace Tevux.Protocols.Mqtt {
         public void Tick() {
             var currentTime = Helpers.GetCurrentTime();
 
-            if (currentTime - _lastAck > _client.DelayOnRetry) {
+            if (currentTime - _lastAck > _client.ConnectionOptions.RetryDelay) {
                 if (_unacknowledgedPackets.Count > 0) {
                     Trace.WriteLine(TraceLevel.Queuing, $"Cleaning unacknowledged Unsubscribe packet.");
 #warning Server did not acknowledged all unsubscribe messages. Is this a protocol violation?..

@@ -12,6 +12,8 @@ namespace Tevux.Protocols.Mqtt {
         public byte[] WillMessage { get; private set; } = new byte[0];
         public QosLevel WillQosLevel { get; private set; } = QosLevel.AtMostOnce;
         public bool IsWillRetained { get; private set; }
+        public int MaxRetryCount { get; private set; } = 3;
+        public int RetryDelay { get; private set; } = 10;
 
         public MqttConnectionOptions() {
             ClientId = Guid.NewGuid().ToString();
@@ -49,6 +51,11 @@ namespace Tevux.Protocols.Mqtt {
             WillMessage = message;
             WillQosLevel = qosLevel;
             IsWillRetained = retain;
+        }
+
+        public void SetRetransmissionParameters(int maxRetryCount, int retryDelay) {
+            MaxRetryCount = maxRetryCount;
+            RetryDelay = retryDelay;
         }
     }
 }

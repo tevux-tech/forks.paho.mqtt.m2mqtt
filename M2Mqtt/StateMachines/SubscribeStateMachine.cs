@@ -18,12 +18,12 @@ namespace Tevux.Protocols.Mqtt {
                 foreach (DictionaryEntry item in _packetsWaitingForAck) {
                     var packet = (RetransmissionContext)item.Value;
 
-                    if (currentTime - packet.Timestamp > _client.DelayOnRetry) {
+                    if (currentTime - packet.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         _client.Send(packet.Packet);
                         packet.Attempt++;
                     }
 
-                    if (packet.Attempt >= _client.RetryAttemps) {
+                    if (packet.Attempt >= _client.ConnectionOptions.MaxRetryCount) {
                         _tempList.Enqueue(item.Key);
                         Trace.WriteLine(TraceLevel.Queuing, $"                                Subscribe packet {packet.Packet.PacketId} could no be sent, even after retries.");
                     }

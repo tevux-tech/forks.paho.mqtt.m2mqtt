@@ -108,12 +108,12 @@ namespace Tevux.Protocols.Mqtt {
                 foreach (DictionaryEntry item in packetTable) {
                     var queuedItem = (RetransmissionContext)item.Value;
 
-                    if (currentTime - queuedItem.Timestamp > _client.DelayOnRetry) {
+                    if (currentTime - queuedItem.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         _client.Send(queuedItem.Packet);
                         queuedItem.Attempt++;
                     }
 
-                    if (queuedItem.Attempt > _client.RetryAttemps) {
+                    if (queuedItem.Attempt > _client.ConnectionOptions.MaxRetryCount) {
                         _tempList.Enqueue(item.Key);
                         Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could no be sent, even after retries.");
                         NotifyPublishFailed(queuedItem.Packet.PacketId);
