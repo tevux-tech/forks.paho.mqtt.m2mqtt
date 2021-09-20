@@ -28,7 +28,7 @@ namespace Tevux.Protocols.Mqtt {
                     else if (currentTime - context.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         context.AttemptNumber++;
                         context.Timestamp = currentTime;
-                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}{ControlPacketBase.PacketTypes.GetShortName(context.Packet.Type)}-> {context.PacketId:X4} ({context.AttemptNumber})");
+                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}{context.Packet.GetShortName()}-> {context.PacketId:X4} ({context.AttemptNumber})");
                         _client.Send(context.Packet);
                     }
                 }
@@ -61,7 +61,7 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(packet);
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}{ControlPacketBase.PacketTypes.GetShortName(packet.Type)}-> {packet.PacketId:X4}");
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}{packet.GetShortName()}-> {packet.PacketId:X4}");
 
             if (waitForCompletion) {
                 var timeToBreak = false;
@@ -83,7 +83,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         private void InternalProcessPacket(ControlPacketBase packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{ControlPacketBase.PacketTypes.GetShortName(packet.Type)}");
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
 
             lock (_packetsWaitingForAck.SyncRoot) {
                 if (_packetsWaitingForAck.Contains(packet.PacketId)) {
@@ -95,13 +95,13 @@ namespace Tevux.Protocols.Mqtt {
                     _client.OnPacketAcknowledged(contextToRemove.Packet, packet);
                 }
                 else {
-                    HandleRoguePacketReceived(packet.PacketId, packet.Type);
+                    HandleRoguePacketReceived(packet);
                 }
             }
         }
 
-        private void HandleRoguePacketReceived(ushort packetId, byte type) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packetId:X4} <-{ControlPacketBase.PacketTypes.GetShortName(type)} (R)");
+        private void HandleRoguePacketReceived(ControlPacketBase packet) {
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()} (R)");
         }
     }
 }

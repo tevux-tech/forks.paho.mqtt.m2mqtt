@@ -3,6 +3,7 @@ using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class IncomingPublishStateMachine {
+        private string _indent = "            ";
         private MqttClient _client;
         private readonly ConcurrentQueue _tempList = new ConcurrentQueue();
 
@@ -21,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(PublishPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId:X4} <-Publis ");
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()} ");
 
             var currentTime = Helpers.GetCurrentTime();
 
@@ -38,7 +39,7 @@ namespace Tevux.Protocols.Mqtt {
                     _packetsQoS1PubAck.Add(packet.PacketId, new TransmissionContext() { Packet = pubAckPacket, AttemptNumber = 1, Timestamp = currentTime });
                 }
                 _client.Send(pubAckPacket.GetBytes());
-                Trace.WriteLine(TraceLevel.Frame, $"            PubAck-> {pubAckPacket.PacketId:X4}");
+                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{packet.GetShortName()}-> {pubAckPacket.PacketId:X4}");
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
@@ -46,13 +47,13 @@ namespace Tevux.Protocols.Mqtt {
                     _packetQoS2PubRec.Add(packet.PacketId, new TransmissionContext() { Packet = pubRecPacket, AttemptNumber = 1, Timestamp = currentTime });
                 }
                 _client.Send(pubRecPacket.GetBytes());
-                Trace.WriteLine(TraceLevel.Frame, $"            PubRec-> {pubRecPacket.PacketId:X4}");
+                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{pubRecPacket.GetShortName()}-> {pubRecPacket.PacketId:X4}");
             }
         }
 
         public void ProcessPacket(PubrelPacket packet) {
             var currentTime = Helpers.GetCurrentTime();
-            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId:X4} <-PubRel");
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
 
             var isOk = true;
 
@@ -66,7 +67,7 @@ namespace Tevux.Protocols.Mqtt {
                 }
                 else {
                     isOk = false;
-                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue PubRel packet for PacketId {packet.PacketId:X4}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"{_indent}<-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
                     NotifyRoguePacketReceived(packet.PacketId);
                 }
             }
@@ -76,7 +77,7 @@ namespace Tevux.Protocols.Mqtt {
 #warning server may ask resend PubRel if for some reason this PubComp is lost. Need to handle that, too.
 
                 _client.Send(pubcompPacket);
-                Trace.WriteLine(TraceLevel.Frame, $"            PubCom-> {packet.PacketId:X4}");
+                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{pubcompPacket.GetShortName()}-> {pubcompPacket.PacketId:X4}");
             }
         }
 
@@ -94,7 +95,7 @@ namespace Tevux.Protocols.Mqtt {
 
                     if (queuedItem.AttemptNumber > _client.ConnectionOptions.MaxRetryCount) {
                         _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could no be sent, even after retries.");
+                        Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could not be sent, even after retries.");
                         NotifyPublishFailed(queuedItem.Packet.PacketId);
                     }
                 }

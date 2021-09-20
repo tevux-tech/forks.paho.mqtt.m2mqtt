@@ -71,10 +71,10 @@ namespace Tevux.Protocols.Mqtt {
                         return nameof(Unsuback).Substring(0, 6);
 
                     case Pingreq:
-                        return nameof(Pingreq).Substring(0, 6);
+                        return "Pngreq";
 
                     case Pingresp:
-                        return nameof(Pingresp).Substring(0, 6);
+                        return "Pngres";
 
                     case Disconnect:
                         return nameof(Disconnect).Substring(0, 6);
@@ -92,6 +92,10 @@ namespace Tevux.Protocols.Mqtt {
         public ushort PacketId { get; protected set; }
 
         public abstract byte[] GetBytes();
+
+        public string GetShortName() {
+            return PacketTypes.GetShortName(Type);
+        }
 
         /// <summary>
         /// Calculates the size of the fixed header, which depends on the remaining length. See section 2.2.3.
