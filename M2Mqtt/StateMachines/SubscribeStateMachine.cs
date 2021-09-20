@@ -25,7 +25,7 @@ namespace Tevux.Protocols.Mqtt {
 
                     if (message.Attempt >= _client.RetryAttemps) {
                         _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"                Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
+                        Trace.WriteLine(TraceLevel.Queuing, $"                                Subscribe message {message.Message.MessageId} could no be sent, even after retries.");
                     }
                 }
             }
@@ -33,7 +33,7 @@ namespace Tevux.Protocols.Mqtt {
             var areThereMessageToRemove = true;
             while (areThereMessageToRemove) {
                 if (_tempList.TryDequeue(out var item)) {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                Cleaning unacknowledged Subscribe message {item.ToString()}.");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                                        Cleaning unacknowledged Subscribe message {item.ToString()}.");
                     lock (_messagesWaitingForAck.SyncRoot) {
                         _messagesWaitingForAck.Remove(item);
                     }
@@ -52,11 +52,11 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(message);
-            Trace.WriteLine(TraceLevel.Frame, $"                Subscr-> {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                                        Subscr-> {message.MessageId.ToString("X4")}");
         }
 
         public void ProcessMessage(MqttMsgSuback message) {
-            Trace.WriteLine(TraceLevel.Frame, $"                <-SubAck {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                                                 {message.MessageId.ToString("X4")} <-SubAck");
 
             lock (_messagesWaitingForAck.SyncRoot) {
                 if (_messagesWaitingForAck.Contains(message.MessageId)) {
@@ -65,7 +65,7 @@ namespace Tevux.Protocols.Mqtt {
                     _client.OnMqttMsgSubscribed(message);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                Rogue SubAck message for MessageId {message.MessageId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                                Rogue SubAck message for MessageId {message.MessageId.ToString("X4")}");
 #warning Rogue SubAck message, what do I do now?..
                 }
             }

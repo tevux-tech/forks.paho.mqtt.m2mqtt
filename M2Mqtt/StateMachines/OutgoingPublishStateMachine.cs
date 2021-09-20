@@ -38,13 +38,13 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(message.GetBytes());
-            Trace.WriteLine(TraceLevel.Frame, $"        Publis-> {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"            Publis-> {message.MessageId.ToString("X4")}");
 
             message.DupFlag = true;
         }
 
         public void ProcessMessage(MqttMsgPuback message) {
-            Trace.WriteLine(TraceLevel.Frame, $"        <-PubAck {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {message.MessageId.ToString("X4")} <-PubAck");
 
             lock (_messagesWaitingForQoS1PubAck.SyncRoot) {
                 if (_messagesWaitingForQoS1PubAck.Contains(message.MessageId)) {
@@ -52,14 +52,14 @@ namespace Tevux.Protocols.Mqtt {
                     NotifyPublishSucceeded(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue PubAck message for MessageId {message.MessageId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue PubAck message for MessageId {message.MessageId.ToString("X4")}");
                     NotifyRogueMessageReceived(message.MessageId);
                 }
             }
         }
 
         public void ProcessMessage(MqttMsgPubrec message) {
-            Trace.WriteLine(TraceLevel.Frame, $"        <-PubRec {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {message.MessageId.ToString("X4")} <-PubRec");
             var currentTime = Helpers.GetCurrentTime();
             var isOk = true;
 
@@ -68,7 +68,7 @@ namespace Tevux.Protocols.Mqtt {
                     _messagesWaitingForQoS2Pubrec.Remove(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue Pubrec message for MessageId {message.MessageId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue Pubrec message for MessageId {message.MessageId.ToString("X4")}");
                     isOk = false;
                     NotifyRogueMessageReceived(message.MessageId);
                 }
@@ -82,12 +82,12 @@ namespace Tevux.Protocols.Mqtt {
                 }
 
                 _client.Send(pubrelMessage);
-                Trace.WriteLine(TraceLevel.Frame, $"        PubRel-> {message.MessageId.ToString("X4")}");
+                Trace.WriteLine(TraceLevel.Frame, $"            PubRel-> {message.MessageId.ToString("X4")}");
             }
         }
 
         public void ProcessMessage(MqttMsgPubcomp message) {
-            Trace.WriteLine(TraceLevel.Frame, $"        <-PubCom {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {message.MessageId.ToString("X4")} <-PubCom");
 
             lock (_messagesWaitingForQoS2Pubcomp.SyncRoot) {
                 if (_messagesWaitingForQoS2Pubcomp.Contains(message.MessageId)) {
@@ -95,7 +95,7 @@ namespace Tevux.Protocols.Mqtt {
                     NotifyPublishSucceeded(message.MessageId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"        <-Rogue Pubcomp message for MessageId {message.MessageId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue Pubcomp message for MessageId {message.MessageId.ToString("X4")}");
                     NotifyRogueMessageReceived(message.MessageId);
                 }
             }
@@ -115,7 +115,7 @@ namespace Tevux.Protocols.Mqtt {
 
                     if (queuedItem.Attempt > _client.RetryAttemps) {
                         _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"        Message {queuedItem.Message.MessageId} could no be sent, even after retries.");
+                        Trace.WriteLine(TraceLevel.Queuing, $"            Message {queuedItem.Message.MessageId} could no be sent, even after retries.");
                         NotifyPublishFailed(queuedItem.Message.MessageId);
                     }
                 }
@@ -123,7 +123,7 @@ namespace Tevux.Protocols.Mqtt {
 
 
             while (_tempList.TryDequeue(out var item)) {
-                Trace.WriteLine(TraceLevel.Queuing, $"        Cleaning unacknowledged message {item}.");
+                Trace.WriteLine(TraceLevel.Queuing, $"            Cleaning unacknowledged message {item}.");
                 lock (messageTable.SyncRoot) {
                     messageTable.Remove(item);
                 }

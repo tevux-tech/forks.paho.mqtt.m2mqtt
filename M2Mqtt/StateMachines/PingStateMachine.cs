@@ -28,7 +28,7 @@ namespace Tevux.Protocols.Mqtt {
                 if ((currentTime - _client.LastCommTime > _client.DelayOnRetry) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
                     var pingreq = new MqttMsgPingReq();
                     _client.Send(pingreq);
-                    Trace.WriteLine(TraceLevel.Frame, "                        PngReq->");
+                    Trace.WriteLine(TraceLevel.Frame, "PngReq->");
                     _isWaitingForPingResponse = true;
                     _requestTimestamp = currentTime;
                 }
@@ -36,7 +36,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessMessage(MqttMsgPingResp message) {
-            Trace.WriteLine(TraceLevel.Frame, "                        <-PngRes");
+            Trace.WriteLine(TraceLevel.Frame, "<-PngRes");
             IsBrokerAlive = true;
             _isWaitingForPingResponse = false;
         }

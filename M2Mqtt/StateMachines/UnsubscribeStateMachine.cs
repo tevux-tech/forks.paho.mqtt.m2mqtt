@@ -33,11 +33,11 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(message);
-            Trace.WriteLine(TraceLevel.Frame, $"                UnsubA-> {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                                        UnsubA-> {message.MessageId.ToString("X4")}");
         }
 
         public void ProcessMessage(MqttMsgUnsuback message) {
-            Trace.WriteLine(TraceLevel.Frame, $"                <-Unsubs {message.MessageId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                                                 {message.MessageId.ToString("X4")} <-Unsubs");
 
             _lastAck = Helpers.GetCurrentTime();
 
