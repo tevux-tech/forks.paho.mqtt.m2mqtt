@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
@@ -43,7 +43,6 @@ namespace Tevux.Protocols.Mqtt {
             // DupFlag = dupFlag;
             QosLevel = qosLevel;
             RetainFlag = retain;
-            PacketId = 0;
         }
 
         public override byte[] GetBytes() {

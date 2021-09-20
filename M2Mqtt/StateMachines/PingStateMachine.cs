@@ -17,7 +17,7 @@ namespace Tevux.Protocols.Mqtt {
             var currentTime = Helpers.GetCurrentTime();
 
             if (_isWaitingForPingResponse) {
-                if (currentTime - _requestTimestamp > _client.ConnectionOptions.RetryDelay) {
+                if (currentTime - _requestTimestamp > _client.ConnectionOptions.KeepAlivePeriod) {
                     // Problem. Server does not respond.
                     _isWaitingForPingResponse = false;
                     IsBrokerAlive = false;
@@ -25,7 +25,7 @@ namespace Tevux.Protocols.Mqtt {
             }
             else {
                 // Keep alive period equals zero means turning off keep alive mechanism.
-                if ((currentTime - _client.LastCommTime > _client.ConnectionOptions.RetryDelay) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
+                if ((currentTime - _client.LastCommTime > _client.ConnectionOptions.KeepAlivePeriod) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
                     var pingreq = new PingreqPacket();
                     _client.Send(pingreq);
                     Trace.WriteLine(TraceLevel.Frame, "PngReq->");
