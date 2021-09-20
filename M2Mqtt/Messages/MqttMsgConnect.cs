@@ -22,19 +22,6 @@ namespace Tevux.Protocols.Mqtt {
     /// Class for CONNECT message from client to broker. See section 3.1.
     /// </summary>
     internal class MqttMsgConnect : MqttMsgBase {
-#warning should get that from connection options
-        public const ushort KeepAliveDefaultValue = 15; // seconds
-
-        // connect flags
-        public class FlagOffset {
-            public const byte Username = 0x07;
-            public const byte Password = 0x06;
-            public const byte WillRetain = 0x05;
-            public const byte WillQoS = 0x03;
-            public const byte Will = 0x02;
-            public const byte CleanSession = 0x01;
-        }
-
         public MqttConnectionOptions ConnectionOptions { get; private set; }
 
         public MqttMsgConnect() {
