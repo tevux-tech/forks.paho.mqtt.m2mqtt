@@ -20,10 +20,10 @@ namespace Tevux.Protocols.Mqtt {
     public delegate void UnsubscribedEventHandler(object sender, UnsubscribedEventArgs e);
 
     public class UnsubscribedEventArgs : EventArgs {
-        public ushort PacketId { get; private set; }
+        public string Topic { get; private set; }
 
-        internal UnsubscribedEventArgs(ushort packetId) {
-            PacketId = packetId;
+        internal UnsubscribedEventArgs(string topic) {
+            Topic = topic;
         }
     }
 }

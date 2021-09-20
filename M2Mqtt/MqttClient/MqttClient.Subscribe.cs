@@ -28,8 +28,7 @@ namespace Tevux.Protocols.Mqtt {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             var subscribePacket = new SubscribePacket(topic, qosLevel);
-
-            var isSubscribed = _subscribeStateMachine.Subscribe(subscribePacket, waitForCompletion);
+            var isSubscribed = _subscriptionStateMachine.Subscribe(subscribePacket, waitForCompletion);
 
             return isSubscribed;
         }

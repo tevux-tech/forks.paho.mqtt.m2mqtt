@@ -24,8 +24,7 @@ namespace Tevux.Protocols.Mqtt {
                 if (IsConnected) {
                     _pingStateMachine.Tick();
                     if (_pingStateMachine.IsBrokerAlive) {
-                        _unsubscribeStateMachine.Tick();
-                        _subscribeStateMachine.Tick();
+                        _subscriptionStateMachine.Tick();
                         _outgoingPublishStateMachine.Tick();
                         _incomingPublishStateMachine.Tick();
                     }

@@ -24,8 +24,7 @@ namespace Tevux.Protocols.Mqtt {
 
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);
-            _unsubscribeStateMachine.Initialize(this);
-            _subscribeStateMachine.Initialize(this);
+            _subscriptionStateMachine.Initialize(this);
             _outgoingPublishStateMachine.Initialize(this);
             _incomingPublishStateMachine.Initialize(this);
 

@@ -42,8 +42,7 @@ namespace Tevux.Protocols.Mqtt {
 
         private readonly PingStateMachine _pingStateMachine = new PingStateMachine();
         private readonly ConnectStateMachine _connectStateMachine = new ConnectStateMachine();
-        private readonly UnsubscribeStateMachine _unsubscribeStateMachine = new UnsubscribeStateMachine();
-        private readonly SubscribeStateMachine _subscribeStateMachine = new SubscribeStateMachine();
+        private readonly SubscriptionStateMachine _subscriptionStateMachine = new SubscriptionStateMachine();
         private readonly OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
         private readonly IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
 

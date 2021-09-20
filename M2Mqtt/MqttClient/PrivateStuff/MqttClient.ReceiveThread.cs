@@ -85,7 +85,7 @@ namespace Tevux.Protocols.Mqtt {
 
                             isOk = SubackPacket.TryParse(variableHeaderBytes, payloadBytes, out var parsedPacket);
 
-                            _subscribeStateMachine.ProcessPacket(parsedPacket);
+                            _subscriptionStateMachine.ProcessPacket(parsedPacket);
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Puback) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.4.
@@ -150,7 +150,7 @@ namespace Tevux.Protocols.Mqtt {
 
                             isOk = UnsubackPacket.TryParse(variableHeaderBytes, out var parsedPacket);
 
-                            _unsubscribeStateMachine.ProcessPacket(parsedPacket);
+                            _subscriptionStateMachine.ProcessPacket(parsedPacket);
                         }
                         else {
                             // This is either a malformed packet header, or it is meant for server, not client.

@@ -36,20 +36,18 @@ namespace Tevux.Protocols.Mqtt {
             Published?.Invoke(this, new PublishFinishedEventArgs(packetId, isPublished));
         }
 
-        /// <summary>
-        /// Wrapper method for raising subscribed topic event
-        /// </summary>
-        /// <param name="suback">SUBACK packet received</param>
-        internal void OnMqttMsgSubscribed(string topic, GrantedQosLevel grantedQosLevel) {
-            new Thread(() => Subscribed?.Invoke(this, new SubscribedEventArgs(topic, grantedQosLevel))).Start();
-        }
-
-        /// <summary>
-        /// Wrapper method for raising unsubscribed topic event
-        /// </summary>
-        /// <param name="packetId">Packet identifier for unsubscribed topic</param>
-        internal void OnMqttMsgUnsubscribed(ushort packetId) {
-            Unsubscribed?.Invoke(this, new UnsubscribedEventArgs(packetId));
+        internal void OnPacketAcknowledged(ControlPacketBase sentPacket, ControlPacketBase receivedPacket) {
+            // Creating a separate thread because those events are raised from state machines,
+            // and I cannot let the end user to block them by attaching a long-running handlers.
+#warning Probably want to use a single persistent thread?..
+            new Thread(() => {
+                if ((sentPacket is SubscribePacket subscribePacket) && (receivedPacket is SubackPacket subackPacket)) {
+                    Subscribed?.Invoke(this, new SubscribedEventArgs(subscribePacket.Topic, subackPacket.GrantedQosLevel));
+                }
+                else if ((sentPacket is UnsubscribePacket unsubscribePacket) && (receivedPacket is UnsubackPacket unsubackPacket)) {
+                    Unsubscribed?.Invoke(this, new UnsubscribedEventArgs(unsubscribePacket.Topic));
+                }
+            }).Start();
         }
 
         /// <summary>

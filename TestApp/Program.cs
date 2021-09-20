@@ -22,6 +22,7 @@ namespace TestApp {
             client.Initialize();
             client.PublishReceived += HandlePublishReceived;
             client.Subscribed += HandleSubscribed;
+            client.Unsubscribed += HandleUnsubscribed;
 
             var networkOptions = new ChannelConnectionOptions();
             networkOptions.SetHostname("172.16.0.2");
@@ -48,6 +49,10 @@ namespace TestApp {
             Thread.Sleep(1000);
 
             // client.Disconnect();
+        }
+
+        private void HandleUnsubscribed(object sender, UnsubscribedEventArgs e) {
+            Console.WriteLine($"Unsubscribed: {e.Topic}");
         }
 
         private void HandleSubscribed(object sender, SubscribedEventArgs e) {

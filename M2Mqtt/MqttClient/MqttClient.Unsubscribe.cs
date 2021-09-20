@@ -18,19 +18,25 @@ using System;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
+        public bool UnsubscribeAndWait(string topic) {
+            return InternalUnsubscribe(topic, true);
+        }
+        public void Unsubscribe(string topic) {
+            InternalUnsubscribe(topic, false);
+        }
+
         /// <summary>
         /// Unsubscribe for message topics
         /// </summary>
         /// <param name="topics">List of topics to unsubscribe</param>
         /// <returns>Packet Id in UNSUBACK packet from broker</returns>
-        public ushort Unsubscribe(string topic) {
+        public bool InternalUnsubscribe(string topic, bool waitForCompletion) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             var unsubscribePacket = new UnsubscribePacket(topic);
+            var isUnsubscribed = _subscriptionStateMachine.Unsubscribe(unsubscribePacket, waitForCompletion);
 
-            _unsubscribeStateMachine.Unsubscribe(unsubscribePacket);
-
-            return unsubscribePacket.PacketId;
+            return isUnsubscribed;
         }
     }
 }

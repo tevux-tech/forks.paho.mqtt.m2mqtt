@@ -3,7 +3,7 @@ using System.Threading;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
-    internal class SubscribeStateMachine {
+    internal class SubscriptionStateMachine {
         private readonly string _indent = "                                        ";
         private MqttClient _client;
         private readonly Hashtable _packetsWaitingForAck = new Hashtable();
@@ -28,12 +28,11 @@ namespace Tevux.Protocols.Mqtt {
                     else if (currentTime - context.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         context.AttemptNumber++;
                         context.Timestamp = currentTime;
-                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}Subscr-> {context.PacketId:X4} ({context.AttemptNumber})");
+                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}{ControlPacketBase.PacketTypes.GetShortName(context.Packet.Type)}-> {context.PacketId:X4} ({context.AttemptNumber})");
                         _client.Send(context.Packet);
                     }
                 }
             }
-
 
             while (_tempList.TryDequeue(out var item)) {
                 var context = (TransmissionContext)item;
@@ -45,6 +44,14 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public bool Subscribe(SubscribePacket packet, bool waitForCompletion = false) {
+            return InternalSubscribeUnsubscribe(packet, waitForCompletion);
+        }
+
+        public bool Unsubscribe(UnsubscribePacket packet, bool waitForCompletion = false) {
+            return InternalSubscribeUnsubscribe(packet, waitForCompletion);
+        }
+
+        private bool InternalSubscribeUnsubscribe(ControlPacketBase packet, bool waitForCompletion = false) {
             var currentTime = Helpers.GetCurrentTime();
 
             var transmissionContext = new TransmissionContext() { Packet = packet, AttemptNumber = 1, Timestamp = currentTime };
@@ -54,7 +61,7 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(packet);
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}Subscr-> {packet.PacketId:X4}");
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}{ControlPacketBase.PacketTypes.GetShortName(packet.Type)}-> {packet.PacketId:X4}");
 
             if (waitForCompletion) {
                 var timeToBreak = false;
@@ -69,8 +76,14 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(SubackPacket packet) {
-            //if ((new Random()).Next(2) == 1) { return; }
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-SubAck");
+            InternalProcessPacket(packet);
+        }
+        public void ProcessPacket(UnsubackPacket packet) {
+            InternalProcessPacket(packet);
+        }
+
+        private void InternalProcessPacket(ControlPacketBase packet) {
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{ControlPacketBase.PacketTypes.GetShortName(packet.Type)}");
 
             lock (_packetsWaitingForAck.SyncRoot) {
                 if (_packetsWaitingForAck.Contains(packet.PacketId)) {
@@ -78,7 +91,8 @@ namespace Tevux.Protocols.Mqtt {
                     contextToRemove.IsFinished = true;
                     contextToRemove.IsSucceeded = true;
                     _packetsWaitingForAck.Remove(packet.PacketId);
-                    NotifySubscribed(((SubscribePacket)contextToRemove.Packet).Topic, packet.GrantedQosLevel);
+
+                    _client.OnPacketAcknowledged(contextToRemove.Packet, packet);
                 }
                 else {
                     HandleRoguePacketReceived(packet.PacketId, packet.Type);
@@ -87,10 +101,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         private void HandleRoguePacketReceived(ushort packetId, byte type) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packetId:X4} <-SubAck (R)");
-        }
-        private void NotifySubscribed(string topic, GrantedQosLevel grantedQosLevel) {
-            _client.OnMqttMsgSubscribed(topic, grantedQosLevel);
+            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packetId:X4} <-{ControlPacketBase.PacketTypes.GetShortName(type)} (R)");
         }
     }
 }

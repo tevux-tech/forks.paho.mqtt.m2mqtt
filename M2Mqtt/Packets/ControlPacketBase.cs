@@ -34,6 +34,55 @@ namespace Tevux.Protocols.Mqtt {
             public const byte Pingreq = 0x0C;
             public const byte Pingresp = 0x0D;
             public const byte Disconnect = 0x0E;
+
+            public static string GetShortName(byte type) {
+                switch (type) {
+                    case Connect:
+                        return nameof(Connect).Substring(0, 6);
+
+                    case Conack:
+                        return nameof(Conack).Substring(0, 6);
+
+                    case Publish:
+                        return nameof(Publish).Substring(0, 6);
+
+                    case Puback:
+                        return nameof(Puback).Substring(0, 6);
+
+                    case Pubrec:
+                        return nameof(Pubrec).Substring(0, 6);
+
+                    case Pubrel:
+                        return nameof(Pubrel).Substring(0, 6);
+
+                    case Pubcomp:
+                        return nameof(Pubcomp).Substring(0, 6);
+
+                    case Subscribe:
+                        return nameof(Subscribe).Substring(0, 6);
+
+                    case Suback:
+                        return nameof(Suback).Substring(0, 6);
+
+                    case Unsubscribe:
+                        return nameof(Unsubscribe).Substring(0, 6);
+
+                    case Unsuback:
+                        return nameof(Unsuback).Substring(0, 6);
+
+                    case Pingreq:
+                        return nameof(Pingreq).Substring(0, 6);
+
+                    case Pingresp:
+                        return nameof(Pingresp).Substring(0, 6);
+
+                    case Disconnect:
+                        return nameof(Disconnect).Substring(0, 6);
+
+                    default:
+                        return "Undefi";
+                }
+            }
         }
 
         private static ushort _packetIdCounter = 0;
