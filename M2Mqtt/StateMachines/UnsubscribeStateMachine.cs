@@ -1,8 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class UnsubscribeStateMachine {
+        private string _traceIndent = "                                        ";
         private ArrayList _unacknowledgedPackets = new ArrayList();
         private double _lastAck;
         private MqttClient _client;
@@ -33,11 +34,11 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(packet);
-            Trace.WriteLine(TraceLevel.Frame, $"                                        UnsubA-> {packet.PacketId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"{_traceIndent}UnsubA-> {packet.PacketId:X4}");
         }
 
         public void ProcessPacket(UnsubackPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"                                                 {packet.PacketId.ToString("X4")} <-Unsubs");
+            Trace.WriteLine(TraceLevel.Frame, $"{_traceIndent}         {packet.PacketId:X4} <-Unsubs");
 
             _lastAck = Helpers.GetCurrentTime();
 
@@ -56,7 +57,7 @@ namespace Tevux.Protocols.Mqtt {
                     _client.OnMqttMsgUnsubscribed(packet.PacketId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"Rogue UnsubAck packet for PacketId {packet.PacketId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"{_traceIndent}Rogue UnsubAck packet for PacketId {packet.PacketId:X4}");
 #warning Rogue UnsubAck message?..
                 }
             }

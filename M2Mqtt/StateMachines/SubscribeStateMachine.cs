@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
@@ -33,7 +33,7 @@ namespace Tevux.Protocols.Mqtt {
             var areTherePacketsToRemove = true;
             while (areTherePacketsToRemove) {
                 if (_tempList.TryDequeue(out var item)) {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                                        Cleaning unacknowledged Subscribe packet {item.ToString()}.");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                                        Cleaning unacknowledged Subscribe packet {item}.");
                     lock (_packetsWaitingForAck.SyncRoot) {
                         _packetsWaitingForAck.Remove(item);
                     }
@@ -52,11 +52,11 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(packet);
-            Trace.WriteLine(TraceLevel.Frame, $"                                        Subscr-> {packet.PacketId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"                                        Subscr-> {packet.PacketId:X4}");
         }
 
         public void ProcessPacket(SubackPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"                                                 {packet.PacketId.ToString("X4")} <-SubAck");
+            Trace.WriteLine(TraceLevel.Frame, $"                                                 {packet.PacketId:X4} <-SubAck");
 
             lock (_packetsWaitingForAck.SyncRoot) {
                 if (_packetsWaitingForAck.Contains(packet.PacketId)) {
@@ -65,7 +65,7 @@ namespace Tevux.Protocols.Mqtt {
                     _client.OnMqttMsgSubscribed(packet);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"                                Rogue SubAck packet for PacketId {packet.PacketId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"                                Rogue SubAck packet for PacketId {packet.PacketId:X4}");
 #warning Rogue SubAck message, what do I do now?..
                 }
             }

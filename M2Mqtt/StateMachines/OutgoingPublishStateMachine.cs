@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
@@ -38,13 +38,13 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             _client.Send(packet.GetBytes());
-            Trace.WriteLine(TraceLevel.Frame, $"            Publis-> {packet.PacketId.ToString("X4")}");
+            Trace.WriteLine(TraceLevel.Frame, $"            Publis-> {packet.PacketId:X4}");
 
             packet.DupFlag = true;
         }
 
         public void ProcessPacket(PubackPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId.ToString("X4")} <-PubAck");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId:X4} <-PubAck");
 
             lock (_packetsWaitingForQoS1PubAck.SyncRoot) {
                 if (_packetsWaitingForQoS1PubAck.Contains(packet.PacketId)) {
@@ -52,14 +52,14 @@ namespace Tevux.Protocols.Mqtt {
                     NotifyPublishSucceeded(packet.PacketId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue PubAck packet for PacketId {packet.PacketId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue PubAck packet for PacketId {packet.PacketId:X4}");
                     NotifyRoguePacketReceived(packet.PacketId);
                 }
             }
         }
 
         public void ProcessPacket(PubrecPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId.ToString("X4")} <-PubRec");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId:X4} <-PubRec");
             var currentTime = Helpers.GetCurrentTime();
             var isOk = true;
 
@@ -68,7 +68,7 @@ namespace Tevux.Protocols.Mqtt {
                     _packetsWaitingForQoS2Pubrec.Remove(packet.PacketId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue Pubrec packet for PacketId {packet.PacketId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue Pubrec packet for PacketId {packet.PacketId:X4}");
                     isOk = false;
                     NotifyRoguePacketReceived(packet.PacketId);
                 }
@@ -82,12 +82,12 @@ namespace Tevux.Protocols.Mqtt {
                 }
 
                 _client.Send(pubrelPacket);
-                Trace.WriteLine(TraceLevel.Frame, $"            PubRel-> {packet.PacketId.ToString("X4")}");
+                Trace.WriteLine(TraceLevel.Frame, $"            PubRel-> {packet.PacketId:X4}");
             }
         }
 
         public void ProcessPacket(PubcompPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId.ToString("X4")} <-PubCom");
+            Trace.WriteLine(TraceLevel.Frame, $"                     {packet.PacketId:X4} <-PubCom");
 
             lock (_packetsWaitingForQoS2Pubcomp.SyncRoot) {
                 if (_packetsWaitingForQoS2Pubcomp.Contains(packet.PacketId)) {
@@ -95,7 +95,7 @@ namespace Tevux.Protocols.Mqtt {
                     NotifyPublishSucceeded(packet.PacketId);
                 }
                 else {
-                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue Pubcomp packet for PacketId {packet.PacketId.ToString("X4")}");
+                    Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue Pubcomp packet for PacketId {packet.PacketId:X4}");
                     NotifyRoguePacketReceived(packet.PacketId);
                 }
             }
