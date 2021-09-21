@@ -24,7 +24,7 @@ namespace Tevux.Protocols.Mqtt {
         /// </summary>
         /// <param name="publish">PUBLISH message received</param>
         internal void OnMqttMsgPublishReceived(PublishPacket publish) {
-            PublishReceived?.Invoke(this, new PublishReceivedEventArgs(publish.Topic, publish.Message));
+
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Tevux.Protocols.Mqtt {
         /// <param name="packetId">Message identifier for published message</param>
         /// <param name="isPublished">Publish flag</param>
         internal void OnMqttMsgPublished(ushort packetId, bool isPublished) {
-            Published?.Invoke(this, new PublishFinishedEventArgs(packetId, isPublished));
+            // Published?.Invoke(this, new PublishFinishedEventArgs(receivedPacket.PacketId, true));
         }
 
         internal void OnPacketAcknowledged(ControlPacketBase sentPacket, ControlPacketBase receivedPacket) {
@@ -46,6 +46,9 @@ namespace Tevux.Protocols.Mqtt {
                 }
                 else if ((sentPacket is UnsubscribePacket unsubscribePacket) && (receivedPacket is UnsubackPacket unsubackPacket)) {
                     Unsubscribed?.Invoke(this, new UnsubscribedEventArgs(unsubscribePacket.Topic));
+                }
+                else if (receivedPacket is PublishPacket publishReceivedPacket) {
+                    PublishReceived?.Invoke(this, new PublishReceivedEventArgs(publishReceivedPacket.Topic, publishReceivedPacket.Message));
                 }
             }).Start();
         }
