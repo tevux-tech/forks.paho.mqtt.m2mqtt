@@ -15,6 +15,7 @@ Contributors:
 */
 
 using System;
+using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     /// <summary>
@@ -45,6 +46,8 @@ namespace Tevux.Protocols.Mqtt {
         private readonly SubscriptionStateMachine _subscriptionStateMachine = new SubscriptionStateMachine();
         private readonly OutgoingPublishStateMachine _outgoingPublishStateMachine = new OutgoingPublishStateMachine();
         private readonly IncomingPublishStateMachine _incomingPublishStateMachine = new IncomingPublishStateMachine();
+
+        readonly ConcurrentQueue _eventQueue = new ConcurrentQueue();
 
         private bool _isInitialized;
 
