@@ -1,46 +1,19 @@
-﻿using System.Collections;
-using System.Threading;
+﻿using System.Threading;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class SubscriptionStateMachine {
         private readonly string _indent = "                                        ";
         private MqttClient _client;
-        private readonly Hashtable _packetsWaitingForAck = new Hashtable();
-        private readonly ConcurrentQueue _tempList = new ConcurrentQueue();
+        private ResendingStateMachine _packetsToSend = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
+            _packetsToSend.Initialize(client);
         }
 
         public void Tick() {
-            var currentTime = Helpers.GetCurrentTime();
-
-            lock (_packetsWaitingForAck.SyncRoot) {
-                foreach (DictionaryEntry item in _packetsWaitingForAck) {
-                    var context = (TransmissionContext)item.Value;
-
-                    if (context.AttemptNumber >= _client.ConnectionOptions.MaxRetryCount) {
-                        context.IsFinished = true;
-                        context.IsSucceeded = false;
-                        _tempList.Enqueue(context);
-                    }
-                    else if (currentTime - context.Timestamp > _client.ConnectionOptions.RetryDelay) {
-                        context.AttemptNumber++;
-                        context.Timestamp = currentTime;
-                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}{context.PacketToSend.GetShortName()}-> {context.PacketId:X4} ({context.AttemptNumber})");
-                        _client.Send(context.PacketToSend);
-                    }
-                }
-            }
-
-            while (_tempList.TryDequeue(out var item)) {
-                var context = (TransmissionContext)item;
-                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}         {context.PacketToSend.PacketId:X4} FAILED");
-                lock (_packetsWaitingForAck.SyncRoot) {
-                    _packetsWaitingForAck.Remove(context.PacketId);
-                }
-            }
+            _packetsToSend.Tick();
         }
 
         public bool Subscribe(SubscribePacket packet, bool waitForCompletion = false) {
@@ -56,12 +29,7 @@ namespace Tevux.Protocols.Mqtt {
 
             var transmissionContext = new TransmissionContext() { PacketToSend = packet, AttemptNumber = 1, Timestamp = currentTime };
 
-            lock (_packetsWaitingForAck.SyncRoot) {
-                _packetsWaitingForAck.Add(transmissionContext.PacketId, transmissionContext);
-            }
-
-            _client.Send(packet);
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}{packet.GetShortName()}-> {packet.PacketId:X4}");
+            _packetsToSend.Enqueue(transmissionContext);
 
             if (waitForCompletion) {
                 var timeToBreak = false;
@@ -87,18 +55,11 @@ namespace Tevux.Protocols.Mqtt {
         private void InternalProcessPacket(ControlPacketBase packet) {
             Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
 
-            lock (_packetsWaitingForAck.SyncRoot) {
-                if (_packetsWaitingForAck.Contains(packet.PacketId)) {
-                    var contextToRemove = (TransmissionContext)_packetsWaitingForAck[packet.PacketId];
-                    contextToRemove.IsFinished = true;
-                    contextToRemove.IsSucceeded = true;
-                    _packetsWaitingForAck.Remove(packet.PacketId);
-
-                    _client.OnPacketAcknowledged(contextToRemove.PacketToSend, packet);
-                }
-                else {
-                    HandleRoguePacketReceived(packet);
-                }
+            if (_packetsToSend.TryFinalize(packet.PacketId, out var finalizedContext)) {
+                _client.OnPacketAcknowledged(finalizedContext.PacketToSend, packet);
+            }
+            else {
+                HandleRoguePacketReceived(packet);
             }
         }
 
