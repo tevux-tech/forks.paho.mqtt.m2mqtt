@@ -22,24 +22,22 @@ namespace Tevux.Protocols.Mqtt {
         /// Publish a message asynchronously (QoS Level 0 and not retained)
         /// </summary>
         /// <returns>Packet Id related to PUBLISH message</returns>
-        public ushort Publish(string topic, byte[] message) {
+        public void Publish(string topic, byte[] message) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
-            return Publish(topic, message, QosLevel.AtMostOnce, false);
+            Publish(topic, message, QosLevel.AtMostOnce, false);
         }
 
         /// <summary>
         /// Publish a message asynchronously
         /// </summary>
         /// <returns>Packet Id related to PUBLISH packet</returns>
-        public ushort Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
+        public void Publish(string topic, byte[] message, QosLevel qosLevel, bool retain) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             var publishPacket = new PublishPacket(topic, message, qosLevel, retain);
 
             _outgoingPublishStateMachine.Publish(publishPacket);
-
-            return publishPacket.PacketId;
         }
     }
 }
