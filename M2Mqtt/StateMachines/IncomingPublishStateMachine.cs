@@ -3,18 +3,14 @@
 namespace Tevux.Protocols.Mqtt {
     internal class IncomingPublishStateMachine {
         private MqttClient _client;
-
-        private readonly ResendingStateMachine _qos1PubackQueue = new ResendingStateMachine();
         private readonly ResendingStateMachine _qos2PubrecQueue = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
-            _qos1PubackQueue.Initialize(client);
             _qos2PubrecQueue.Initialize(client);
         }
 
         public void Tick() {
-            _qos1PubackQueue.Tick();
             _qos2PubrecQueue.Tick();
         }
 
@@ -26,14 +22,11 @@ namespace Tevux.Protocols.Mqtt {
             if (packet.QosLevel == QosLevel.AtMostOnce) {
                 // Those are the best packets - just sending no responses!
                 NotifyPublishReceived(packet);
-
             }
-
-#warning Should I check here for duplicate incoming messages? Which may already be in the pipeline?
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 var pubAckPacket = new PubackPacket(packet.PacketId);
-                var context = new PublishTransmissionContext(packet, pubAckPacket, currentTime);
-                _qos1PubackQueue.Enqueue(context);
+                _client.Send(pubAckPacket);
+                Trace.LogOutgoingPacket(pubAckPacket);
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
