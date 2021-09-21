@@ -3,17 +3,16 @@ using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class SubscriptionStateMachine {
-        private readonly string _indent = "                                        ";
         private MqttClient _client;
-        private ResendingStateMachine _packetsToSend = new ResendingStateMachine();
+        private ResendingStateMachine _sendQueue = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
-            _packetsToSend.Initialize(client);
+            _sendQueue.Initialize(client);
         }
 
         public void Tick() {
-            _packetsToSend.Tick();
+            _sendQueue.Tick();
         }
 
         public bool Subscribe(SubscribePacket packet, bool waitForCompletion = false) {
@@ -27,9 +26,9 @@ namespace Tevux.Protocols.Mqtt {
         private bool InternalSubscribeUnsubscribe(ControlPacketBase packet, bool waitForCompletion = false) {
             var currentTime = Helpers.GetCurrentTime();
 
-            var transmissionContext = new TransmissionContext() { PacketToSend = packet, AttemptNumber = 1, Timestamp = currentTime };
+            var transmissionContext = new TransmissionContext(packet, currentTime);
 
-            _packetsToSend.Enqueue(transmissionContext);
+            _sendQueue.Enqueue(transmissionContext);
 
             if (waitForCompletion) {
                 var timeToBreak = false;
@@ -53,9 +52,9 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         private void InternalProcessPacket(ControlPacketBase packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
+            Trace.LogIncomingPacket(packet);
 
-            if (_packetsToSend.TryFinalize(packet.PacketId, out var finalizedContext)) {
+            if (_sendQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
                 _client.OnPacketAcknowledged(finalizedContext.PacketToSend, packet);
             }
             else {
@@ -64,7 +63,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         private void HandleRoguePacketReceived(ControlPacketBase packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()} (R)");
+            Trace.LogIncomingPacket(packet, true);
         }
     }
 }

@@ -83,6 +83,10 @@ namespace Tevux.Protocols.Mqtt {
                         return "Undefi";
                 }
             }
+
+            public static string GetShortBlank() {
+                return "      ";
+            }
         }
 
         private static ushort _packetIdCounter = 0;

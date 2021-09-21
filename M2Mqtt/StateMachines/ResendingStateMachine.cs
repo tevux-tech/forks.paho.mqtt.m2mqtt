@@ -4,6 +4,7 @@ using Tevux.Protocols.Mqtt.Utility;
 namespace Tevux.Protocols.Mqtt {
     internal class ResendingStateMachine {
         private readonly string _indent = "            ";
+        private readonly string _blank = ControlPacketBase.PacketTypes.GetShortBlank();
         private MqttClient _client;
         private readonly Hashtable _contexts = new Hashtable();
         private readonly ConcurrentQueue _itemsToRemove = new ConcurrentQueue();
@@ -34,7 +35,7 @@ namespace Tevux.Protocols.Mqtt {
 
             while (_itemsToRemove.TryDequeue(out var item)) {
                 var context = (TransmissionContext)item;
-                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}         {context.PacketToSend.PacketId:X4} FAILED");
+                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}{_blank}{context.PacketToSend.PacketId:X4} FAILED");
                 lock (_contexts.SyncRoot) {
                     _contexts.Remove(context.PacketId);
                 }
@@ -42,12 +43,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void Send(TransmissionContext context) {
-            if (context.AttemptNumber < 2) {
-                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{context.PacketToSend.GetShortName()}-> {context.PacketId:X4}");
-            }
-            else {
-                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{context.PacketToSend.GetShortName()}-> {context.PacketId:X4} ({context.AttemptNumber})");
-            }
+            Trace.LogOutgoingPacket(context.PacketToSend, context.AttemptNumber);
 
             _client.Send(context.PacketToSend);
         }

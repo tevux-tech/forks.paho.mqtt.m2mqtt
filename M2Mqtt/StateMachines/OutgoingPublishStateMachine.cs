@@ -1,9 +1,7 @@
-﻿using System;
-using Tevux.Protocols.Mqtt.Utility;
+﻿using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class OutgoingPublishStateMachine {
-        private string _indent = "            ";
         private MqttClient _client;
 
         private ResendingStateMachine _qos1PublishQueue = new ResendingStateMachine();
@@ -26,12 +24,12 @@ namespace Tevux.Protocols.Mqtt {
         public void Publish(PublishPacket packet) {
             var currentTime = Helpers.GetCurrentTime();
 
-            var context = new PublishTransmissionContext() { OriginalPublishPacket = packet, PacketToSend = packet, AttemptNumber = 1, Timestamp = currentTime };
+            var context = new PublishTransmissionContext(packet, packet, currentTime);
 
             if (packet.QosLevel == QosLevel.AtMostOnce) {
                 // Those are the best packets - just sending and waiting for no responses!
                 _client.Send(context.PacketToSend);
-                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{packet.GetShortName()}-> {packet.PacketId:X4}");
+                Trace.LogOutgoingPacket(packet);
             }
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 _qos1PublishQueue.Enqueue(context);
@@ -45,33 +43,26 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(PubackPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
-
-            var isFinalized = _qos1PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext);
-
-            if (isFinalized) {
+            if (_qos1PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
+                Trace.LogIncomingPacket(packet);
                 NotifyPublishSucceeded(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
-                Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
-                NotifyRoguePacketReceived(packet.PacketId);
-
+                NotifyRoguePacketReceived(packet);
             }
         }
 
         public void ProcessPacket(PubrecPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
             var currentTime = Helpers.GetCurrentTime();
             var isOk = true;
 
-            var isPublishFinalized = _qos2PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext);
-            if (isPublishFinalized) {
+            if (_qos2PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
+                Trace.LogIncomingPacket(packet);
                 NotifyPublishSucceeded(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
-                Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
                 isOk = false;
-                NotifyRoguePacketReceived(packet.PacketId);
+                NotifyRoguePacketReceived(packet);
             }
 
             if (isOk) {
@@ -86,16 +77,13 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(PubcompPacket packet) {
-            if ((new Random()).Next(5) > 2) return;
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
+            Trace.LogIncomingPacket(packet);
 
-            var isPubrelFinalized = _qos2PubrelQueue.TryFinalize(packet.PacketId, out var finalizedContext);
-            if (isPubrelFinalized) {
+            if (_qos2PubrelQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
                 // do nothing?..
             }
             else {
-                Trace.WriteLine(TraceLevel.Queuing, $"            <-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
-                NotifyRoguePacketReceived(packet.PacketId);
+                NotifyRoguePacketReceived(packet);
             }
         }
 
@@ -106,7 +94,9 @@ namespace Tevux.Protocols.Mqtt {
         private void NotifyPublishFailed(ushort packetId) {
             _client.OnMqttMsgPublished(packetId, false);
         }
-        private void NotifyRoguePacketReceived(ushort packetId) { }
+        private void NotifyRoguePacketReceived(ControlPacketBase packet) {
+            Trace.LogIncomingPacket(packet, true);
+        }
 
     }
 }

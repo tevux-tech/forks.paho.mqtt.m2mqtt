@@ -31,7 +31,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(ConnackPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"<-{packet.GetShortName()}");
+            Trace.LogIncomingPacket(packet);
 
             _isWaitingForConnack = false;
             IsConnectionCompleted = true;
@@ -43,7 +43,7 @@ namespace Tevux.Protocols.Mqtt {
             _client.Send(packet);
             _isWaitingForConnack = true;
             _requestTimestamp = currentTime;
-            Trace.WriteLine(TraceLevel.Frame, $"{packet.GetShortName()}->");
+            Trace.LogOutgoingPacket(packet);
         }
 
         public void Reset() {

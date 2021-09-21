@@ -14,6 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using System.Diagnostics;
 
 namespace Tevux.Protocols.Mqtt.Utility {
@@ -60,6 +61,50 @@ namespace Tevux.Protocols.Mqtt.Utility {
             if ((level & TraceLevel) > 0) {
                 TraceListener(format, arg1, arg2, arg3);
             }
+        }
+
+        internal static void LogIncomingPacket(ControlPacketBase packet, bool isRogue = false) {
+            var categoryIndent = "        " + ControlPacketBase.PacketTypes.GetShortBlank() + "   ";
+
+            switch (packet.Type) {
+                case ControlPacketBase.PacketTypes.Conack:
+                    categoryIndent += "                                                ";
+                    break;
+                case ControlPacketBase.PacketTypes.Suback:
+                case ControlPacketBase.PacketTypes.Unsuback:
+                    categoryIndent += "                        ";
+                    break;
+            }
+
+            var rogueSuffix = isRogue ? "(R)" : "";
+
+            Debug($"{categoryIndent}{packet.PacketId:X4} <-{packet.GetShortName()} {rogueSuffix}");
+        }
+        internal static void LogOutgoingPacket(ControlPacketBase packet, int attemptNumber = 1) {
+            var categoryIndent = "        ";
+
+            switch (packet.Type) {
+                case ControlPacketBase.PacketTypes.Connect:
+                case ControlPacketBase.PacketTypes.Disconnect:
+                    categoryIndent += "                                                ";
+                    break;
+                case ControlPacketBase.PacketTypes.Subscribe:
+                case ControlPacketBase.PacketTypes.Unsubscribe:
+                    categoryIndent += "                        ";
+                    break;
+            }
+
+            var attemptSuffix = attemptNumber > 1 ? attemptNumber.ToString() : "";
+
+
+            Debug($"{categoryIndent}{packet.GetShortName()}-> {packet.PacketId:X4} {attemptSuffix}");
+        }
+
+
+        public static void ReturnWith50PercentChance() {
+#if DEBUG
+            if ((new Random()).Next(5) > 2) return;
+#endif
         }
 
     }

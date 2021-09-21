@@ -2,11 +2,10 @@
 
 namespace Tevux.Protocols.Mqtt {
     internal class IncomingPublishStateMachine {
-        private string _indent = "            ";
         private MqttClient _client;
 
-        private ResendingStateMachine _qos1PubackQueue = new ResendingStateMachine();
-        private ResendingStateMachine _qos2PubrecQueue = new ResendingStateMachine();
+        private readonly ResendingStateMachine _qos1PubackQueue = new ResendingStateMachine();
+        private readonly ResendingStateMachine _qos2PubrecQueue = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
@@ -20,7 +19,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(PublishPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()} ");
+            Trace.LogIncomingPacket(packet);
 
             var currentTime = Helpers.GetCurrentTime();
 
@@ -33,31 +32,31 @@ namespace Tevux.Protocols.Mqtt {
 #warning Should I check here for duplicate incoming messages? Which may already be in the pipeline?
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 var pubAckPacket = new PubackPacket(packet.PacketId);
-                var context = new PublishTransmissionContext() { OriginalPublishPacket = packet, PacketToSend = pubAckPacket, AttemptNumber = 1, Timestamp = currentTime };
+                var context = new PublishTransmissionContext(packet, pubAckPacket, currentTime);
                 _qos1PubackQueue.Enqueue(context);
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
-                var context = new PublishTransmissionContext() { OriginalPublishPacket = packet, PacketToSend = pubRecPacket, AttemptNumber = 1, Timestamp = currentTime };
+                var context = new PublishTransmissionContext(packet, pubRecPacket, currentTime);
                 _qos2PubrecQueue.Enqueue(context);
             }
         }
 
         public void ProcessPacket(PubrelPacket packet) {
             var currentTime = Helpers.GetCurrentTime();
-            Trace.WriteLine(TraceLevel.Frame, $"{_indent}         {packet.PacketId:X4} <-{packet.GetShortName()}");
+            Trace.LogIncomingPacket(packet);
 
             var isOk = true;
 
             var isFinalized = _qos2PubrecQueue.TryFinalize(packet.PacketId, out var finalizedContext);
 
             if (isFinalized) {
+                Trace.LogIncomingPacket(packet);
                 NotifyPublishReceived(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
                 isOk = false;
-                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}<-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
-                NotifyRoguePacketReceived(packet.PacketId);
+                NotifyRoguePacketReceived(packet);
             }
 
             if (isOk) {
@@ -65,7 +64,7 @@ namespace Tevux.Protocols.Mqtt {
 #warning server may ask resend PubRel if for some reason this PubComp is lost. Need to handle that, too.
 
                 _client.Send(pubcompPacket);
-                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{pubcompPacket.GetShortName()}-> {pubcompPacket.PacketId:X4}");
+                Trace.LogOutgoingPacket(pubcompPacket);
             }
         }
 
@@ -76,7 +75,9 @@ namespace Tevux.Protocols.Mqtt {
         private void NotifyPublishFailed(ushort packetId) {
             // _client.OnMqttMsgPublished(packet, false);
         }
-        private void NotifyRoguePacketReceived(ushort packetId) { }
+        private void NotifyRoguePacketReceived(ControlPacketBase packet) {
+            Trace.LogIncomingPacket(packet, true);
+        }
 
     }
 }

@@ -26,16 +26,25 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Attempt (for retry)
         /// </summary>
-        public int AttemptNumber { get; set; }
+        public int AttemptNumber { get; set; } = 1;
 
-        public bool IsFinished { get; set; }
-        public bool IsSucceeded { get; set; }
+        public bool IsFinished { get; set; } = false;
+        public bool IsSucceeded { get; set; } = false;
         public virtual ushort PacketId { get { return PacketToSend.PacketId; } }
+
+        public TransmissionContext(ControlPacketBase packetToSend, double timestamp) {
+            PacketToSend = packetToSend;
+            Timestamp = timestamp;
+        }
     }
 
     internal class PublishTransmissionContext : TransmissionContext {
         public PublishPacket OriginalPublishPacket { get; set; }
 
         public override ushort PacketId { get { return OriginalPublishPacket.PacketId; } }
+
+        public PublishTransmissionContext(PublishPacket originalPublishPacket, ControlPacketBase packetToSend, double timestamp) : base(packetToSend, timestamp) {
+            OriginalPublishPacket = originalPublishPacket;
+        }
     }
 }
