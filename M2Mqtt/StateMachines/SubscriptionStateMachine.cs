@@ -28,15 +28,15 @@ namespace Tevux.Protocols.Mqtt {
                     else if (currentTime - context.Timestamp > _client.ConnectionOptions.RetryDelay) {
                         context.AttemptNumber++;
                         context.Timestamp = currentTime;
-                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}{context.Packet.GetShortName()}-> {context.PacketId:X4} ({context.AttemptNumber})");
-                        _client.Send(context.Packet);
+                        Trace.WriteLine(TraceLevel.Frame, $"{_indent}{context.PacketToSend.GetShortName()}-> {context.PacketId:X4} ({context.AttemptNumber})");
+                        _client.Send(context.PacketToSend);
                     }
                 }
             }
 
             while (_tempList.TryDequeue(out var item)) {
                 var context = (TransmissionContext)item;
-                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}         {context.Packet.PacketId:X4} FAILED");
+                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}         {context.PacketToSend.PacketId:X4} FAILED");
                 lock (_packetsWaitingForAck.SyncRoot) {
                     _packetsWaitingForAck.Remove(context.PacketId);
                 }
@@ -54,7 +54,7 @@ namespace Tevux.Protocols.Mqtt {
         private bool InternalSubscribeUnsubscribe(ControlPacketBase packet, bool waitForCompletion = false) {
             var currentTime = Helpers.GetCurrentTime();
 
-            var transmissionContext = new TransmissionContext() { Packet = packet, AttemptNumber = 1, Timestamp = currentTime };
+            var transmissionContext = new TransmissionContext() { PacketToSend = packet, AttemptNumber = 1, Timestamp = currentTime };
 
             lock (_packetsWaitingForAck.SyncRoot) {
                 _packetsWaitingForAck.Add(transmissionContext.PacketId, transmissionContext);
@@ -72,7 +72,9 @@ namespace Tevux.Protocols.Mqtt {
                 }
             }
 
-            return transmissionContext.IsSucceeded;
+            var returnResult = waitForCompletion ? transmissionContext.IsSucceeded : true;
+
+            return returnResult;
         }
 
         public void ProcessPacket(SubackPacket packet) {
@@ -92,7 +94,7 @@ namespace Tevux.Protocols.Mqtt {
                     contextToRemove.IsSucceeded = true;
                     _packetsWaitingForAck.Remove(packet.PacketId);
 
-                    _client.OnPacketAcknowledged(contextToRemove.Packet, packet);
+                    _client.OnPacketAcknowledged(contextToRemove.PacketToSend, packet);
                 }
                 else {
                     HandleRoguePacketReceived(packet);

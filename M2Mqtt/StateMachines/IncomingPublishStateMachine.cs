@@ -1,24 +1,22 @@
-﻿using System.Collections;
-using Tevux.Protocols.Mqtt.Utility;
+﻿using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class IncomingPublishStateMachine {
         private string _indent = "            ";
         private MqttClient _client;
-        private readonly ConcurrentQueue _tempList = new ConcurrentQueue();
 
-        private readonly Hashtable _packetsQoS1PubAck = new Hashtable();
-        private readonly Hashtable _packetQoS2PubRec = new Hashtable();
-        private readonly Hashtable _packetQoS2PubComp = new Hashtable();
+        private ResendingStateMachine _qos1PubackQueue = new ResendingStateMachine();
+        private ResendingStateMachine _qos2PubrecQueue = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
+            _qos1PubackQueue.Initialize(client);
+            _qos2PubrecQueue.Initialize(client);
         }
 
         public void Tick() {
-            ResendAndClean(_packetsQoS1PubAck);
-            ResendAndClean(_packetQoS2PubRec);
-            ResendAndClean(_packetQoS2PubComp);
+            _qos1PubackQueue.Tick();
+            _qos2PubrecQueue.Tick();
         }
 
         public void ProcessPacket(PublishPacket packet) {
@@ -35,19 +33,13 @@ namespace Tevux.Protocols.Mqtt {
 #warning Should I check here for duplicate incoming messages? Which may already be in the pipeline?
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 var pubAckPacket = new PubackPacket(packet.PacketId);
-                lock (_packetsQoS1PubAck.SyncRoot) {
-                    _packetsQoS1PubAck.Add(packet.PacketId, new TransmissionContext() { Packet = pubAckPacket, AttemptNumber = 1, Timestamp = currentTime });
-                }
-                _client.Send(pubAckPacket.GetBytes());
-                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{packet.GetShortName()}-> {pubAckPacket.PacketId:X4}");
+                var context = new PublishTransmissionContext() { OriginalPublishPacket = packet, PacketToSend = pubAckPacket, AttemptNumber = 1, Timestamp = currentTime };
+                _qos1PubackQueue.Enqueue(context);
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
-                lock (_packetQoS2PubRec.SyncRoot) {
-                    _packetQoS2PubRec.Add(packet.PacketId, new TransmissionContext() { Packet = pubRecPacket, AttemptNumber = 1, Timestamp = currentTime });
-                }
-                _client.Send(pubRecPacket.GetBytes());
-                Trace.WriteLine(TraceLevel.Frame, $"{_indent}{pubRecPacket.GetShortName()}-> {pubRecPacket.PacketId:X4}");
+                var context = new PublishTransmissionContext() { OriginalPublishPacket = packet, PacketToSend = pubRecPacket, AttemptNumber = 1, Timestamp = currentTime };
+                _qos2PubrecQueue.Enqueue(context);
             }
         }
 
@@ -57,19 +49,15 @@ namespace Tevux.Protocols.Mqtt {
 
             var isOk = true;
 
-            lock (_packetQoS2PubRec.SyncRoot) {
-                if (_packetQoS2PubRec.Contains(packet.PacketId)) {
-                    // var originalMessage = (MqttMsgPublish)_messagesWaitingForQoS2Pubrel[message.MessageId];
-                    _packetQoS2PubRec.Remove(packet.PacketId);
+            var isFinalized = _qos2PubrecQueue.TryFinalize(packet.PacketId, out var finalizedContext);
 
-#warning need to extract original publish message here
-                    // NotifyPublishReceived(message);
-                }
-                else {
-                    isOk = false;
-                    Trace.WriteLine(TraceLevel.Queuing, $"{_indent}<-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
-                    NotifyRoguePacketReceived(packet.PacketId);
-                }
+            if (isFinalized) {
+                NotifyPublishReceived(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
+            }
+            else {
+                isOk = false;
+                Trace.WriteLine(TraceLevel.Queuing, $"{_indent}<-Rogue {packet.GetShortName()} packet for PacketId {packet.PacketId:X4}");
+                NotifyRoguePacketReceived(packet.PacketId);
             }
 
             if (isOk) {
@@ -78,35 +66,6 @@ namespace Tevux.Protocols.Mqtt {
 
                 _client.Send(pubcompPacket);
                 Trace.WriteLine(TraceLevel.Frame, $"{_indent}{pubcompPacket.GetShortName()}-> {pubcompPacket.PacketId:X4}");
-            }
-        }
-
-        private void ResendAndClean(Hashtable packetTable) {
-            var currentTime = Helpers.GetCurrentTime();
-
-            lock (packetTable.SyncRoot) {
-                foreach (DictionaryEntry item in packetTable) {
-                    var queuedItem = (TransmissionContext)item.Value;
-
-                    if (currentTime - queuedItem.Timestamp > _client.ConnectionOptions.RetryDelay) {
-                        _client.Send(queuedItem.Packet);
-                        queuedItem.AttemptNumber++;
-                    }
-
-                    if (queuedItem.AttemptNumber > _client.ConnectionOptions.MaxRetryCount) {
-                        _tempList.Enqueue(item.Key);
-                        Trace.WriteLine(TraceLevel.Queuing, $"            Packet {queuedItem.Packet.PacketId} could not be sent, even after retries.");
-                        NotifyPublishFailed(queuedItem.Packet.PacketId);
-                    }
-                }
-            }
-
-
-            while (_tempList.TryDequeue(out var item)) {
-                Trace.WriteLine(TraceLevel.Queuing, $"            Cleaning unacknowledged packet {item}.");
-                lock (packetTable.SyncRoot) {
-                    packetTable.Remove(item);
-                }
             }
         }
 

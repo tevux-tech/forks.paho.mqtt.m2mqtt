@@ -16,7 +16,7 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     internal class TransmissionContext {
-        public ControlPacketBase Packet { get; set; }
+        public ControlPacketBase PacketToSend { get; set; }
 
         /// <summary>
         /// Timestamp in ticks (for retry)
@@ -30,6 +30,12 @@ namespace Tevux.Protocols.Mqtt {
 
         public bool IsFinished { get; set; }
         public bool IsSucceeded { get; set; }
-        public ushort PacketId { get { return Packet.PacketId; } }
+        public virtual ushort PacketId { get { return PacketToSend.PacketId; } }
+    }
+
+    internal class PublishTransmissionContext : TransmissionContext {
+        public PublishPacket OriginalPublishPacket { get; set; }
+
+        public override ushort PacketId { get { return OriginalPublishPacket.PacketId; } }
     }
 }
