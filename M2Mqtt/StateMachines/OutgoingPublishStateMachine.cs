@@ -4,9 +4,9 @@ namespace Tevux.Protocols.Mqtt {
     internal class OutgoingPublishStateMachine {
         private MqttClient _client;
 
-        private ResendingStateMachine _qos1PublishQueue = new ResendingStateMachine();
-        private ResendingStateMachine _qos2PublishQueue = new ResendingStateMachine();
-        private ResendingStateMachine _qos2PubrelQueue = new ResendingStateMachine();
+        private readonly ResendingStateMachine _qos1PublishQueue = new ResendingStateMachine();
+        private readonly ResendingStateMachine _qos2PublishQueue = new ResendingStateMachine();
+        private readonly ResendingStateMachine _qos2PubrelQueue = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
@@ -27,7 +27,7 @@ namespace Tevux.Protocols.Mqtt {
             var context = new PublishTransmissionContext(packet, packet, currentTime);
 
             if (packet.QosLevel == QosLevel.AtMostOnce) {
-                // Those are the best packets - just sending and waiting for no responses!
+                // Those are the best packets - just sending and waiting for no response!
                 _client.Send(context.PacketToSend);
                 Trace.LogOutgoingPacket(packet);
             }
@@ -48,55 +48,51 @@ namespace Tevux.Protocols.Mqtt {
                 NotifyPublishSucceeded(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
+                // Not sure under what circumstances this may happen, but broker sent a duplicate Puback packet.
+                // I think discarding the packet is just fine.
                 NotifyRoguePacketReceived(packet);
             }
         }
 
         public void ProcessPacket(PubrecPacket packet) {
             var currentTime = Helpers.GetCurrentTime();
-            var isOk = true;
 
             if (_qos2PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
                 Trace.LogIncomingPacket(packet);
                 NotifyPublishSucceeded(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
-                isOk = false;
+                // Broker did not receive Pubrel packet in time, so it resent Pubrec, but the original Publish packet is no longer in the queue.
+                // However, Pubrel for the original packet may still be in the sending queue.
+                // If so, need to to pull it out and start Pubrel-Pubcomp workflow afresh.
+                _ = _qos2PubrelQueue.TryFinalize(packet.PacketId, out var _);
                 NotifyRoguePacketReceived(packet);
             }
 
-            if (isOk) {
-                var pubrelPacket = new PubrelPacket(packet.PacketId);
-                finalizedContext.PacketToSend = pubrelPacket;
-                finalizedContext.AttemptNumber = 1;
-                finalizedContext.Timestamp = currentTime;
-                finalizedContext.IsFinished = false;
-                finalizedContext.IsSucceeded = false;
-                _qos2PubrelQueue.Enqueue(finalizedContext);
-            }
+            var pubrelPacket = new PubrelPacket(packet.PacketId);
+            finalizedContext.PacketToSend = pubrelPacket;
+            finalizedContext.AttemptNumber = 1;
+            finalizedContext.Timestamp = currentTime;
+            finalizedContext.IsFinished = false;
+            finalizedContext.IsSucceeded = false;
+            _qos2PubrelQueue.Enqueue(finalizedContext);
         }
 
         public void ProcessPacket(PubcompPacket packet) {
-            Trace.LogIncomingPacket(packet);
-
-            if (_qos2PubrelQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
-                // do nothing?..
+            if (_qos2PubrelQueue.TryFinalize(packet.PacketId, out _)) {
+                // Ain't much to do here. QoS 2 sending is now complete.
+                Trace.LogIncomingPacket(packet);
             }
             else {
                 NotifyRoguePacketReceived(packet);
             }
         }
 
-#warning of course, that's not the place to raise events.
-        private void NotifyPublishSucceeded(ControlPacketBase packet) {
-            _client.OnMqttMsgPublished(packet.PacketId, true);
-        }
-        private void NotifyPublishFailed(ushort packetId) {
-            _client.OnMqttMsgPublished(packetId, false);
+        private void NotifyPublishSucceeded(PublishPacket packet) {
+            _client.OnPacketAcknowledged(packet, null);
         }
         private void NotifyRoguePacketReceived(ControlPacketBase packet) {
             Trace.LogIncomingPacket(packet, true);
         }
-
     }
 }

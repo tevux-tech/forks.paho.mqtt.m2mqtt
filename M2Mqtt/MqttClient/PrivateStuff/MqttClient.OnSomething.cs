@@ -19,23 +19,6 @@ using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Wrapper method for raising PUBLISH message received event
-        /// </summary>
-        /// <param name="publish">PUBLISH message received</param>
-        internal void OnMqttMsgPublishReceived(PublishPacket publish) {
-
-        }
-
-        /// <summary>
-        /// Wrapper method for raising published message event
-        /// </summary>
-        /// <param name="packetId">Message identifier for published message</param>
-        /// <param name="isPublished">Publish flag</param>
-        internal void OnMqttMsgPublished(ushort packetId, bool isPublished) {
-            // Published?.Invoke(this, new PublishFinishedEventArgs(receivedPacket.PacketId, true));
-        }
-
         internal void OnPacketAcknowledged(ControlPacketBase sentPacket, ControlPacketBase receivedPacket) {
             // Creating a separate thread because those events are raised from state machines,
             // and I cannot let the end user to block them by attaching a long-running handlers.
@@ -49,6 +32,9 @@ namespace Tevux.Protocols.Mqtt {
                 }
                 else if (receivedPacket is PublishPacket publishReceivedPacket) {
                     PublishReceived?.Invoke(this, new PublishReceivedEventArgs(publishReceivedPacket.Topic, publishReceivedPacket.Message));
+                }
+                else if (sentPacket is PublishPacket publishedPacket) {
+                    Published?.Invoke(this, new PublishFinishedEventArgs(publishedPacket.Topic));
                 }
             }).Start();
         }
