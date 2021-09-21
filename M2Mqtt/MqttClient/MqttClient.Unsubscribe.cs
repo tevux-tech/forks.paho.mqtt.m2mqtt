@@ -22,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
             return InternalUnsubscribe(topic, true);
         }
         public void Unsubscribe(string topic) {
-            InternalUnsubscribe(topic, false);
+            _ = InternalUnsubscribe(topic, false);
         }
 
         /// <summary>

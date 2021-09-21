@@ -93,7 +93,7 @@ namespace Tevux.Protocols.Mqtt {
             bool isSent;
 
             try {
-                _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
+                _ = _socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
                 isSent = true;
             }
             catch (Exception) {

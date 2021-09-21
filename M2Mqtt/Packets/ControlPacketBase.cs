@@ -140,8 +140,7 @@ namespace Tevux.Protocols.Mqtt {
         /// Encode remaining length and insert it into packet buffer
         /// </summary>
         /// <param name="index">Index from which insert encoded value into buffer</param>
-        /// <returns>Index updated</returns>
-        protected static int EncodeRemainingLength(int remainingLength, byte[] buffer, int index) {
+        protected static void EncodeRemainingLength(int remainingLength, byte[] buffer, int index) {
             do {
                 var digit = remainingLength % 128;
                 remainingLength /= 128;
@@ -150,8 +149,6 @@ namespace Tevux.Protocols.Mqtt {
                 }
                 buffer[index++] = (byte)digit;
             } while (remainingLength > 0);
-
-            return index;
         }
 
         /// <summary>
@@ -168,30 +165,28 @@ namespace Tevux.Protocols.Mqtt {
         /// </summary>
         public static string GetTraceString(string name, object[] fieldNames, object[] fieldValues) {
             object GetStringObject(object value) {
-                var binary = value as byte[];
-                if (binary != null) {
+                if (value is byte[] binary) {
                     var hexChars = "0123456789ABCDEF";
                     var sb = new System.Text.StringBuilder(binary.Length * 2);
                     for (var i = 0; i < binary.Length; ++i) {
-                        sb.Append(hexChars[binary[i] >> 4]);
-                        sb.Append(hexChars[binary[i] & 0x0F]);
+                        _ = sb.Append(hexChars[binary[i] >> 4]);
+                        _ = sb.Append(hexChars[binary[i] & 0x0F]);
                     }
 
                     return sb.ToString();
                 }
 
-                var list = value as object[];
-                if (list != null) {
+                if (value is object[] list) {
                     var sb = new System.Text.StringBuilder();
-                    sb.Append('[');
+                    _ = sb.Append('[');
                     for (var i = 0; i < list.Length; ++i) {
                         if (i > 0) {
-                            sb.Append(',');
+                            _ = sb.Append(',');
                         }
 
-                        sb.Append(list[i]);
+                        _ = sb.Append(list[i]);
                     }
-                    sb.Append(']');
+                    _ = sb.Append(']');
 
                     return sb.ToString();
                 }
@@ -200,24 +195,24 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             var outputBuilder = new System.Text.StringBuilder();
-            outputBuilder.Append(name);
+            _ = outputBuilder.Append(name);
 
             if ((fieldNames != null) && (fieldValues != null)) {
-                outputBuilder.Append("(");
+                _ = outputBuilder.Append("(");
                 var addComma = false;
                 for (var i = 0; i < fieldValues.Length; i++) {
                     if (fieldValues[i] != null) {
                         if (addComma) {
-                            outputBuilder.Append(",");
+                            _ = outputBuilder.Append(",");
                         }
 
-                        outputBuilder.Append(fieldNames[i]);
-                        outputBuilder.Append(":");
-                        outputBuilder.Append(GetStringObject(fieldValues[i]));
+                        _ = outputBuilder.Append(fieldNames[i]);
+                        _ = outputBuilder.Append(":");
+                        _ = outputBuilder.Append(GetStringObject(fieldValues[i]));
                         addComma = true;
                     }
                 }
-                outputBuilder.Append(")");
+                _ = outputBuilder.Append(")");
             }
 
             return outputBuilder.ToString();

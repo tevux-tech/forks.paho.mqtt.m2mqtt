@@ -103,7 +103,7 @@ namespace Tevux.Protocols.Mqtt.Utility {
 
         public static void ReturnWith50PercentChance() {
 #if DEBUG
-            if ((new Random()).Next(5) > 2) return;
+            if ((new Random()).Next(5) > 2) { return; }
 #endif
         }
 

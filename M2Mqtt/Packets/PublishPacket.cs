@@ -25,7 +25,7 @@ namespace Tevux.Protocols.Mqtt {
         public string Topic { get; private set; }
         public byte[] Message { get; private set; }
         public QosLevel QosLevel { get; private set; }
-        public bool DupFlag { get; internal set; }
+        public bool DuplicateFlag { get; internal set; }
         public bool RetainFlag { get; private set; }
 
         internal PublishPacket() {
@@ -72,7 +72,7 @@ namespace Tevux.Protocols.Mqtt {
             // Finally, building the resulting full payload.
             var finalBuffer = new byte[fixedHeaderSize + remainingLength];
             finalBuffer[0] = (byte)(Type << 4);
-            finalBuffer[0] += (byte)((DupFlag ? 1 : 0) << 3);
+            finalBuffer[0] += (byte)((DuplicateFlag ? 1 : 0) << 3);
             finalBuffer[0] += (byte)(((byte)QosLevel) << 1);
             finalBuffer[0] += (byte)((RetainFlag ? 1 : 0) << 0);
             EncodeRemainingLength(remainingLength, finalBuffer, 1);
@@ -104,7 +104,7 @@ namespace Tevux.Protocols.Mqtt {
             }
 
             // read DUP flag from fixed header
-            parsedPacket.DupFlag = (flags >> 3) == 0x01;
+            parsedPacket.DuplicateFlag = (flags >> 3) == 0x01;
 
             // read retain flag from fixed header
             parsedPacket.RetainFlag = ((flags & 0x01) >> 0) == 0x01;

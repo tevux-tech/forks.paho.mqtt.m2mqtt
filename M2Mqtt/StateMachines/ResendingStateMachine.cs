@@ -48,7 +48,7 @@ namespace Tevux.Protocols.Mqtt {
             _client.Send(context.PacketToSend);
         }
 
-        public void Enqueue(TransmissionContext context) {
+        public void EnqueueAndSend(TransmissionContext context) {
             Send(context);
             lock (_contexts.SyncRoot) {
                 _contexts.Add(context.PacketId, context);

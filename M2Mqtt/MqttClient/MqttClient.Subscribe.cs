@@ -22,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
             return InternalSubscribe(topic, qosLevel, true);
         }
         public void Subscribe(string topic, QosLevel qosLevel) {
-            InternalSubscribe(topic, qosLevel, false);
+            _ = InternalSubscribe(topic, qosLevel, false);
         }
         private bool InternalSubscribe(string topic, QosLevel qosLevel, bool waitForCompletion = false) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }

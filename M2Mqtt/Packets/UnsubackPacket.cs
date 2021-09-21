@@ -30,10 +30,10 @@ namespace Tevux.Protocols.Mqtt {
 
         public static bool TryParse(byte[] variableHeaderBytes, out UnsubackPacket parsedPacket) {
             var isOk = true;
-            parsedPacket = new UnsubackPacket();
-
-            // Bytes 1-2: Packet Identifier. Can be anything.
-            parsedPacket.PacketId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1]);
+            parsedPacket = new UnsubackPacket {
+                // Bytes 1-2: Packet Identifier. Can be anything.
+                PacketId = (ushort)((variableHeaderBytes[0] << 8) + variableHeaderBytes[1])
+            };
 
             return isOk;
         }

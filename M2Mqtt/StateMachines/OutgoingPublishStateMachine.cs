@@ -32,14 +32,17 @@ namespace Tevux.Protocols.Mqtt {
                 Trace.LogOutgoingPacket(packet);
             }
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
-                _qos1PublishQueue.Enqueue(context);
+                _qos1PublishQueue.EnqueueAndSend(context);
+
+                // Any subsequent Publish packet transmissions must be marked with Duplicate flag.
+                packet.DuplicateFlag = true;
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
-                _qos2PublishQueue.Enqueue(context);
-            }
+                _qos2PublishQueue.EnqueueAndSend(context);
 
-#warning errrr?..
-            packet.DupFlag = true;
+                // Any subsequent Publish packet transmissions must be marked with Duplicate flag.
+                packet.DuplicateFlag = true;
+            }
         }
 
         public void ProcessPacket(PubackPacket packet) {
@@ -75,7 +78,7 @@ namespace Tevux.Protocols.Mqtt {
             finalizedContext.Timestamp = currentTime;
             finalizedContext.IsFinished = false;
             finalizedContext.IsSucceeded = false;
-            _qos2PubrelQueue.Enqueue(finalizedContext);
+            _qos2PubrelQueue.EnqueueAndSend(finalizedContext);
         }
 
         public void ProcessPacket(PubcompPacket packet) {

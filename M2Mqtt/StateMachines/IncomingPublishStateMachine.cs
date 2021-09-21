@@ -39,7 +39,7 @@ namespace Tevux.Protocols.Mqtt {
                 // Normal workflow starts here.
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
                 var context = new PublishTransmissionContext(packet, pubRecPacket, currentTime);
-                _qos2PubrecQueue.Enqueue(context);
+                _qos2PubrecQueue.EnqueueAndSend(context);
             }
         }
 

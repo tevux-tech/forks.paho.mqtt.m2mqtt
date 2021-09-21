@@ -4,7 +4,7 @@ using Tevux.Protocols.Mqtt.Utility;
 namespace Tevux.Protocols.Mqtt {
     internal class SubscriptionStateMachine {
         private MqttClient _client;
-        private ResendingStateMachine _sendQueue = new ResendingStateMachine();
+        private readonly ResendingStateMachine _sendQueue = new ResendingStateMachine();
 
         public void Initialize(MqttClient client) {
             _client = client;
@@ -28,7 +28,7 @@ namespace Tevux.Protocols.Mqtt {
 
             var transmissionContext = new TransmissionContext(packet, currentTime);
 
-            _sendQueue.Enqueue(transmissionContext);
+            _sendQueue.EnqueueAndSend(transmissionContext);
 
             if (waitForCompletion) {
                 var timeToBreak = false;
