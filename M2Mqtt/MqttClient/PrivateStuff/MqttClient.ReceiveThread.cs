@@ -47,30 +47,30 @@ namespace Tevux.Protocols.Mqtt {
 
                             PublishPacket parsedPacket = null;
                             if (isOk) { isOk = PublishPacket.TryParse(flags, variableHeaderAndPayloadBytes, out parsedPacket); }
-
                             if (isOk) { _incomingPublishStateMachine.ProcessPacket(parsedPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Conack) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.2.1.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            ConnackPacket connackPacket = null;
 
-                            isOk = ConnackPacket.TryParse(variableHeaderBytes, out var parsedPacket);
+                            isOk = _channel.TryReceive(lengthBytes);
 
-                            _connectStateMachine.ProcessPacket(parsedPacket);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = ConnackPacket.TryParse(variableHeaderBytes, out connackPacket); }
+                            if (isOk) { _connectStateMachine.ProcessPacket(connackPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Pingresp) && (flags == 0x00)) {
                             // Remaining length is always 0, see section 3.13.
                             // Thus, need to read 1 more byte, and discard it.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
+                            PingrespPacket pingrespPacket = null;
+                            isOk = _channel.TryReceive(lengthBytes);
 
-                            isOk = PingrespPacket.TryParse(out var parsedPacket);
-
-                            _pingStateMachine.ProcessPacket(parsedPacket);
+                            if (isOk) { isOk = PingrespPacket.TryParse(out pingrespPacket); }
+                            if (isOk) { _pingStateMachine.ProcessPacket(pingrespPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Suback) && (flags == 0x00)) {
                             // Remaining length is variable header (2 bytes) plus the length of the payload, see section 3.9.
@@ -78,79 +78,76 @@ namespace Tevux.Protocols.Mqtt {
                             isOk = ControlPacketBase.TryDecodeRemainingLength(_channel, out var remainingLength);
 
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            byte[] payloadBytes = null;
+                            SubackPacket subackPacket = null;
 
-                            var payloadBytes = new byte[remainingLength - 2];
-                            _channel.TryReceive(payloadBytes);
-
-                            isOk = SubackPacket.TryParse(variableHeaderBytes, payloadBytes, out var parsedPacket);
-
-                            _subscriptionStateMachine.ProcessPacket(parsedPacket);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) {
+                                payloadBytes = new byte[remainingLength - 2];
+                                isOk = _channel.TryReceive(payloadBytes);
+                            }
+                            if (isOk) { isOk = SubackPacket.TryParse(variableHeaderBytes, payloadBytes, out subackPacket); }
+                            if (isOk) { _subscriptionStateMachine.ProcessPacket(subackPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Puback) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.4.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
-
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            PubackPacket pubackPacket = null;
 
-                            isOk = PubackPacket.TryParse(variableHeaderBytes, out var parsedPacket);
-
-                            _outgoingPublishStateMachine.ProcessPacket(parsedPacket);
+                            isOk = _channel.TryReceive(lengthBytes);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = PubackPacket.TryParse(variableHeaderBytes, out pubackPacket); }
+                            if (isOk) { _outgoingPublishStateMachine.ProcessPacket(pubackPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Pubrec) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.5.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
-
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            PubrecPacket pubrecPacket = null;
 
-                            isOk = PubrecPacket.TryParse(variableHeaderBytes, out var parsedPacket);
-
-                            _outgoingPublishStateMachine.ProcessPacket(parsedPacket);
+                            isOk = _channel.TryReceive(lengthBytes);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = PubrecPacket.TryParse(variableHeaderBytes, out pubrecPacket); }
+                            if (isOk) { _outgoingPublishStateMachine.ProcessPacket(pubrecPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Pubrel) && (flags == 0x02)) {
                             // Remaining length is always 2, see section 3.6.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
-
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            PubrelPacket pubrelPacket = null;
 
-                            isOk = PubrelPacket.TryParse(variableHeaderBytes, out var parsedPacket);
-
-                            _incomingPublishStateMachine.ProcessPacket(parsedPacket);
+                            isOk = _channel.TryReceive(lengthBytes);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = PubrelPacket.TryParse(variableHeaderBytes, out pubrelPacket); }
+                            if (isOk) { _incomingPublishStateMachine.ProcessPacket(pubrelPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Pubcomp) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.7.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
-
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            PubcompPacket pubcompPacket = null;
 
-                            isOk = PubcompPacket.TryParse(variableHeaderBytes, out var parsedPacket);
-
-                            _outgoingPublishStateMachine.ProcessPacket(parsedPacket);
+                            isOk = _channel.TryReceive(lengthBytes);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = PubcompPacket.TryParse(variableHeaderBytes, out pubcompPacket); }
+                            if (isOk) { _outgoingPublishStateMachine.ProcessPacket(pubcompPacket); }
                         }
                         else if ((packetType == ControlPacketBase.PacketTypes.Unsuback) && (flags == 0x00)) {
                             // Remaining length is always 2, see section 3.11.
                             // Thus, need to read 3 more bytes.
                             var lengthBytes = new byte[1];
-                            _channel.TryReceive(lengthBytes);
-
                             var variableHeaderBytes = new byte[2];
-                            _channel.TryReceive(variableHeaderBytes);
+                            UnsubackPacket unsubackPacket = null;
 
-                            isOk = UnsubackPacket.TryParse(variableHeaderBytes, out var parsedPacket);
-
-                            _subscriptionStateMachine.ProcessPacket(parsedPacket);
+                            isOk = _channel.TryReceive(lengthBytes);
+                            if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = UnsubackPacket.TryParse(variableHeaderBytes, out unsubackPacket); }
+                            if (isOk) { _subscriptionStateMachine.ProcessPacket(unsubackPacket); }
                         }
                         else {
                             // This is either a malformed packet header, or it is meant for server, not client.
