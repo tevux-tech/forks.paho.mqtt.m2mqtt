@@ -16,18 +16,17 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        internal void Send(byte[] msgBytes) {
-            if (_channel.TrySend(msgBytes)) {
-                LastCommTime = Helpers.GetCurrentTime();
+        internal void Send(byte[] buffer) {
+            if (_channel.TrySend(buffer)) {
+                _lastCommunicationTime = Helpers.GetCurrentTime();
             }
             else {
                 CloseConnections();
             }
-
         }
 
-        internal void Send(ControlPacketBase msg) {
-            Send(msg.GetBytes());
+        internal void Send(ControlPacketBase packet) {
+            Send(packet.GetBytes());
         }
     }
 }

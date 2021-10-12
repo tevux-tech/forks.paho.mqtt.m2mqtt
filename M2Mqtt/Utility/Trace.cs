@@ -70,6 +70,7 @@ namespace Tevux.Protocols.Mqtt.Utility {
                 case ControlPacketBase.PacketTypes.Conack:
                     categoryIndent += "                                                ";
                     break;
+
                 case ControlPacketBase.PacketTypes.Suback:
                 case ControlPacketBase.PacketTypes.Unsuback:
                     categoryIndent += "                        ";
@@ -88,6 +89,7 @@ namespace Tevux.Protocols.Mqtt.Utility {
                 case ControlPacketBase.PacketTypes.Disconnect:
                     categoryIndent += "                                                ";
                     break;
+
                 case ControlPacketBase.PacketTypes.Subscribe:
                 case ControlPacketBase.PacketTypes.Unsubscribe:
                     categoryIndent += "                        ";

@@ -24,7 +24,7 @@ namespace Tevux.Protocols.Mqtt {
     /// </summary>
     internal class UnsecureTcpChannel : IMqttNetworkChannel {
         private Socket _socket;
-        private ChannelConnectionOptions _connectionOptions;
+        private readonly ChannelConnectionOptions _connectionOptions;
 
         public bool DataAvailable {
             get {

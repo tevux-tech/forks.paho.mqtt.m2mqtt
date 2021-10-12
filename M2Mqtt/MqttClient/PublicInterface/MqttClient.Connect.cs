@@ -45,7 +45,7 @@ namespace Tevux.Protocols.Mqtt {
             };
 
             if (isOk) {
-                LastCommTime = 0;
+                _lastCommunicationTime = 0;
                 _isConnectionClosing = false;
             }
 

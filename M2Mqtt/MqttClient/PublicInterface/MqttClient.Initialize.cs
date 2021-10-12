@@ -27,7 +27,7 @@ namespace Tevux.Protocols.Mqtt {
 
             new Thread(MasterTickThread).Start();
             new Thread(ReceiveThread).Start();
-            new Thread(EventQueueThread).Start();
+            new Thread(ProcessEventQueueThread).Start();
 
             _isInitialized = true;
         }

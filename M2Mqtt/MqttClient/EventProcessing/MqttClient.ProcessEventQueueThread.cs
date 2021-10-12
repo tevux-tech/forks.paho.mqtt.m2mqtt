@@ -14,11 +14,12 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        private void EventQueueThread() {
+        private void ProcessEventQueueThread() {
             while (true) {
                 while (_eventQueue.TryDequeue(out var dequeuedEvent)) {
                     var eventSource = (EventSource)dequeuedEvent;
@@ -34,6 +35,9 @@ namespace Tevux.Protocols.Mqtt {
                     }
                     else if (eventSource.SentPacket is PublishPacket publishedPacket) {
                         Published?.Invoke(this, new PublishFinishedEventArgs(publishedPacket.Topic));
+                    }
+                    else if (eventSource.SentPacket is DisconnectPacket) {
+                        ConnectionClosed?.Invoke(this, EventArgs.Empty);
                     }
                 }
 

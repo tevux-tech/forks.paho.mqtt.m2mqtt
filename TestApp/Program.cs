@@ -28,20 +28,22 @@ namespace TestApp {
             var mqttCertificate = new X509Certificate(Encoding.UTF8.GetBytes(_mqttCertificateString));
 
             var networkOptions = new ChannelConnectionOptions();
-            networkOptions.SetHostname("test.mosquitto.org");
-            networkOptions.SetPort(8883);
-            networkOptions.SetCertificate(mqttCertificate);
+            // networkOptions.SetHostname("test.mosquitto.org");
+            networkOptions.SetHostname("moominhouse");
+            networkOptions.SetPort(1883);
+            // networkOptions.SetCertificate(mqttCertificate);
 
             var brokerOptions = new MqttConnectionOptions();
             brokerOptions.SetClientId("TestApp");
             brokerOptions.SetRetransmissionParameters(3, 3);
+            // brokerOptions.SetCleanSession(false);
 
             while (client.Connect(networkOptions, brokerOptions) == false) {
                 Console.WriteLine("Reconnecting...");
             };
 
             client.Subscribe("temp/testapp", QosLevel.AtMostOnce);
-            client.Subscribe("temp/test-publish2", QosLevel.ExactlyOnce);
+            //client.Subscribe("temp/test-publish2", QosLevel.ExactlyOnce);
 
             Thread.Sleep(1000);
 
@@ -54,6 +56,8 @@ namespace TestApp {
             client.Unsubscribe("temp/testapp");
 
             Thread.Sleep(1000);
+
+            Console.ReadLine();
 
             client.Disconnect();
         }
@@ -69,7 +73,7 @@ namespace TestApp {
         }
 
         private void HandlePublishReceived(object sender, PublishReceivedEventArgs e) {
-
+            Console.WriteLine($"Received: {Encoding.UTF8.GetString(e.Message)}");
         }
 
         private string _mqttCertificateString = @"-----BEGIN CERTIFICATE-----

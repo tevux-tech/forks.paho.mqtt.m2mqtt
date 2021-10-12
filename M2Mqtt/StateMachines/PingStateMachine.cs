@@ -13,7 +13,7 @@ namespace Tevux.Protocols.Mqtt {
             Reset();
         }
 
-        public void Tick() {
+        public void Tick(double lastCommunicationTime) {
             var currentTime = Helpers.GetCurrentTime();
 
             if (_isWaitingForPingResponse) {
@@ -25,7 +25,7 @@ namespace Tevux.Protocols.Mqtt {
             }
             else {
                 // Keep alive period equals zero means turning off keep alive mechanism.
-                if ((currentTime - _client.LastCommTime > _client.ConnectionOptions.KeepAlivePeriod) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
+                if ((currentTime - lastCommunicationTime > _client.ConnectionOptions.KeepAlivePeriod) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
                     var pingreq = new PingreqPacket();
                     _client.Send(pingreq);
                     Trace.WriteLine(TraceLevel.Frame, $"{pingreq.GetShortName()}->");

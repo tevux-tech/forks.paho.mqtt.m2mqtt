@@ -15,17 +15,21 @@ Contributors:
 */
 
 namespace Tevux.Protocols.Mqtt {
-
     public partial class MqttClient {
+        private bool _isConnectionClosing;
+
         private void CloseConnections() {
             if (_isConnectionClosing) { return; }
 
             _isConnectionClosing = true;
-            IsConnected = false;
 
             _channel.Close();
+            IsConnected = false;
 
-            OnConnectionClosed();
+            // This is a dummy packet, so it just fits my the event queue.
+            _eventQueue.Enqueue(new EventSource(new DisconnectPacket(), null));
+
+            _isConnectionClosing = false;
         }
     }
 }

@@ -16,6 +16,14 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        public MqttClient() { }
+        internal class EventSource {
+            public ControlPacketBase SentPacket { get; }
+            public ControlPacketBase ReceivedPacket { get; }
+
+            public EventSource(ControlPacketBase sentPacket, ControlPacketBase receivedPacket) {
+                SentPacket = sentPacket;
+                ReceivedPacket = receivedPacket;
+            }
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
         private void MasterTickThread() {
             while (true) {
                 if (IsConnected) {
-                    _pingStateMachine.Tick();
+                    _pingStateMachine.Tick(_lastCommunicationTime);
                     if (_pingStateMachine.IsBrokerAlive) {
                         _subscriptionStateMachine.Tick();
                         _outgoingPublishStateMachine.Tick();

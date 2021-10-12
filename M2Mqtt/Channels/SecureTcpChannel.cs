@@ -18,7 +18,6 @@ using System;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Tevux.Protocols.Mqtt {
@@ -27,7 +26,7 @@ namespace Tevux.Protocols.Mqtt {
     /// </summary>
     public class SecureTcpChannel : IMqttNetworkChannel {
         private Socket _socket;
-        private ChannelConnectionOptions _connectionOptions;
+        private readonly ChannelConnectionOptions _connectionOptions;
         private SslStream _sslStream;
         private NetworkStream _netStream;
 
@@ -151,30 +150,6 @@ namespace Tevux.Protocols.Mqtt {
                 // Refer to: https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.shutdown(v=vs.110).aspx
             }
             _socket.Dispose();
-        }
-    }
-
-    public static class MqttSslUtility {
-        public static SslProtocols ToSslPlatformEnum(MqttSslProtocols mqttSslProtocol) {
-            switch (mqttSslProtocol) {
-                case MqttSslProtocols.None:
-                    return SslProtocols.None;
-
-                case MqttSslProtocols.SSLv3:
-                    throw new ArgumentException("Ssl3 is obsolete. It is no longer supported. https://go.microsoft.com/fwlink/?linkid=14202");
-
-                case MqttSslProtocols.TLSv1_0:
-                    return SslProtocols.Tls;
-
-                case MqttSslProtocols.TLSv1_1:
-                    return SslProtocols.Tls11;
-
-                case MqttSslProtocols.TLSv1_2:
-                    return SslProtocols.Tls12;
-
-                default:
-                    throw new ArgumentException("SSL/TLS protocol version not supported");
-            }
         }
     }
 }

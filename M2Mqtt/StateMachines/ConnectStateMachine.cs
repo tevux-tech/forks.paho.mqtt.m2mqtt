@@ -10,7 +10,6 @@ namespace Tevux.Protocols.Mqtt {
         public bool IsConnectionSuccessful { get; private set; }
         public ConnackPacket.ReturnCodes ConnectionResult { get; private set; }
 
-
         public void Initialize(MqttClient client) {
             _client = client;
             Reset();

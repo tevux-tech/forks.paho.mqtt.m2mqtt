@@ -14,15 +14,12 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
+
 namespace Tevux.Protocols.Mqtt {
-    /// <summary>
-    /// Supported SSL/TLS protocol versions
-    /// </summary>
-    public enum MqttSslProtocols {
-        None,
-        SSLv3,
-        TLSv1_0,
-        TLSv1_1,
-        TLSv1_2
+    public delegate void ConnectionClosedEventHandler(object sender, EventArgs e);
+
+    public class ConnectionClosedEventArgs : EventArgs {
+        internal ConnectionClosedEventArgs() { }
     }
 }

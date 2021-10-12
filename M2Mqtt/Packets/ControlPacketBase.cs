@@ -164,7 +164,7 @@ namespace Tevux.Protocols.Mqtt {
         /// Returns a string representation of the message for tracing.
         /// </summary>
         public static string GetTraceString(string name, object[] fieldNames, object[] fieldValues) {
-            object GetStringObject(object value) {
+            static object GetStringObject(object value) {
                 if (value is byte[] binary) {
                     var hexChars = "0123456789ABCDEF";
                     var sb = new System.Text.StringBuilder(binary.Length * 2);
@@ -198,21 +198,21 @@ namespace Tevux.Protocols.Mqtt {
             _ = outputBuilder.Append(name);
 
             if ((fieldNames != null) && (fieldValues != null)) {
-                _ = outputBuilder.Append("(");
+                _ = outputBuilder.Append('(');
                 var addComma = false;
                 for (var i = 0; i < fieldValues.Length; i++) {
                     if (fieldValues[i] != null) {
                         if (addComma) {
-                            _ = outputBuilder.Append(",");
+                            _ = outputBuilder.Append(',');
                         }
 
                         _ = outputBuilder.Append(fieldNames[i]);
-                        _ = outputBuilder.Append(":");
+                        _ = outputBuilder.Append(':');
                         _ = outputBuilder.Append(GetStringObject(fieldValues[i]));
                         addComma = true;
                     }
                 }
-                _ = outputBuilder.Append(")");
+                _ = outputBuilder.Append(')');
             }
 
             return outputBuilder.ToString();
