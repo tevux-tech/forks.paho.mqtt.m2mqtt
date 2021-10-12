@@ -34,13 +34,13 @@ namespace Tevux.Protocols.Mqtt {
                 _channel = new SecureTcpChannel(channelConnectionOptions);
             }
             else {
-                _channel = new UnsecureTcpChannel();
+                _channel = new UnsecureTcpChannel(channelConnectionOptions);
             }
 
             ConnectionOptions = mqttConnectionOptions;
 
             var isOk = true;
-            if (_channel.TryConnect(channelConnectionOptions.Hostname, channelConnectionOptions.Port) == false) {
+            if (_channel.TryConnect() == false) {
                 isOk = false;
             };
 

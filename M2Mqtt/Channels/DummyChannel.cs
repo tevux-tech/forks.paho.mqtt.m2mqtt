@@ -29,7 +29,7 @@ namespace Tevux.Protocols.Mqtt {
 
         public bool IsConnected { get; private set; } = false;
 
-        public bool TryConnect(string remoteHostName, ushort remotePort) {
+        public bool TryConnect() {
             return false;
         }
 

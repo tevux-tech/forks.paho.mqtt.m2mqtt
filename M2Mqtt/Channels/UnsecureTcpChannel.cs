@@ -24,10 +24,7 @@ namespace Tevux.Protocols.Mqtt {
     /// </summary>
     internal class UnsecureTcpChannel : IMqttNetworkChannel {
         private Socket _socket;
-
-        public string RemoteHostName { get; private set; }
-        public IPAddress RemoteIpAddress { get; private set; }
-        public int RemotePort { get; private set; }
+        private ChannelConnectionOptions _connectionOptions;
 
         public bool DataAvailable {
             get {
@@ -37,21 +34,20 @@ namespace Tevux.Protocols.Mqtt {
 
         public bool IsConnected { get; private set; }
 
-        public UnsecureTcpChannel() {
-
+        public UnsecureTcpChannel(ChannelConnectionOptions connectionOptions) {
+            _connectionOptions = connectionOptions;
         }
 
-        public bool TryConnect(string remoteHostName, ushort remotePort) {
+        public bool TryConnect() {
             bool isOk;
 
-            if (IPAddress.TryParse(remoteHostName, out var remoteIpAddress)) {
+            if (IPAddress.TryParse(_connectionOptions.Hostname, out var remoteIpAddress)) {
                 // Hostname is actually a valid IP address.
-                RemoteIpAddress = remoteIpAddress;
                 isOk = true;
             }
             else {
                 // Maybe it is a valid hostname? We can get IP address from DNS cache then.
-                var hostEntry = Dns.GetHostEntryAsync(remoteHostName).Result;
+                var hostEntry = Dns.GetHostEntryAsync(_connectionOptions.Hostname).Result;
 
                 if ((hostEntry != null) && (hostEntry.AddressList.Length > 0)) {
                     // Check for the first address not null.
@@ -60,7 +56,7 @@ namespace Tevux.Protocols.Mqtt {
                         i++;
                     }
 
-                    RemoteIpAddress = hostEntry.AddressList[i];
+                    remoteIpAddress = hostEntry.AddressList[i];
                     isOk = true;
                 }
                 else {
@@ -68,14 +64,11 @@ namespace Tevux.Protocols.Mqtt {
                 }
             }
 
-            RemoteHostName = remoteHostName;
-            RemotePort = remotePort;
-
             if (isOk) {
                 try {
-                    _socket = new Socket(RemoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    _socket = new Socket(remoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     // try connection to the broker
-                    _socket.Connect(RemoteHostName, RemotePort);
+                    _socket.Connect(remoteIpAddress, _connectionOptions.Port);
 
                     isOk = true;
                     IsConnected = true;

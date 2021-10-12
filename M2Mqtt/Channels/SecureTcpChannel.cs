@@ -28,11 +28,6 @@ namespace Tevux.Protocols.Mqtt {
     public class SecureTcpChannel : IMqttNetworkChannel {
         private Socket _socket;
         private ChannelConnectionOptions _connectionOptions;
-
-        public string RemoteHostName { get; private set; }
-        public IPAddress RemoteIpAddress { get; private set; }
-        public int RemotePort { get; private set; }
-
         private SslStream _sslStream;
         private NetworkStream _netStream;
 
@@ -48,52 +43,52 @@ namespace Tevux.Protocols.Mqtt {
             _connectionOptions = connectionOptions;
         }
 
-        public bool TryConnect(string remoteHostName, ushort remotePort) {
-            var isOk = false;
+        public bool TryConnect() {
+            bool isOk;
 
-            IPAddress remoteIpAddress = null;
-            try {
-                // check if remoteHostName is a valid IP address and get it
-                remoteIpAddress = IPAddress.Parse(_connectionOptions.Hostname);
+            if (IPAddress.TryParse(_connectionOptions.Hostname, out var remoteIpAddress)) {
+                // Hostname is actually a valid IP address.
+                isOk = true;
             }
-            catch {
-            }
-
-            // in this case the parameter remoteHostName isn't a valid IP address
-            if (remoteIpAddress == null) {
-                var hostEntry = Dns.GetHostEntryAsync(remoteHostName).Result;
+            else {
+                // Maybe it is a valid hostname? We can get IP address from DNS cache then.
+                var hostEntry = Dns.GetHostEntryAsync(_connectionOptions.Hostname).Result;
 
                 if ((hostEntry != null) && (hostEntry.AddressList.Length > 0)) {
-                    // check for the first address not null
-                    // it seems that with .Net Micro Framework, the IPV6 addresses aren't supported and return "null"
+                    // Check for the first address not null.
                     var i = 0;
                     while (hostEntry.AddressList[i] == null) {
                         i++;
                     }
 
                     remoteIpAddress = hostEntry.AddressList[i];
+                    isOk = true;
                 }
                 else {
-                    throw new Exception("No address found for the remote host name");
+                    isOk = false;
                 }
             }
 
-            RemoteHostName = _connectionOptions.Hostname;
-            RemoteIpAddress = remoteIpAddress;
-            RemotePort = _connectionOptions.Port;
+            if (isOk) {
+                try {
+                    _socket = new Socket(remoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    _socket.Connect(remoteIpAddress, _connectionOptions.Port);
 
-            _socket = new Socket(RemoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _socket.Connect(RemoteHostName, RemotePort);
+                    _netStream = new NetworkStream(_socket);
+                    _sslStream = new SslStream(_netStream, false, _connectionOptions.UserCertificateValidationCallback, _connectionOptions.UserCertificateSelectionCallback);
 
-            // create SSL stream
-            _netStream = new NetworkStream(_socket);
-            _sslStream = new SslStream(_netStream, false, _connectionOptions.UserCertificateValidationCallback, _connectionOptions.UserCertificateSelectionCallback);
+                    var clientCertificates = new X509CertificateCollection(new X509Certificate[] { _connectionOptions.Certificate });
 
-            var clientCertificates = new X509CertificateCollection(new X509Certificate[] { _connectionOptions.Certificate });
+                    _sslStream.AuthenticateAsClient(_connectionOptions.Hostname, clientCertificates, false);
 
-            _sslStream.AuthenticateAsClient(RemoteHostName, clientCertificates, false);
-            isOk = true;
-            IsConnected = true;
+                    isOk = true;
+                    IsConnected = true;
+                }
+                catch {
+                    isOk = false;
+                    Close();
+                }
+            }
 
             return isOk;
         }

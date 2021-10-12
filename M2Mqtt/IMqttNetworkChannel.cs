@@ -57,6 +57,6 @@ namespace Tevux.Protocols.Mqtt {
         /// <summary>
         /// Connect to remote server
         /// </summary>
-        bool TryConnect(string remoteHostName, ushort remotePort);
+        bool TryConnect();
     }
 }
