@@ -37,14 +37,9 @@ namespace Tevux.Protocols.Mqtt {
                 _channel = new UnsecureTcpChannel();
             }
 
-
-
             ConnectionOptions = mqttConnectionOptions;
 
-            var connectPacket = new ConnectPacket(mqttConnectionOptions);
-
             var isOk = true;
-
             if (_channel.TryConnect(channelConnectionOptions.Hostname, channelConnectionOptions.Port) == false) {
                 isOk = false;
             };
@@ -54,24 +49,29 @@ namespace Tevux.Protocols.Mqtt {
                 _isConnectionClosing = false;
             }
 
-            _connectStateMachine.Connect(connectPacket);
-            while (_connectStateMachine.IsConnectionCompleted == false) {
-                _connectStateMachine.Tick();
-                Thread.Sleep(1000);
+            if (isOk) {
+                var connectPacket = new ConnectPacket(mqttConnectionOptions);
+                _connectStateMachine.Connect(connectPacket);
+                while (_connectStateMachine.IsConnectionCompleted == false) {
+                    _connectStateMachine.Tick();
+                    Thread.Sleep(1000);
+                }
             }
-
 
             if (_connectStateMachine.IsConnectionSuccessful) {
-                _pingStateMachine.Reset();
-                _connectStateMachine.Reset();
+                if (mqttConnectionOptions.IsCleanSession) {
+                    _pingStateMachine.Reset();
+                    _connectStateMachine.Reset();
+                }
 
-                // restore previous session
-                RestoreSession();
-
-                IsConnected = true;
+            }
+            else {
+                isOk = false;
             }
 
-            return IsConnected;
+            IsConnected = isOk;
+
+            return isOk;
         }
     }
 }
