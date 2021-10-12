@@ -7,6 +7,7 @@ namespace Tevux.Protocols.Mqtt {
         private MqttClient _client;
 
         public bool IsConnectionCompleted { get; private set; }
+        public bool IsConnectionSuccessful { get; private set; }
         public ConnackPacket.ReturnCodes ConnectionResult { get; private set; }
 
 
@@ -23,6 +24,7 @@ namespace Tevux.Protocols.Mqtt {
                     // Problem. Server does not respond.
                     _isWaitingForConnack = false;
                     IsConnectionCompleted = true;
+                    IsConnectionSuccessful = false;
                 }
             }
             else {
@@ -35,10 +37,13 @@ namespace Tevux.Protocols.Mqtt {
 
             _isWaitingForConnack = false;
             IsConnectionCompleted = true;
+            IsConnectionSuccessful = true;
             ConnectionResult = packet.ReturnCode;
         }
 
         public void Connect(ConnectPacket packet) {
+            Reset();
+
             var currentTime = Helpers.GetCurrentTime();
             _client.Send(packet);
             _isWaitingForConnack = true;

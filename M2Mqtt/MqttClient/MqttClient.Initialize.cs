@@ -19,9 +19,6 @@ using System.Threading;
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public void Initialize() {
-#warning Add secure communication
-            _channel = new UnsecureTcpChannel();
-
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);
             _subscriptionStateMachine.Initialize(this);

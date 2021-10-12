@@ -36,7 +36,7 @@ namespace Tevux.Protocols.Mqtt {
         public event ConnectionClosedEventHandler ConnectionClosed = delegate { };
 
         // channel to communicate over the network
-        private IMqttNetworkChannel _channel;
+        private IMqttNetworkChannel _channel = new DummyChannel();
 
         // connection is closing due to peer
         private bool _isConnectionClosing;

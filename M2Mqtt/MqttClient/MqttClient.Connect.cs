@@ -19,25 +19,25 @@ using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        /// <summary>
-        /// Connect to broker
-        /// </summary>
-        /// <returns>Return code of CONNACK packet from broker</returns>
-        public void Connect() {
-            Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
+        public bool Connect() {
+            return Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
         }
 
-        public void Connect(ChannelConnectionOptions channelConnectionOptions) {
-            Connect(channelConnectionOptions, new MqttConnectionOptions());
+        public bool Connect(ChannelConnectionOptions channelConnectionOptions) {
+            return Connect(channelConnectionOptions, new MqttConnectionOptions());
         }
 
-
-        /// <summary>
-        /// Connect to broker
-        /// </summary>
-        /// <returns>Return code of CONNACK packet from broker</returns>
-        public void Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
+        public bool Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+
+            if (channelConnectionOptions.IsTlsUsed) {
+                _channel = new SecureTcpChannel(channelConnectionOptions);
+            }
+            else {
+                _channel = new UnsecureTcpChannel();
+            }
+
+
 
             ConnectionOptions = mqttConnectionOptions;
 
@@ -61,7 +61,7 @@ namespace Tevux.Protocols.Mqtt {
             }
 
 
-            if (_connectStateMachine.ConnectionResult == ConnackPacket.ReturnCodes.Accepted) {
+            if (_connectStateMachine.IsConnectionSuccessful) {
                 _pingStateMachine.Reset();
                 _connectStateMachine.Reset();
 
@@ -71,8 +71,7 @@ namespace Tevux.Protocols.Mqtt {
                 IsConnected = true;
             }
 
-#warning needto use other constructs to return connection success. going for void temporarily.
-            // return _connectStateMachine.ConnectionResult;
+            return IsConnected;
         }
     }
 }
