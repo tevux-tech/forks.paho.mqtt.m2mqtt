@@ -8,7 +8,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{8594FCA1-1C31-48EA-A766-9B6A557FA00A}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
 		Resources\mqtt-v3.1.1-os.pdf = Resources\mqtt-v3.1.1-os.pdf
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
