@@ -30,7 +30,7 @@ namespace Tevux.Protocols.Mqtt {
         /// </summary>
         /// <param name="topics">List of topics to unsubscribe</param>
         /// <returns>Packet Id in UNSUBACK packet from broker</returns>
-        public bool InternalUnsubscribe(string topic, bool waitForCompletion) {
+        private bool InternalUnsubscribe(string topic, bool waitForCompletion) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
             var unsubscribePacket = new UnsubscribePacket(topic);
