@@ -36,8 +36,11 @@ namespace Tevux.Protocols.Mqtt {
                     else if (eventSource.SentPacket is PublishPacket publishedPacket) {
                         Published?.Invoke(this, new PublishFinishedEventArgs(publishedPacket.Topic));
                     }
+                    else if ((eventSource.SentPacket is ConnackPacket connectPacket) && (eventSource.ReceivedPacket is ConnackPacket connackPacket)) {
+                        Connected?.Invoke(this, EventArgs.Empty);
+                    }
                     else if (eventSource.SentPacket is DisconnectPacket) {
-                        ConnectionClosed?.Invoke(this, EventArgs.Empty);
+                        Disconnected?.Invoke(this, EventArgs.Empty);
                     }
                 }
 

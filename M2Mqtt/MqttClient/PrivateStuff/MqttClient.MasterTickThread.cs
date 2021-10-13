@@ -67,6 +67,9 @@ namespace Tevux.Protocols.Mqtt {
                             _connectStateMachine.Reset();
 #warning need to reset publish state machine, too
                         }
+
+                        // These are dummy packets, so it just fits my the event queue.
+                        _eventQueue.Enqueue(new EventSource(new ConnackPacket(), new ConnackPacket()));
                     }
                     else {
                         isOk = false;

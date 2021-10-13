@@ -14,6 +14,7 @@ Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
 */
 
+using System;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
@@ -24,7 +25,8 @@ namespace Tevux.Protocols.Mqtt {
         public event PublishedEventHandler Published = delegate { };
         public event SubscribedEventHandler Subscribed = delegate { };
         public event UnsubscribedEventHandler Unsubscribed = delegate { };
-        public event ConnectionClosedEventHandler ConnectionClosed = delegate { };
+        public event EventHandler Disconnected = delegate { };
+        public event EventHandler Connected = delegate { };
 
         internal void OnPacketAcknowledged(ControlPacketBase sentPacket, ControlPacketBase receivedPacket) {
             // Creating a separate thread because those events are raised from state machines,
