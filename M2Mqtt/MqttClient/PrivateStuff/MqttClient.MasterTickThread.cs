@@ -33,7 +33,51 @@ namespace Tevux.Protocols.Mqtt {
                         CloseConnections();
                     }
                 }
-                Thread.Sleep(1000);
+                else if (_isConnectionRequested) {
+                    Trace.WriteLine(TraceLevel.Information, "Connecting...");
+                    if (_channelConnectionOptions.IsTlsUsed) {
+                        _channel = new SecureTcpChannel(_channelConnectionOptions);
+                    }
+                    else {
+                        _channel = new UnsecureTcpChannel(_channelConnectionOptions);
+                    }
+
+                    var isOk = true;
+                    if (_channel.TryConnect() == false) {
+                        isOk = false;
+                    };
+
+                    if (isOk) {
+                        _lastCommunicationTime = 0;
+                        _isConnectionClosing = false;
+                    }
+
+                    if (isOk) {
+                        var connectPacket = new ConnectPacket(ConnectionOptions);
+                        _connectStateMachine.Connect(connectPacket);
+                        while (_connectStateMachine.IsConnectionCompleted == false) {
+                            _connectStateMachine.Tick();
+                            Thread.Sleep(1000);
+                        }
+                    }
+
+                    if (_connectStateMachine.IsConnectionSuccessful) {
+                        if (ConnectionOptions.IsCleanSession) {
+                            _pingStateMachine.Reset();
+                            _connectStateMachine.Reset();
+#warning need to reset publish state machine, too
+                        }
+                    }
+                    else {
+                        isOk = false;
+                    }
+
+                    IsConnected = isOk;
+                    Thread.Sleep(100);
+                }
+                else {
+                    Thread.Sleep(1000);
+                }
             }
         }
     }

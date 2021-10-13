@@ -10,6 +10,7 @@ namespace Tevux.Protocols.Mqtt {
         public X509Certificate Certificate { get; private set; } = new X509Certificate();
         public SslProtocols MinimumSslProtocol { get; private set; } = SslProtocols.None;
         public bool IsTlsUsed { get; private set; }
+        public bool IsReconnectionEnabled { get; private set; }
         public RemoteCertificateValidationCallback UserCertificateValidationCallback { get; private set; }
         public LocalCertificateSelectionCallback UserCertificateSelectionCallback { get; private set; }
 
@@ -44,6 +45,10 @@ namespace Tevux.Protocols.Mqtt {
         public void SetCertificate(X509Certificate certificate) {
             Certificate = certificate;
             IsTlsUsed = true;
+        }
+
+        public void SetReconnection(bool isReconnectionEnabled) {
+            IsReconnectionEnabled = isReconnectionEnabled;
         }
     }
 }

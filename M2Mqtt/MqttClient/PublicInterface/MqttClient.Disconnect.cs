@@ -24,7 +24,7 @@ namespace Tevux.Protocols.Mqtt {
             var disconnect = new DisconnectPacket();
             Send(disconnect);
 
-            CloseConnections();
+            CloseConnections(true);
         }
     }
 }

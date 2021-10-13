@@ -31,6 +31,7 @@ namespace TestApp {
             // networkOptions.SetHostname("test.mosquitto.org");
             networkOptions.SetHostname("moominhouse");
             networkOptions.SetPort(1883);
+            networkOptions.SetReconnection(true);
             // networkOptions.SetCertificate(mqttCertificate);
 
             var brokerOptions = new MqttConnectionOptions();
@@ -38,8 +39,11 @@ namespace TestApp {
             brokerOptions.SetRetransmissionParameters(3, 3);
             // brokerOptions.SetCleanSession(false);
 
-            while (client.Connect(networkOptions, brokerOptions) == false) {
-                Console.WriteLine("Reconnecting...");
+            client.Connect(networkOptions, brokerOptions);
+
+            while (client.IsConnected == false) {
+                Console.WriteLine("Connecting...");
+                Thread.Sleep(500);
             };
 
             client.Subscribe("temp/testapp", QosLevel.AtMostOnce);

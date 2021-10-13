@@ -15,7 +15,6 @@ Contributors:
 */
 
 using System;
-using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
@@ -29,49 +28,14 @@ namespace Tevux.Protocols.Mqtt {
 
         public bool Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+            if (IsConnected) { Disconnect(); }
 
-            if (channelConnectionOptions.IsTlsUsed) {
-                _channel = new SecureTcpChannel(channelConnectionOptions);
-            }
-            else {
-                _channel = new UnsecureTcpChannel(channelConnectionOptions);
-            }
-
+            _channelConnectionOptions = channelConnectionOptions;
             ConnectionOptions = mqttConnectionOptions;
 
-            var isOk = true;
-            if (_channel.TryConnect() == false) {
-                isOk = false;
-            };
+            _isConnectionRequested = true;
 
-            if (isOk) {
-                _lastCommunicationTime = 0;
-                _isConnectionClosing = false;
-            }
-
-            if (isOk) {
-                var connectPacket = new ConnectPacket(mqttConnectionOptions);
-                _connectStateMachine.Connect(connectPacket);
-                while (_connectStateMachine.IsConnectionCompleted == false) {
-                    _connectStateMachine.Tick();
-                    Thread.Sleep(1000);
-                }
-            }
-
-            if (_connectStateMachine.IsConnectionSuccessful) {
-                if (mqttConnectionOptions.IsCleanSession) {
-                    _pingStateMachine.Reset();
-                    _connectStateMachine.Reset();
-                }
-
-            }
-            else {
-                isOk = false;
-            }
-
-            IsConnected = isOk;
-
-            return isOk;
+            return IsConnected;
         }
     }
 }

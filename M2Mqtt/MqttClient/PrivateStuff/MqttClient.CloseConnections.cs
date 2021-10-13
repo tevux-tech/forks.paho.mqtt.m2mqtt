@@ -18,18 +18,18 @@ namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         private bool _isConnectionClosing;
 
-        private void CloseConnections() {
+        private void CloseConnections(bool isClosedManually = false) {
             if (_isConnectionClosing) { return; }
 
             _isConnectionClosing = true;
-
-            _channel.Close();
             IsConnected = false;
+            _channel.Close();
 
             // This is a dummy packet, so it just fits my the event queue.
             _eventQueue.Enqueue(new EventSource(new DisconnectPacket(), null));
 
             _isConnectionClosing = false;
+            if (_channelConnectionOptions.IsReconnectionEnabled && (isClosedManually == false)) { _isConnectionRequested = true; }
         }
     }
 }

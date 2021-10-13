@@ -15,6 +15,7 @@ Contributors:
 */
 
 using System.Threading;
+using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
@@ -154,12 +155,12 @@ namespace Tevux.Protocols.Mqtt {
                             // Either way, it is a protocol violation, so network connection should be closed.
                             // Although specification is not entirely clear what to do if a client receives a packet which is meant for a server.
                             // But I will go with section 4.8 and close the connection anyway.
-
+                            Trace.WriteLine(TraceLevel.Error, "Malformed packet received. Beginning shutdown.");
                             CloseConnections();
                         }
                     }
                     else {
-                        // Cannot receive needed data. Something is wrong with the data channel.
+                        Trace.WriteLine(TraceLevel.Error, "Cannot receive needed data. Something is wrong with the data channel.");
                         CloseConnections();
                     }
                 }
