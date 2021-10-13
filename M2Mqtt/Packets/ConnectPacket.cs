@@ -69,8 +69,8 @@ namespace Tevux.Protocols.Mqtt {
                 willPayload[1] = (byte)(willTopicBytes.Length & 0xFF);
                 Array.Copy(willTopicBytes, 0, willPayload, 2, willTopicBytes.Length);
 
-                willPayload[willPayload.Length + 2 + 0] = (byte)(ConnectionOptions.WillMessage.Length >> 8);
-                willPayload[willPayload.Length + 2 + 1] = (byte)(ConnectionOptions.WillMessage.Length & 0xFF);
+                willPayload[willTopicBytes.Length + 2 + 0] = (byte)(ConnectionOptions.WillMessage.Length >> 8);
+                willPayload[willTopicBytes.Length + 2 + 1] = (byte)(ConnectionOptions.WillMessage.Length & 0xFF);
                 Array.Copy(ConnectionOptions.WillMessage, 0, willPayload, willTopicBytes.Length + 2 + 2, ConnectionOptions.WillMessage.Length);
 
                 // Setting appropriate flag bits.
