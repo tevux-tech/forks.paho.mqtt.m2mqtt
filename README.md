@@ -1,3 +1,6 @@
+[![NuGet](https://img.shields.io/nuget/dt/Tevux.M2Mqtt.svg?label=NuGet&style=flat&logo=nuget)](https://www.nuget.org/packages/Tevux.M2Mqtt/) 
+[![NuGet](https://img.shields.io/nuget/vpre/Tevux.M2Mqtt.svg?label=NuGet&style=flat&logo=nuget)](https://www.nuget.org/packages/Tevux.M2Mqtt/) 
+
 # M2Mqtt
 
 ![](images/m2mqtt6.png)
