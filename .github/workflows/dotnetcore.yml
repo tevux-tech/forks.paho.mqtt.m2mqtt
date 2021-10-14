@@ -2,9 +2,9 @@ name: .NET Core
 
 on:
   push:
-    branches: [ master ]
+    branches: [ Release ]
   pull_request:
-    branches: [ master ]
+    branches: [ Release ]
 
 jobs:
   build:
@@ -18,4 +18,4 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Build
-      run: dotnet build M2Mqtt.Core.sln --configuration Release
+      run: dotnet build M2Mqtt.sln --configuration Release
