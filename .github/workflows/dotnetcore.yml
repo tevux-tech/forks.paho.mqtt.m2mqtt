@@ -30,5 +30,8 @@ jobs:
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
       
-    - name: Publish
+    - name: Publish to Nuget.org
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+      
+    - name: Publish to Tevux Packages
+      run: nuget push **\*.nupkg -Source 'https://nuget.pkg.github.com/tevux-tech/index.json' -ApiKey ${{ecrets.GITHUB_TOKEN}}
