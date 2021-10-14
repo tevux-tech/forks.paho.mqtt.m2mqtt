@@ -24,5 +24,5 @@ using System.Reflection;
 [assembly: AssemblyCopyright("Copyright © Paolo Patierno 2014, Simonas Greicius 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("0.16.1.0")]
-[assembly: AssemblyFileVersion("0.16.1.0")]
+[assembly: AssemblyVersion("0.16.2.0")]
+[assembly: AssemblyFileVersion("0.16.2.0")]
