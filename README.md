@@ -1,3 +1,6 @@
+[![NuGet](https://img.shields.io/nuget/dt/Tevux.M2Mqtt.svg?label=NuGet&style=flat&logo=nuget)](https://www.nuget.org/packages/Tevux.M2Mqtt/) 
+[![NuGet](https://img.shields.io/nuget/vpre/Tevux.M2Mqtt.svg?label=NuGet&style=flat&logo=nuget)](https://www.nuget.org/packages/Tevux.M2Mqtt/) 
+
 # M2Mqtt
 
 ![](images/m2mqtt6.png)
@@ -9,7 +12,6 @@ MQTT, short for Message Queue Telemetry Transport, is a light weight messaging p
 MQTT protocol is based on publish/subscribe pattern so that a client can subscribe to one or more topics and receive messages that other clients publish on these topics.
 
 For all information about MQTT protocol, please visit official web site  http://mqtt.org/.
-
 
 # Sample
 
