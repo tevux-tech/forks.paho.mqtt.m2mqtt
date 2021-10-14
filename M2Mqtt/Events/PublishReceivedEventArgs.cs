@@ -15,14 +15,18 @@ Contributors:
    Simonas Greicius - 2021 rework
 */
 
-using System.Reflection;
-[assembly: AssemblyTitle("M2Mqtt")]
-[assembly: AssemblyDescription("MQTT Client Library for M2M communication")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tevux Technologies")]
-[assembly: AssemblyProduct("Tevux.M2Mqtt")]
-[assembly: AssemblyCopyright("Copyright © Paolo Patierno 2014, Simonas Greicius 2021")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("0.16.0.0")]
-[assembly: AssemblyFileVersion("0.16.0.0")]
+using System;
+
+namespace Tevux.Protocols.Mqtt {
+    public delegate void PublishReceivedEventHandler(object sender, PublishReceivedEventArgs e);
+
+    public class PublishReceivedEventArgs : EventArgs {
+        public string Topic { get; private set; }
+        public byte[] Message { get; private set; }
+
+        internal PublishReceivedEventArgs(string topic, byte[] message) {
+            Topic = topic;
+            Message = message;
+        }
+    }
+}

@@ -15,14 +15,17 @@ Contributors:
    Simonas Greicius - 2021 rework
 */
 
-using System.Reflection;
-[assembly: AssemblyTitle("M2Mqtt")]
-[assembly: AssemblyDescription("MQTT Client Library for M2M communication")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tevux Technologies")]
-[assembly: AssemblyProduct("Tevux.M2Mqtt")]
-[assembly: AssemblyCopyright("Copyright © Paolo Patierno 2014, Simonas Greicius 2021")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("0.16.0.0")]
-[assembly: AssemblyFileVersion("0.16.0.0")]
+using System;
+
+namespace Tevux.Protocols.Mqtt {
+    public partial class MqttClient {
+        public void Disconnect() {
+            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+
+            var disconnect = new DisconnectPacket();
+            Send(disconnect);
+
+            CloseConnections(true);
+        }
+    }
+}
