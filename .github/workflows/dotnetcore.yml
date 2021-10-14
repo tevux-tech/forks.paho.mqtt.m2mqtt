@@ -34,4 +34,4 @@ jobs:
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
       
     - name: Publish to Tevux Packages
-      run: nuget push **\*.nupkg -Source 'https://nuget.pkg.github.com/tevux-tech/index.json' -ApiKey ${{ecrets.GITHUB_TOKEN}}
+      run: nuget push **\*.nupkg -Source 'https://nuget.pkg.github.com/tevux-tech/index.json' -ApiKey ${{secrets.GITHUB_TOKEN}}
