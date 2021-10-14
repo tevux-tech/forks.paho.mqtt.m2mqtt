@@ -15,14 +15,22 @@ Contributors:
    Simonas Greicius - 2021 rework
 */
 
-using System.Reflection;
-[assembly: AssemblyTitle("M2Mqtt")]
-[assembly: AssemblyDescription("MQTT Client Library for M2M communication")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tevux Technologies")]
-[assembly: AssemblyProduct("Tevux.M2Mqtt")]
-[assembly: AssemblyCopyright("Copyright © Paolo Patierno 2014, Simonas Greicius 2021")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("0.15.0.0")]
-[assembly: AssemblyFileVersion("0.15.0.0")]
+using Tevux.Protocols.Mqtt.Utility;
+
+namespace Tevux.Protocols.Mqtt {
+    public partial class MqttClient {
+        internal void Send(byte[] buffer) {
+            if (_channel.TrySend(buffer)) {
+                _lastCommunicationTime = Helpers.GetCurrentTime();
+            }
+            else {
+                Trace.WriteLine(TraceLevel.Error, "Cannot send data through the channel.");
+                CloseConnections();
+            }
+        }
+
+        internal void Send(ControlPacketBase packet) {
+            Send(packet.GetBytes());
+        }
+    }
+}

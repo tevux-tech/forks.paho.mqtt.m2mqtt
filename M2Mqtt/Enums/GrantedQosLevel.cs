@@ -15,14 +15,11 @@ Contributors:
    Simonas Greicius - 2021 rework
 */
 
-using System.Reflection;
-[assembly: AssemblyTitle("M2Mqtt")]
-[assembly: AssemblyDescription("MQTT Client Library for M2M communication")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tevux Technologies")]
-[assembly: AssemblyProduct("Tevux.M2Mqtt")]
-[assembly: AssemblyCopyright("Copyright © Paolo Patierno 2014, Simonas Greicius 2021")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("0.15.0.0")]
-[assembly: AssemblyFileVersion("0.15.0.0")]
+namespace Tevux.Protocols.Mqtt {
+    public enum GrantedQosLevel : byte {
+        AtMostOnce = 0x00,
+        AtLeastOnce = 0x01,
+        ExactlyOnce = 0x02,
+        NotGranted = 0x80
+    }
+}
