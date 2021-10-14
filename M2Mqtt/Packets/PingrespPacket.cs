@@ -12,6 +12,7 @@ and the Eclipse Distribution License is available at
 
 Contributors:
    Paolo Patierno - initial API and implementation and/or initial documentation
+   Simonas Greicius - 2021 rework and simplification
 */
 
 namespace Tevux.Protocols.Mqtt {

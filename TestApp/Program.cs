@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+Copyright (c) 2021 Simonas Greicius
+
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+and Eclipse Distribution License v1.0 which accompany this distribution. 
+
+The Eclipse Public License is available at 
+   http://www.eclipse.org/legal/epl-v10.html
+and the Eclipse Distribution License is available at 
+   http://www.eclipse.org/org/documents/edl-v10.php.
+
+Contributors:
+   Simonas Greicius - creation of TestApp
+*/
+
+using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -28,16 +44,14 @@ namespace TestApp {
             var mqttCertificate = new X509Certificate(Encoding.UTF8.GetBytes(_mqttCertificateString));
 
             var networkOptions = new ChannelConnectionOptions();
-            // networkOptions.SetHostname("test.mosquitto.org");
-            networkOptions.SetHostname("moominhouse");
+            // Mosquitto server is very slow and congested. Replace with local instance, if possible.
+            networkOptions.SetHostname("test.mosquitto.org");
             networkOptions.SetPort(1883);
             networkOptions.SetReconnection(true);
-            // networkOptions.SetCertificate(mqttCertificate);
 
             var brokerOptions = new MqttConnectionOptions();
             brokerOptions.SetClientId("TestApp");
             brokerOptions.SetRetransmissionParameters(3, 3);
-            // brokerOptions.SetCleanSession(false);
 
             client.Connect(networkOptions, brokerOptions);
 
@@ -47,7 +61,7 @@ namespace TestApp {
             };
 
             client.Subscribe("temp/testapp", QosLevel.AtMostOnce);
-            //client.Subscribe("temp/test-publish2", QosLevel.ExactlyOnce);
+            client.Subscribe("temp/test-publish2", QosLevel.ExactlyOnce);
 
             Thread.Sleep(1000);
 
@@ -72,8 +86,8 @@ namespace TestApp {
 
         private void HandleSubscribed(object sender, SubscribedEventArgs e) {
             Console.WriteLine($"Subscribed: {e.Topic}:{e.GrantedQosLevel}");
-            Thread.Sleep(5000);
-            Console.WriteLine("Onomnom");
+            //Thread.Sleep(5000);
+            //Console.WriteLine("Onomnom");
         }
 
         private void HandlePublishReceived(object sender, PublishReceivedEventArgs e) {
