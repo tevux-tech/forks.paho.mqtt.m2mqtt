@@ -28,6 +28,7 @@ namespace Tevux.Protocols.Mqtt {
                 var pubAckPacket = new PubackPacket(packet.PacketId);
                 _client.Send(pubAckPacket);
                 Trace.LogOutgoingPacket(pubAckPacket);
+                NotifyPublishReceived(packet);
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
                 // Before adding a Pubrec packet to the send queue, checking if it is not there already by trying to finalize it.
