@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <VersionPrefix>4.3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Tevux.Protocols.Mqtt.M2MqttClient</AssemblyName>
     <PackageId>Tevux.M2Mqtt</PackageId>
 
