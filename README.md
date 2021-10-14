@@ -10,7 +10,6 @@ MQTT protocol is based on publish/subscribe pattern so that a client can subscri
 
 For all information about MQTT protocol, please visit official web site  http://mqtt.org/.
 
-
 # Sample
 
 There a [test app](TestApp/Program.cs) to get started quickly.
