@@ -39,5 +39,7 @@ namespace Tevux.Protocols.Mqtt {
 
             _outgoingPublishStateMachine.Publish(publishPacket);
         }
+
+#warning do I add PublishAndWait method?
     }
 }
