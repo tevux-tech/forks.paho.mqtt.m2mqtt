@@ -22,6 +22,8 @@ namespace Tevux.Protocols.Mqtt {
         private void CloseConnections(bool isClosedManually = false) {
             if (_isConnectionClosing) { return; }
 
+            _log.Info($"Shutting connections down due to {(isClosedManually ? "user request" : "external sources")}. ");
+
             _isConnectionClosing = true;
             IsConnected = false;
             _channel.Close();

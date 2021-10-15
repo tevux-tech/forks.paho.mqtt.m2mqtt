@@ -21,6 +21,7 @@ namespace Tevux.Protocols.Mqtt {
         private bool _isWaitingForConnack;
         private double _requestTimestamp;
         private MqttClient _client;
+        private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
         public bool IsConnectionCompleted { get; private set; }
         public bool IsConnectionSuccessful { get; private set; }
@@ -40,6 +41,7 @@ namespace Tevux.Protocols.Mqtt {
                     _isWaitingForConnack = false;
                     IsConnectionCompleted = true;
                     IsConnectionSuccessful = false;
+                    _log.Error($"PINRESP has not been received in {_client.ConnectionOptions.KeepAlivePeriod} s.");
                 }
             }
             else {
@@ -48,7 +50,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         public void ProcessPacket(ConnackPacket packet) {
-            Trace.LogIncomingPacket(packet);
+            PacketTracer.LogIncomingPacket(packet);
 
             _isWaitingForConnack = false;
             IsConnectionCompleted = true;
@@ -63,7 +65,7 @@ namespace Tevux.Protocols.Mqtt {
             _client.Send(packet);
             _isWaitingForConnack = true;
             _requestTimestamp = currentTime;
-            Trace.LogOutgoingPacket(packet);
+            PacketTracer.LogOutgoingPacket(packet);
         }
 
         public void Reset() {

@@ -48,6 +48,10 @@ namespace Tevux.Protocols.Mqtt {
             };
         }
 
+        public override string ToString() {
+            return $"{Hostname}:{Port}";
+        }
+
         public void SetHostname(string hostname) {
             if (string.IsNullOrEmpty(hostname)) { throw new ArgumentException($"Argument '{nameof(hostname)}' has to be a valid non-empty string", nameof(hostname)); }
 

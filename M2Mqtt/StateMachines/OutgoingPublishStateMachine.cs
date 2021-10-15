@@ -45,7 +45,7 @@ namespace Tevux.Protocols.Mqtt {
             if (packet.QosLevel == QosLevel.AtMostOnce) {
                 // Those are the best packets - just sending and waiting for no response!
                 _client.Send(context.PacketToSend);
-                Trace.LogOutgoingPacket(packet);
+                PacketTracer.LogOutgoingPacket(packet);
             }
             else if (packet.QosLevel == QosLevel.AtLeastOnce) {
                 _qos1PublishQueue.EnqueueAndSend(context);
@@ -63,7 +63,7 @@ namespace Tevux.Protocols.Mqtt {
 
         public void ProcessPacket(PubackPacket packet) {
             if (_qos1PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
-                Trace.LogIncomingPacket(packet);
+                PacketTracer.LogIncomingPacket(packet);
                 NotifyPublishSucceeded(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
@@ -77,7 +77,7 @@ namespace Tevux.Protocols.Mqtt {
             var currentTime = Helpers.GetCurrentTime();
 
             if (_qos2PublishQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
-                Trace.LogIncomingPacket(packet);
+                PacketTracer.LogIncomingPacket(packet);
                 NotifyPublishSucceeded(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
@@ -100,7 +100,7 @@ namespace Tevux.Protocols.Mqtt {
         public void ProcessPacket(PubcompPacket packet) {
             if (_qos2PubrelQueue.TryFinalize(packet.PacketId, out _)) {
                 // Ain't much to do here. QoS 2 sending is now complete.
-                Trace.LogIncomingPacket(packet);
+                PacketTracer.LogIncomingPacket(packet);
             }
             else {
                 NotifyRoguePacketReceived(packet);
@@ -111,7 +111,7 @@ namespace Tevux.Protocols.Mqtt {
             _client.OnPacketAcknowledged(packet, null);
         }
         private void NotifyRoguePacketReceived(ControlPacketBase packet) {
-            Trace.LogIncomingPacket(packet, true);
+            PacketTracer.LogIncomingPacket(packet, true);
         }
     }
 }

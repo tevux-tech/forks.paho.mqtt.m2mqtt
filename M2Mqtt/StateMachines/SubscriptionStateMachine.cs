@@ -68,7 +68,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         private void InternalProcessPacket(ControlPacketBase packet) {
-            Trace.LogIncomingPacket(packet);
+            PacketTracer.LogIncomingPacket(packet);
 
             if (_sendQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
                 _client.OnPacketAcknowledged(finalizedContext.PacketToSend, packet);
@@ -79,7 +79,7 @@ namespace Tevux.Protocols.Mqtt {
         }
 
         private void HandleRoguePacketReceived(ControlPacketBase packet) {
-            Trace.LogIncomingPacket(packet, true);
+            PacketTracer.LogIncomingPacket(packet, true);
         }
     }
 }

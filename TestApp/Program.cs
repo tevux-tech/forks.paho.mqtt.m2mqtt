@@ -18,13 +18,25 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
+using NLog;
 using Tevux.Protocols.Mqtt;
-using Tevux.Protocols.Mqtt.Utility;
 
 namespace TestApp {
     class Program {
         static void Main(string[] args) {
-            Trace.TraceListener = (format, data) => { Console.WriteLine(format, data); };
+            var config = new NLog.Config.LoggingConfiguration();
+
+            // Targets where to log to: File and Console
+            // var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "file.txt" };
+            var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
+
+            // Rules for mapping loggers to targets            
+            config.AddRule(LogLevel.Trace, LogLevel.Fatal, logconsole);
+            //  config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+
+            // Apply config           
+            NLog.LogManager.Configuration = config;
+
 
             var myTest = new MyTest();
 
@@ -34,7 +46,6 @@ namespace TestApp {
 
     public class MyTest {
         public MyTest() {
-
             var client = new MqttClient();
             client.Initialize();
             client.PublishReceived += HandlePublishReceived;

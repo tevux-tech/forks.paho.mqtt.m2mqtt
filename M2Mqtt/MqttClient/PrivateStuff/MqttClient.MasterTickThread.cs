@@ -15,7 +15,6 @@ Contributors:
 */
 
 using System.Threading;
-using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
@@ -29,12 +28,12 @@ namespace Tevux.Protocols.Mqtt {
                         _incomingPublishStateMachine.Tick();
                     }
                     else {
-                        Trace.WriteLine(TraceLevel.Error, "PING timeouted, beginning shutdown.");
+                        _log.Error($"PINGREQ timeouted.");
                         CloseConnections();
                     }
                 }
                 else if (_isConnectionRequested) {
-                    Trace.WriteLine(TraceLevel.Information, "Connecting...");
+                    _log.Info($"Connection has been requested, so going for it.");
                     if (_channelConnectionOptions.IsTlsUsed) {
                         _channel = new SecureTcpChannel(_channelConnectionOptions);
                     }
@@ -45,6 +44,7 @@ namespace Tevux.Protocols.Mqtt {
                     var isOk = true;
                     if (_channel.TryConnect() == false) {
                         isOk = false;
+                        _log.Error($"Cannot connect to channel {_channel.GetType()}.");
                     };
 
                     if (isOk) {
@@ -55,7 +55,10 @@ namespace Tevux.Protocols.Mqtt {
                     if (isOk) {
                         var connectPacket = new ConnectPacket(ConnectionOptions);
                         _connectStateMachine.Connect(connectPacket);
+                        _log.Info($"Connecting to {_channelConnectionOptions}...");
+                        Thread.Sleep(1000);
                         while (_connectStateMachine.IsConnectionCompleted == false) {
+                            _log.Info($"Still connecting to {_channelConnectionOptions}...");
                             _connectStateMachine.Tick();
                             Thread.Sleep(1000);
                         }
@@ -70,9 +73,12 @@ namespace Tevux.Protocols.Mqtt {
 
                         // These are dummy packets, so it just fits my the event queue.
                         _eventQueue.Enqueue(new EventSource(new ConnackPacket(), new ConnackPacket()));
+
+                        _log.Info($"Connected to {_channelConnectionOptions}.");
                     }
                     else {
                         isOk = false;
+                        _log.Error($"could not connect to {_channelConnectionOptions}. If reconnection is enabled, will try again soon.");
                     }
 
                     IsConnected = isOk;

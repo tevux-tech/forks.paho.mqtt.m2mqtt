@@ -30,6 +30,7 @@ namespace Tevux.Protocols.Mqtt {
         private readonly ChannelConnectionOptions _connectionOptions;
         private SslStream _sslStream;
         private NetworkStream _netStream;
+        private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
         public bool DataAvailable {
             get {
@@ -65,6 +66,7 @@ namespace Tevux.Protocols.Mqtt {
                     isOk = true;
                 }
                 else {
+                    _log.Error($"Cannot determine IP address from hostname {_connectionOptions.Hostname}. Even DNS cannot help.");
                     isOk = false;
                 }
             }
@@ -84,7 +86,8 @@ namespace Tevux.Protocols.Mqtt {
                     isOk = true;
                     IsConnected = true;
                 }
-                catch {
+                catch (Exception ex) {
+                    _log.Error(ex, $"Cannot open socket to {_connectionOptions.Hostname}.");
                     isOk = false;
                     Close();
                 }
@@ -102,7 +105,8 @@ namespace Tevux.Protocols.Mqtt {
 
                 isSent = true;
             }
-            catch (Exception) {
+            catch (Exception ex) {
+                _log.Error(ex, $"Cannot send data over socket.");
                 isSent = false;
                 Close();
             }
@@ -119,12 +123,13 @@ namespace Tevux.Protocols.Mqtt {
                 try {
                     bytesReceived = _sslStream.Read(buffer, idx, buffer.Length - idx);
                 }
-                catch (Exception) {
+                catch (Exception ex) {
+                    _log.Error(ex, $"Cannot receive data from socket.");
                     isSocketAlright = false;
                 }
 
                 if (bytesReceived == 0) {
-                    // Socket closed gracefully by peer / broker.
+                    _log.Error($"Socket closed gracefully by peer / broker..");
                     isSocketAlright = false;
                 }
 
@@ -146,7 +151,8 @@ namespace Tevux.Protocols.Mqtt {
             try {
                 _socket.Shutdown(SocketShutdown.Both);
             }
-            catch {
+            catch (Exception ex) {
+                _log.Error(ex, $"An error occurred when attempting to access the socket or socket has been closed.");
                 // An error occurred when attempting to access the socket or socket has been closed
                 // Refer to: https://msdn.microsoft.com/en-us/library/system.net.sockets.socket.shutdown(v=vs.110).aspx
             }
