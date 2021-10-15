@@ -17,6 +17,10 @@ Contributors:
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the outgoing publish traffic for all QoS levels. 
+    /// It sends PUBLISH and PUBREL, and processes incoming PUBACK, PUBREC and PUBCOMP.
+    /// </summary>
     internal class OutgoingPublishStateMachine {
         private readonly ResendingStateMachine _qos1PublishQueue = new ResendingStateMachine();
         private readonly ResendingStateMachine _qos2PublishQueue = new ResendingStateMachine();

@@ -18,12 +18,17 @@ using System.Collections;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// Any MQTT packet is allowed to be retransmitted as the implementor sees fit (with some sane delays, of course).
+    /// This state machine does exactly that. 
+    /// Retransmission process is completely identical for all packets, so other state machines simply use a copy of this one to handle retransmission.
+    /// </summary>
     internal class ResendingStateMachine {
-
         private readonly Hashtable _contexts = new Hashtable();
         private readonly ConcurrentQueue _itemsToRemove = new ConcurrentQueue();
         private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         private MqttClient _client;
+
         public void EnqueueAndSend(TransmissionContext context) {
             Send(context);
             lock (_contexts.SyncRoot) {
@@ -70,11 +75,15 @@ namespace Tevux.Protocols.Mqtt {
                 }
             }
         }
+
+        /// <summary>
+        /// Finalized means that the packet was either successfully sent, or retransmission count has been reached without success.
+        /// In both cases, process is done and then it is up to the state machine to handle situation.
+        /// </summary>
         public bool TryFinalize(ushort packetId, out TransmissionContext finalizedContext) {
             var isFinalized = false;
 
             lock (_contexts.SyncRoot) {
-
                 if (_contexts.Contains(packetId)) {
                     var contextToRemove = (TransmissionContext)_contexts[packetId];
                     contextToRemove.IsFinished = true;

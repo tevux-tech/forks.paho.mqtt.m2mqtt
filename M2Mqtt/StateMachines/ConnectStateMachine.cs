@@ -17,6 +17,9 @@ Contributors:
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the exchange of CONNECT-CONNACK packets.
+    /// </summary>
     internal class ConnectStateMachine {
         private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         private MqttClient _client;
@@ -25,6 +28,7 @@ namespace Tevux.Protocols.Mqtt {
         public ConnackPacket.ReturnCodes ConnectionResult { get; private set; }
         public bool IsConnectionCompleted { get; private set; }
         public bool IsConnectionSuccessful { get; private set; }
+
         public void Connect(ConnectPacket packet) {
             Reset();
 

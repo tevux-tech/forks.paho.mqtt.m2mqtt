@@ -18,25 +18,52 @@ using System.Threading;
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the exchange of SUBSCRIBE-SUBACK and UNSUBSCRIBE-UNSUBACK packets.
+    /// Although those processes are distinct, the mechanism is actually almost identical, 
+    /// so I used a single state machine to handle both.
+    /// </summary>
     internal class SubscriptionStateMachine {
-        private MqttClient _client;
         private readonly ResendingStateMachine _sendQueue = new ResendingStateMachine();
+        private MqttClient _client;
 
         public void Initialize(MqttClient client) {
             _client = client;
             _sendQueue.Initialize(client);
         }
 
-        public void Tick() {
-            _sendQueue.Tick();
+        public void ProcessPacket(SubackPacket packet) {
+            InternalProcessPacket(packet);
+        }
+
+        public void ProcessPacket(UnsubackPacket packet) {
+            InternalProcessPacket(packet);
         }
 
         public bool Subscribe(SubscribePacket packet, bool waitForCompletion = false) {
             return InternalSubscribeUnsubscribe(packet, waitForCompletion);
         }
 
+        public void Tick() {
+            _sendQueue.Tick();
+        }
         public bool Unsubscribe(UnsubscribePacket packet, bool waitForCompletion = false) {
             return InternalSubscribeUnsubscribe(packet, waitForCompletion);
+        }
+
+        private void HandleRoguePacketReceived(ControlPacketBase packet) {
+            PacketTracer.LogIncomingPacket(packet, true);
+        }
+
+        private void InternalProcessPacket(ControlPacketBase packet) {
+            PacketTracer.LogIncomingPacket(packet);
+
+            if (_sendQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
+                _client.OnPacketAcknowledged(finalizedContext.PacketToSend, packet);
+            }
+            else {
+                HandleRoguePacketReceived(packet);
+            }
         }
 
         private bool InternalSubscribeUnsubscribe(ControlPacketBase packet, bool waitForCompletion = false) {
@@ -58,28 +85,6 @@ namespace Tevux.Protocols.Mqtt {
             var returnResult = waitForCompletion ? transmissionContext.IsSucceeded : true;
 
             return returnResult;
-        }
-
-        public void ProcessPacket(SubackPacket packet) {
-            InternalProcessPacket(packet);
-        }
-        public void ProcessPacket(UnsubackPacket packet) {
-            InternalProcessPacket(packet);
-        }
-
-        private void InternalProcessPacket(ControlPacketBase packet) {
-            PacketTracer.LogIncomingPacket(packet);
-
-            if (_sendQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
-                _client.OnPacketAcknowledged(finalizedContext.PacketToSend, packet);
-            }
-            else {
-                HandleRoguePacketReceived(packet);
-            }
-        }
-
-        private void HandleRoguePacketReceived(ControlPacketBase packet) {
-            PacketTracer.LogIncomingPacket(packet, true);
         }
     }
 }

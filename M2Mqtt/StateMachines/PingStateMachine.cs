@@ -17,6 +17,9 @@ Contributors:
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the exchange of PINGREQ-PINGRESP packets.
+    /// </summary>
     internal class PingStateMachine {
         private MqttClient _client;
         private bool _isWaitingForPingResponse;
