@@ -18,15 +18,26 @@ using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class PingStateMachine {
+        private MqttClient _client;
         private bool _isWaitingForPingResponse;
         private double _requestTimestamp;
-        private MqttClient _client;
 
         public bool IsBrokerAlive { get; private set; } = true;
 
         public void Initialize(MqttClient client) {
             _client = client;
             Reset();
+        }
+
+        public void ProcessPacket(PingrespPacket packet) {
+            PacketTracer.LogIncomingPacket(packet);
+            IsBrokerAlive = true;
+            _isWaitingForPingResponse = false;
+        }
+
+        public void Reset() {
+            IsBrokerAlive = true;
+            _isWaitingForPingResponse = false;
         }
 
         public void Tick(double lastCommunicationTime) {
@@ -49,17 +60,6 @@ namespace Tevux.Protocols.Mqtt {
                     _requestTimestamp = currentTime;
                 }
             }
-        }
-
-        public void ProcessPacket(PingrespPacket packet) {
-            PacketTracer.LogIncomingPacket(packet);
-            IsBrokerAlive = true;
-            _isWaitingForPingResponse = false;
-        }
-
-        public void Reset() {
-            IsBrokerAlive = true;
-            _isWaitingForPingResponse = false;
         }
     }
 }

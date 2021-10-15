@@ -20,13 +20,25 @@ using Tevux.Protocols.Mqtt.Utility;
 namespace Tevux.Protocols.Mqtt {
     internal class ResendingStateMachine {
 
-        private MqttClient _client;
         private readonly Hashtable _contexts = new Hashtable();
         private readonly ConcurrentQueue _itemsToRemove = new ConcurrentQueue();
         private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+        private MqttClient _client;
+        public void EnqueueAndSend(TransmissionContext context) {
+            Send(context);
+            lock (_contexts.SyncRoot) {
+                _contexts.Add(context.PacketId, context);
+            }
+        }
 
         public void Initialize(MqttClient client) {
             _client = client;
+        }
+
+        public void Send(TransmissionContext context) {
+            PacketTracer.LogOutgoingPacket(context.PacketToSend, context.AttemptNumber);
+
+            _client.Send(context.PacketToSend);
         }
 
         public void Tick() {
@@ -58,20 +70,6 @@ namespace Tevux.Protocols.Mqtt {
                 }
             }
         }
-
-        public void Send(TransmissionContext context) {
-            PacketTracer.LogOutgoingPacket(context.PacketToSend, context.AttemptNumber);
-
-            _client.Send(context.PacketToSend);
-        }
-
-        public void EnqueueAndSend(TransmissionContext context) {
-            Send(context);
-            lock (_contexts.SyncRoot) {
-                _contexts.Add(context.PacketId, context);
-            }
-        }
-
         public bool TryFinalize(ushort packetId, out TransmissionContext finalizedContext) {
             var isFinalized = false;
 

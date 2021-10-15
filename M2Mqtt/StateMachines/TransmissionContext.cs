@@ -16,13 +16,21 @@ Contributors:
 */
 
 namespace Tevux.Protocols.Mqtt {
-    internal class TransmissionContext {
-        public ControlPacketBase PacketToSend { get; set; }
+    internal class PublishTransmissionContext : TransmissionContext {
+        public PublishTransmissionContext(PublishPacket originalPublishPacket, ControlPacketBase packetToSend, double timestamp) : base(packetToSend, timestamp) {
+            OriginalPublishPacket = originalPublishPacket;
+        }
 
-        /// <summary>
-        /// Timestamp in ticks (for retry)
-        /// </summary>
-        public double Timestamp { get; set; }
+        public PublishPacket OriginalPublishPacket { get; set; }
+
+        public override ushort PacketId { get { return OriginalPublishPacket.PacketId; } }
+    }
+
+    internal class TransmissionContext {
+        public TransmissionContext(ControlPacketBase packetToSend, double timestamp) {
+            PacketToSend = packetToSend;
+            Timestamp = timestamp;
+        }
 
         /// <summary>
         /// Attempt (for retry)
@@ -32,20 +40,11 @@ namespace Tevux.Protocols.Mqtt {
         public bool IsFinished { get; set; } = false;
         public bool IsSucceeded { get; set; } = false;
         public virtual ushort PacketId { get { return PacketToSend.PacketId; } }
+        public ControlPacketBase PacketToSend { get; set; }
 
-        public TransmissionContext(ControlPacketBase packetToSend, double timestamp) {
-            PacketToSend = packetToSend;
-            Timestamp = timestamp;
-        }
-    }
-
-    internal class PublishTransmissionContext : TransmissionContext {
-        public PublishPacket OriginalPublishPacket { get; set; }
-
-        public override ushort PacketId { get { return OriginalPublishPacket.PacketId; } }
-
-        public PublishTransmissionContext(PublishPacket originalPublishPacket, ControlPacketBase packetToSend, double timestamp) : base(packetToSend, timestamp) {
-            OriginalPublishPacket = originalPublishPacket;
-        }
+        /// <summary>
+        /// Timestamp in ticks (for retry)
+        /// </summary>
+        public double Timestamp { get; set; }
     }
 }

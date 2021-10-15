@@ -18,16 +18,11 @@ using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class IncomingPublishStateMachine {
-        private MqttClient _client;
         private readonly ResendingStateMachine _qos2PubrecQueue = new ResendingStateMachine();
-
+        private MqttClient _client;
         public void Initialize(MqttClient client) {
             _client = client;
             _qos2PubrecQueue.Initialize(client);
-        }
-
-        public void Tick() {
-            _qos2PubrecQueue.Tick();
         }
 
         public void ProcessPacket(PublishPacket packet) {
@@ -76,6 +71,9 @@ namespace Tevux.Protocols.Mqtt {
             PacketTracer.LogOutgoingPacket(pubcompPacket);
         }
 
+        public void Tick() {
+            _qos2PubrecQueue.Tick();
+        }
         private void NotifyPublishReceived(PublishPacket packet) {
             _client.OnPacketAcknowledged(null, packet);
         }

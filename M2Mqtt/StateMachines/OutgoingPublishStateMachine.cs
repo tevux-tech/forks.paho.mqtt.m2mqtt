@@ -3,11 +3,11 @@ Copyright (c) 2021 Simonas Greicius
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
-The Eclipse Public License is available at 
+The Eclipse Public License is available at
    http://www.eclipse.org/legal/epl-v10.html
-and the Eclipse Distribution License is available at 
+and the Eclipse Distribution License is available at
    http://www.eclipse.org/org/documents/edl-v10.php.
 
 Contributors:
@@ -18,47 +18,16 @@ using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
     internal class OutgoingPublishStateMachine {
-        private MqttClient _client;
-
         private readonly ResendingStateMachine _qos1PublishQueue = new ResendingStateMachine();
         private readonly ResendingStateMachine _qos2PublishQueue = new ResendingStateMachine();
         private readonly ResendingStateMachine _qos2PubrelQueue = new ResendingStateMachine();
+        private MqttClient _client;
 
         public void Initialize(MqttClient client) {
             _client = client;
             _qos1PublishQueue.Initialize(client);
             _qos2PublishQueue.Initialize(client);
             _qos2PubrelQueue.Initialize(client);
-        }
-
-        public void Tick() {
-            _qos1PublishQueue.Tick();
-            _qos2PublishQueue.Tick();
-            _qos2PubrelQueue.Tick();
-        }
-
-        public void Publish(PublishPacket packet) {
-            var currentTime = Helpers.GetCurrentTime();
-
-            var context = new PublishTransmissionContext(packet, packet, currentTime);
-
-            if (packet.QosLevel == QosLevel.AtMostOnce) {
-                // Those are the best packets - just sending and waiting for no response!
-                _client.Send(context.PacketToSend);
-                PacketTracer.LogOutgoingPacket(packet);
-            }
-            else if (packet.QosLevel == QosLevel.AtLeastOnce) {
-                _qos1PublishQueue.EnqueueAndSend(context);
-
-                // Any subsequent Publish packet transmissions must be marked with Duplicate flag.
-                packet.DuplicateFlag = true;
-            }
-            else if (packet.QosLevel == QosLevel.ExactlyOnce) {
-                _qos2PublishQueue.EnqueueAndSend(context);
-
-                // Any subsequent Publish packet transmissions must be marked with Duplicate flag.
-                packet.DuplicateFlag = true;
-            }
         }
 
         public void ProcessPacket(PubackPacket packet) {
@@ -107,9 +76,39 @@ namespace Tevux.Protocols.Mqtt {
             }
         }
 
+        public void Publish(PublishPacket packet) {
+            var currentTime = Helpers.GetCurrentTime();
+
+            var context = new PublishTransmissionContext(packet, packet, currentTime);
+
+            if (packet.QosLevel == QosLevel.AtMostOnce) {
+                // Those are the best packets - just sending and waiting for no response!
+                _client.Send(context.PacketToSend);
+                PacketTracer.LogOutgoingPacket(packet);
+            }
+            else if (packet.QosLevel == QosLevel.AtLeastOnce) {
+                _qos1PublishQueue.EnqueueAndSend(context);
+
+                // Any subsequent Publish packet transmissions must be marked with Duplicate flag.
+                packet.DuplicateFlag = true;
+            }
+            else if (packet.QosLevel == QosLevel.ExactlyOnce) {
+                _qos2PublishQueue.EnqueueAndSend(context);
+
+                // Any subsequent Publish packet transmissions must be marked with Duplicate flag.
+                packet.DuplicateFlag = true;
+            }
+        }
+
+        public void Tick() {
+            _qos1PublishQueue.Tick();
+            _qos2PublishQueue.Tick();
+            _qos2PubrelQueue.Tick();
+        }
         private void NotifyPublishSucceeded(PublishPacket packet) {
             _client.OnPacketAcknowledged(packet, null);
         }
+
         private void NotifyRoguePacketReceived(ControlPacketBase packet) {
             PacketTracer.LogIncomingPacket(packet, true);
         }
