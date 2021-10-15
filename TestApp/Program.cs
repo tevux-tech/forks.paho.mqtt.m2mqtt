@@ -23,7 +23,7 @@ using Tevux.Protocols.Mqtt;
 
 namespace TestApp {
     class Program {
-        static void Main(string[] args) {
+        static void Main() {
             var config = new NLog.Config.LoggingConfiguration();
 
             // Targets where to log to: File and Console
@@ -36,9 +36,7 @@ namespace TestApp {
 
             // Apply config           
             NLog.LogManager.Configuration = config;
-
-
-            var myTest = new MyTest();
+            _ = new MyTest();
 
             Thread.Sleep(-1);
         }
@@ -105,7 +103,7 @@ namespace TestApp {
             Console.WriteLine($"Received: {Encoding.UTF8.GetString(e.Message)}");
         }
 
-        private string _mqttCertificateString = @"-----BEGIN CERTIFICATE-----
+        private readonly string _mqttCertificateString = @"-----BEGIN CERTIFICATE-----
 MIIEAzCCAuugAwIBAgIUBY1hlCGvdj4NhBXkZ/uLUZNILAwwDQYJKoZIhvcNAQEL
 BQAwgZAxCzAJBgNVBAYTAkdCMRcwFQYDVQQIDA5Vbml0ZWQgS2luZ2RvbTEOMAwG
 A1UEBwwFRGVyYnkxEjAQBgNVBAoMCU1vc3F1aXR0bzELMAkGA1UECwwCQ0ExFjAU

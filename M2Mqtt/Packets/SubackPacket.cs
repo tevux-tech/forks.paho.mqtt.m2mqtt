@@ -55,9 +55,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return isOk;
         }
-
-        public override string ToString() {
-            return GetTraceString("SUBACK", new object[] { "packetId", "grantedQosLevel" }, new object[] { PacketId, GrantedQosLevel });
-        }
     }
 }

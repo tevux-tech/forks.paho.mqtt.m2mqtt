@@ -129,9 +129,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return isOk;
         }
-
-        public override string ToString() {
-            return GetTraceString("PUBLISH", new object[] { "messageId", "topic", "message" }, new object[] { PacketId, Topic, Message });
-        }
     }
 }

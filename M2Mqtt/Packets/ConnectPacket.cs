@@ -141,9 +141,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return finalBuffer;
         }
-
-        public override string ToString() {
-            return GetTraceString("CONNECT", new object[] { "clientId", "willFlag", "willRetain", "willQosLevel", "willTopic", "willMessage", "username", "password", "cleanSession", "keepAlivePeriod" }, new object[] { ConnectionOptions.ClientId, ConnectionOptions.IsWillUsed, ConnectionOptions.IsWillRetained, ConnectionOptions.WillQosLevel, ConnectionOptions.WillTopic, ConnectionOptions.WillMessage, ConnectionOptions.Username, ConnectionOptions.Password, ConnectionOptions.IsCleanSession, ConnectionOptions.KeepAlivePeriod });
-        }
     }
 }

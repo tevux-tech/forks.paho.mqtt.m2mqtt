@@ -70,9 +70,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return isOk;
         }
-
-        public override string ToString() {
-            return GetTraceString("CONNACK", new object[] { "returnCode" }, new object[] { (ReturnCodes)ReturnCode });
-        }
     }
 }

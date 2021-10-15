@@ -69,9 +69,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return finalBuffer;
         }
-
-        public override string ToString() {
-            return GetTraceString("UNSUBSCRIBE", new object[] { "packetId", "topics" }, new object[] { PacketId, Topic });
-        }
     }
 }

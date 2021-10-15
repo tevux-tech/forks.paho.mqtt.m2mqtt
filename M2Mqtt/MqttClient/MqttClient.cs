@@ -22,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
         private IMqttNetworkChannel _channel = new DummyChannel();
         private ChannelConnectionOptions _channelConnectionOptions = new ChannelConnectionOptions();
         private bool _isConnectionRequested;
-        private NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+        private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
         private readonly PingStateMachine _pingStateMachine = new PingStateMachine();
         private readonly ConnectStateMachine _connectStateMachine = new ConnectStateMachine();

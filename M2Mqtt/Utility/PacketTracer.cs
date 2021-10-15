@@ -19,7 +19,7 @@ using System;
 
 namespace Tevux.Protocols.Mqtt.Utility {
     public static class PacketTracer {
-        private static NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
         internal static void LogIncomingPacket(ControlPacketBase packet, bool isRogue = false) {
             var categoryIndent = "        " + ControlPacketBase.PacketTypes.GetShortBlank() + "   ";

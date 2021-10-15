@@ -23,7 +23,7 @@ namespace Tevux.Protocols.Mqtt {
         private MqttClient _client;
         private readonly Hashtable _contexts = new Hashtable();
         private readonly ConcurrentQueue _itemsToRemove = new ConcurrentQueue();
-        private NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+        private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
         public void Initialize(MqttClient client) {
             _client = client;

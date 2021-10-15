@@ -72,9 +72,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return finalBuffer;
         }
-
-        public override string ToString() {
-            return GetTraceString("SUBSCRIBE", new object[] { "packetId", "topic", "qosLevel" }, new object[] { PacketId, Topic, QosLevel });
-        }
     }
 }
