@@ -24,18 +24,13 @@ using Tevux.Protocols.Mqtt;
 namespace TestApp {
     class Program {
         static void Main() {
+            // Configure NLog.
             var config = new NLog.Config.LoggingConfiguration();
-
-            // Targets where to log to: File and Console
-            // var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "file.txt" };
             var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
-
-            // Rules for mapping loggers to targets            
             config.AddRule(LogLevel.Trace, LogLevel.Fatal, logconsole);
-            //  config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+            LogManager.Configuration = config;
 
-            // Apply config           
-            NLog.LogManager.Configuration = config;
+            // Run the test program
             _ = new MyTest();
 
             Thread.Sleep(-1);
@@ -82,8 +77,6 @@ namespace TestApp {
 
             client.Unsubscribe("temp/testapp");
 
-            Thread.Sleep(1000);
-
             Console.ReadLine();
 
             client.Disconnect();
@@ -95,8 +88,6 @@ namespace TestApp {
 
         private void HandleSubscribed(object sender, SubscribedEventArgs e) {
             Console.WriteLine($"Subscribed: {e.Topic}:{e.GrantedQosLevel}");
-            //Thread.Sleep(5000);
-            //Console.WriteLine("Onomnom");
         }
 
         private void HandlePublishReceived(object sender, PublishReceivedEventArgs e) {
