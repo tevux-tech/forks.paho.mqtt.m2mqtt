@@ -32,9 +32,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return buffer;
         }
-
-        public override string ToString() {
-            return GetTraceString("DISCONNECT", null, null);
-        }
     }
 }

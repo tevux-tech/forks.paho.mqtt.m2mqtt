@@ -47,9 +47,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return true;
         }
-
-        public override string ToString() {
-            return GetTraceString("PUBACK", new object[] { "packetId" }, new object[] { PacketId });
-        }
     }
 }

@@ -17,21 +17,21 @@ Contributors:
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the incoming publish traffic for all QoS levels. 
+    /// It processes incoming PUBLISH and PUBREL, and sends PUBACK, PUBREC and PUBCOMP.
+    /// </summary>
     internal class IncomingPublishStateMachine {
-        private MqttClient _client;
         private readonly ResendingStateMachine _qos2PubrecQueue = new ResendingStateMachine();
+        private MqttClient _client;
 
         public void Initialize(MqttClient client) {
             _client = client;
             _qos2PubrecQueue.Initialize(client);
         }
 
-        public void Tick() {
-            _qos2PubrecQueue.Tick();
-        }
-
         public void ProcessPacket(PublishPacket packet) {
-            Trace.LogIncomingPacket(packet);
+            PacketTracer.LogIncomingPacket(packet);
 
             var currentTime = Helpers.GetCurrentTime();
 
@@ -43,7 +43,7 @@ namespace Tevux.Protocols.Mqtt {
                 // Puback has no retransmission. So just sending it, and if broker will not receive it, it will retransmit Publish packet.
                 var pubAckPacket = new PubackPacket(packet.PacketId);
                 _client.Send(pubAckPacket);
-                Trace.LogOutgoingPacket(pubAckPacket);
+                PacketTracer.LogOutgoingPacket(pubAckPacket);
                 NotifyPublishReceived(packet);
             }
             else if (packet.QosLevel == QosLevel.ExactlyOnce) {
@@ -51,7 +51,7 @@ namespace Tevux.Protocols.Mqtt {
                 // If finalization succeeds, that means broker did not get a Pubrec of the previous packet and is now resending
                 // original Publish packet. So we simply discard the original Transmission context and start a new transmission.
                 var weHaveAProblem = _qos2PubrecQueue.TryFinalize(packet.PacketId, out var finalizedContext);
-                if (weHaveAProblem) { Trace.LogIncomingPacket(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket, true); }
+                if (weHaveAProblem) { PacketTracer.LogIncomingPacket(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket, true); }
 
                 // Normal workflow starts here.
                 var pubRecPacket = new PubrecPacket(packet.PacketId);
@@ -62,7 +62,7 @@ namespace Tevux.Protocols.Mqtt {
 
         public void ProcessPacket(PubrelPacket packet) {
             if (_qos2PubrecQueue.TryFinalize(packet.PacketId, out var finalizedContext)) {
-                Trace.LogIncomingPacket(packet);
+                PacketTracer.LogIncomingPacket(packet);
                 NotifyPublishReceived(((PublishTransmissionContext)finalizedContext).OriginalPublishPacket);
             }
             else {
@@ -73,14 +73,17 @@ namespace Tevux.Protocols.Mqtt {
 
             var pubcompPacket = new PubcompPacket(packet.PacketId);
             _client.Send(pubcompPacket);
-            Trace.LogOutgoingPacket(pubcompPacket);
+            PacketTracer.LogOutgoingPacket(pubcompPacket);
         }
 
+        public void Tick() {
+            _qos2PubrecQueue.Tick();
+        }
         private void NotifyPublishReceived(PublishPacket packet) {
             _client.OnPacketAcknowledged(null, packet);
         }
         private void NotifyRoguePacketReceived(ControlPacketBase packet) {
-            Trace.LogIncomingPacket(packet, true);
+            PacketTracer.LogIncomingPacket(packet, true);
         }
     }
 }

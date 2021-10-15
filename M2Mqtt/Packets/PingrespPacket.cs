@@ -35,9 +35,5 @@ namespace Tevux.Protocols.Mqtt {
 
             return true;
         }
-
-        public override string ToString() {
-            return GetTraceString("PINGRESP", null, null);
-        }
     }
 }

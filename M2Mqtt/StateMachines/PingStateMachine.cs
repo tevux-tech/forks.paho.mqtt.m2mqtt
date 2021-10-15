@@ -17,16 +17,30 @@ Contributors:
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the exchange of PINGREQ-PINGRESP packets.
+    /// </summary>
     internal class PingStateMachine {
+        private MqttClient _client;
         private bool _isWaitingForPingResponse;
         private double _requestTimestamp;
-        private MqttClient _client;
 
         public bool IsBrokerAlive { get; private set; } = true;
 
         public void Initialize(MqttClient client) {
             _client = client;
             Reset();
+        }
+
+        public void ProcessPacket(PingrespPacket packet) {
+            PacketTracer.LogIncomingPacket(packet);
+            IsBrokerAlive = true;
+            _isWaitingForPingResponse = false;
+        }
+
+        public void Reset() {
+            IsBrokerAlive = true;
+            _isWaitingForPingResponse = false;
         }
 
         public void Tick(double lastCommunicationTime) {
@@ -44,22 +58,11 @@ namespace Tevux.Protocols.Mqtt {
                 if ((currentTime - lastCommunicationTime > _client.ConnectionOptions.KeepAlivePeriod) && (_client.ConnectionOptions.KeepAlivePeriod > 0)) {
                     var pingreq = new PingreqPacket();
                     _client.Send(pingreq);
-                    Trace.WriteLine(TraceLevel.Frame, $"{pingreq.GetShortName()}->");
+                    PacketTracer.LogOutgoingPacket(pingreq);
                     _isWaitingForPingResponse = true;
                     _requestTimestamp = currentTime;
                 }
             }
-        }
-
-        public void ProcessPacket(PingrespPacket packet) {
-            Trace.WriteLine(TraceLevel.Frame, $"<-{packet.GetShortName()}");
-            IsBrokerAlive = true;
-            _isWaitingForPingResponse = false;
-        }
-
-        public void Reset() {
-            IsBrokerAlive = true;
-            _isWaitingForPingResponse = false;
         }
     }
 }

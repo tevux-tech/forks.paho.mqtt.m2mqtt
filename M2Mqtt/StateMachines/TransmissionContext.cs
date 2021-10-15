@@ -16,36 +16,36 @@ Contributors:
 */
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// QoS 2 is a two-stage process, so by the time PUBREL/PUBCOMP packets come into play, 
+    /// original PUBLISH packet is long gone. But we need to preserve the original packet so 
+    /// an appropriate event can be raised once entire exchange process is complete.
+    /// </summary>
+    internal class PublishTransmissionContext : TransmissionContext {
+        public PublishTransmissionContext(PublishPacket originalPublishPacket, ControlPacketBase packetToSend, double timestamp) : base(packetToSend, timestamp) {
+            OriginalPublishPacket = originalPublishPacket;
+        }
+
+        public PublishPacket OriginalPublishPacket { get; set; }
+
+        public override ushort PacketId { get { return OriginalPublishPacket.PacketId; } }
+    }
+
+    /// <summary>
+    /// This context is used to temporarily preserve states while packets are being exchanged between client and broker 
+    /// (for example, for ACK packets or retry count).
+    /// </summary>
     internal class TransmissionContext {
-        public ControlPacketBase PacketToSend { get; set; }
-
-        /// <summary>
-        /// Timestamp in ticks (for retry)
-        /// </summary>
-        public double Timestamp { get; set; }
-
-        /// <summary>
-        /// Attempt (for retry)
-        /// </summary>
-        public int AttemptNumber { get; set; } = 1;
-
-        public bool IsFinished { get; set; } = false;
-        public bool IsSucceeded { get; set; } = false;
-        public virtual ushort PacketId { get { return PacketToSend.PacketId; } }
-
         public TransmissionContext(ControlPacketBase packetToSend, double timestamp) {
             PacketToSend = packetToSend;
             Timestamp = timestamp;
         }
-    }
 
-    internal class PublishTransmissionContext : TransmissionContext {
-        public PublishPacket OriginalPublishPacket { get; set; }
-
-        public override ushort PacketId { get { return OriginalPublishPacket.PacketId; } }
-
-        public PublishTransmissionContext(PublishPacket originalPublishPacket, ControlPacketBase packetToSend, double timestamp) : base(packetToSend, timestamp) {
-            OriginalPublishPacket = originalPublishPacket;
-        }
+        public int AttemptNumber { get; set; } = 1;
+        public bool IsFinished { get; set; } = false;
+        public bool IsSucceeded { get; set; } = false;
+        public virtual ushort PacketId { get { return PacketToSend.PacketId; } }
+        public ControlPacketBase PacketToSend { get; set; }
+        public double Timestamp { get; set; }
     }
 }

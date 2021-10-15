@@ -17,18 +17,45 @@ Contributors:
 using Tevux.Protocols.Mqtt.Utility;
 
 namespace Tevux.Protocols.Mqtt {
+    /// <summary>
+    /// This state machine handles the exchange of CONNECT-CONNACK packets.
+    /// </summary>
     internal class ConnectStateMachine {
+        private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
+        private MqttClient _client;
         private bool _isWaitingForConnack;
         private double _requestTimestamp;
-        private MqttClient _client;
-
+        public ConnackPacket.ReturnCodes ConnectionResult { get; private set; }
         public bool IsConnectionCompleted { get; private set; }
         public bool IsConnectionSuccessful { get; private set; }
-        public ConnackPacket.ReturnCodes ConnectionResult { get; private set; }
+
+        public void Connect(ConnectPacket packet) {
+            Reset();
+
+            var currentTime = Helpers.GetCurrentTime();
+            _client.Send(packet);
+            _isWaitingForConnack = true;
+            _requestTimestamp = currentTime;
+            PacketTracer.LogOutgoingPacket(packet);
+        }
 
         public void Initialize(MqttClient client) {
             _client = client;
             Reset();
+        }
+
+        public void ProcessPacket(ConnackPacket packet) {
+            PacketTracer.LogIncomingPacket(packet);
+
+            _isWaitingForConnack = false;
+            IsConnectionCompleted = true;
+            IsConnectionSuccessful = true;
+            ConnectionResult = packet.ReturnCode;
+        }
+
+        public void Reset() {
+            _isWaitingForConnack = false;
+            IsConnectionCompleted = false;
         }
 
         public void Tick() {
@@ -40,35 +67,12 @@ namespace Tevux.Protocols.Mqtt {
                     _isWaitingForConnack = false;
                     IsConnectionCompleted = true;
                     IsConnectionSuccessful = false;
+                    _log.Error($"PINRESP has not been received in {_client.ConnectionOptions.KeepAlivePeriod} s.");
                 }
             }
             else {
 
             }
-        }
-
-        public void ProcessPacket(ConnackPacket packet) {
-            Trace.LogIncomingPacket(packet);
-
-            _isWaitingForConnack = false;
-            IsConnectionCompleted = true;
-            IsConnectionSuccessful = true;
-            ConnectionResult = packet.ReturnCode;
-        }
-
-        public void Connect(ConnectPacket packet) {
-            Reset();
-
-            var currentTime = Helpers.GetCurrentTime();
-            _client.Send(packet);
-            _isWaitingForConnack = true;
-            _requestTimestamp = currentTime;
-            Trace.LogOutgoingPacket(packet);
-        }
-
-        public void Reset() {
-            _isWaitingForConnack = false;
-            IsConnectionCompleted = false;
         }
     }
 }

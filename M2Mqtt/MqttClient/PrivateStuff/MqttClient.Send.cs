@@ -15,8 +15,6 @@ Contributors:
    Simonas Greicius - 2021 rework
 */
 
-using Tevux.Protocols.Mqtt.Utility;
-
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         internal void Send(byte[] buffer) {
@@ -24,7 +22,7 @@ namespace Tevux.Protocols.Mqtt {
                 _lastCommunicationTime = Helpers.GetCurrentTime();
             }
             else {
-                Trace.WriteLine(TraceLevel.Error, "Cannot send data through the channel.");
+                _log.Error($"Cannot send data through the channel.");
                 CloseConnections();
             }
         }

@@ -18,15 +18,20 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
+using NLog;
 using Tevux.Protocols.Mqtt;
-using Tevux.Protocols.Mqtt.Utility;
 
 namespace TestApp {
     class Program {
-        static void Main(string[] args) {
-            Trace.TraceListener = (format, data) => { Console.WriteLine(format, data); };
+        static void Main() {
+            // Configure NLog.
+            var config = new NLog.Config.LoggingConfiguration();
+            var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
+            config.AddRule(LogLevel.Trace, LogLevel.Fatal, logconsole);
+            LogManager.Configuration = config;
 
-            var myTest = new MyTest();
+            // Run the test program
+            _ = new MyTest();
 
             Thread.Sleep(-1);
         }
@@ -34,7 +39,6 @@ namespace TestApp {
 
     public class MyTest {
         public MyTest() {
-
             var client = new MqttClient();
             client.Initialize();
             client.PublishReceived += HandlePublishReceived;
@@ -73,8 +77,6 @@ namespace TestApp {
 
             client.Unsubscribe("temp/testapp");
 
-            Thread.Sleep(1000);
-
             Console.ReadLine();
 
             client.Disconnect();
@@ -86,15 +88,13 @@ namespace TestApp {
 
         private void HandleSubscribed(object sender, SubscribedEventArgs e) {
             Console.WriteLine($"Subscribed: {e.Topic}:{e.GrantedQosLevel}");
-            //Thread.Sleep(5000);
-            //Console.WriteLine("Onomnom");
         }
 
         private void HandlePublishReceived(object sender, PublishReceivedEventArgs e) {
             Console.WriteLine($"Received: {Encoding.UTF8.GetString(e.Message)}");
         }
 
-        private string _mqttCertificateString = @"-----BEGIN CERTIFICATE-----
+        private readonly string _mqttCertificateString = @"-----BEGIN CERTIFICATE-----
 MIIEAzCCAuugAwIBAgIUBY1hlCGvdj4NhBXkZ/uLUZNILAwwDQYJKoZIhvcNAQEL
 BQAwgZAxCzAJBgNVBAYTAkdCMRcwFQYDVQQIDA5Vbml0ZWQgS2luZ2RvbTEOMAwG
 A1UEBwwFRGVyYnkxEjAQBgNVBAoMCU1vc3F1aXR0bzELMAkGA1UECwwCQ0ExFjAU
