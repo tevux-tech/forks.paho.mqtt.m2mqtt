@@ -16,7 +16,7 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RootNamespace>Tevux.Protocols.Mqtt</RootNamespace>
-    <Version>0.17.0</Version>
+    <Version>0.17.1</Version>
     <Authors>Paolo Patierno, Simonas Greicius</Authors>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
