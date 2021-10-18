@@ -113,7 +113,7 @@ namespace Tevux.Protocols.Mqtt {
             // Packet id is valid only with QOS level 1 or QOS level 2
             if ((parsedPacket.QosLevel == QosLevel.AtLeastOnce) || (parsedPacket.QosLevel == QosLevel.ExactlyOnce)) {
                 // message id
-                parsedPacket.PacketId = (ushort)((variableHeaderAndPayloadBytes[topicUtf8Length] << 8) + variableHeaderAndPayloadBytes[topicUtf8Length + 1]);
+                parsedPacket.PacketId = (ushort)((variableHeaderAndPayloadBytes[topicUtf8Length + 2] << 8) + variableHeaderAndPayloadBytes[topicUtf8Length + 2 + 1]);
             }
 
             // get payload with message data
