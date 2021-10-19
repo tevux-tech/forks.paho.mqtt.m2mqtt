@@ -16,18 +16,19 @@ Contributors:
 */
 
 using System;
+using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        public bool Connect() {
-            return Connect(new ChannelConnectionOptions(), new MqttConnectionOptions());
+        public void ConnectAndWait() {
+            ConnectAndWait(new ChannelConnectionOptions(), new MqttConnectionOptions());
         }
 
-        public bool Connect(ChannelConnectionOptions channelConnectionOptions) {
-            return Connect(channelConnectionOptions, new MqttConnectionOptions());
+        public void ConnectAndWait(ChannelConnectionOptions channelConnectionOptions) {
+            ConnectAndWait(channelConnectionOptions, new MqttConnectionOptions());
         }
 
-        public bool Connect(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
+        public void ConnectAndWait(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
             if (IsConnected) { Disconnect(); }
 
@@ -36,7 +37,9 @@ namespace Tevux.Protocols.Mqtt {
 
             _isConnectionRequested = true;
 
-            return IsConnected;
+            while (IsConnected == false) {
+                Thread.Sleep(100);
+            }
         }
     }
 }
