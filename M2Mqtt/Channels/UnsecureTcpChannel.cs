@@ -70,6 +70,7 @@ namespace Tevux.Protocols.Mqtt {
             if (isOk) {
                 try {
                     _socket = new Socket(remoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    _socket.NoDelay = true;
                     // try connection to the broker
                     _socket.Connect(remoteIpAddress, _connectionOptions.Port);
 
