@@ -15,6 +15,7 @@ Contributors:
 */
 
 using System;
+using System.Text;
 
 namespace Tevux.Protocols.Mqtt {
     public class MqttConnectionOptions {
@@ -65,6 +66,18 @@ namespace Tevux.Protocols.Mqtt {
 
             WillTopic = topic;
             WillMessage = message;
+            WillQosLevel = qosLevel;
+            IsWillRetained = retain;
+        }
+
+        public void SetWill(string topic, string message, QosLevel qosLevel, bool retain) {
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentException($"Argument '{nameof(topic)}' has to be a valid non-empty string", nameof(topic)); }
+            if (string.IsNullOrEmpty(message)) { throw new ArgumentException($"Argument '{nameof(message)}' has to be a valid non-empty string", nameof(message)); }
+
+            IsWillUsed = true;
+
+            WillTopic = topic;
+            WillMessage = Encoding.UTF8.GetBytes(message);
             WillQosLevel = qosLevel;
             IsWillRetained = retain;
         }
