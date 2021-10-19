@@ -30,7 +30,7 @@ namespace Tevux.Protocols.Mqtt {
 
         public void ConnectAndWait(ChannelConnectionOptions channelConnectionOptions, MqttConnectionOptions mqttConnectionOptions) {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
-            if (IsConnected) { Disconnect(); }
+            if (IsConnected) { DisconnectAndWait(); }
 
             _channelConnectionOptions = channelConnectionOptions;
             ConnectionOptions = mqttConnectionOptions;
