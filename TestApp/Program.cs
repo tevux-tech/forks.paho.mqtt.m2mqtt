@@ -57,7 +57,7 @@ namespace TestApp {
             brokerOptions.SetClientId("TestApp");
             brokerOptions.SetRetransmissionParameters(3, 3);
 
-            client.Connect(networkOptions, brokerOptions);
+            client.ConnectAndWait(networkOptions, brokerOptions);
 
             while (client.IsConnected == false) {
                 Console.WriteLine("Connecting...");
@@ -79,7 +79,7 @@ namespace TestApp {
 
             Console.ReadLine();
 
-            client.Disconnect();
+            client.DisconnectAndWait();
         }
 
         private void HandleUnsubscribed(object sender, UnsubscribedEventArgs e) {
