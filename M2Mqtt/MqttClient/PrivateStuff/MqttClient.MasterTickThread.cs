@@ -20,7 +20,34 @@ namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         private void MasterTickThread() {
             while (true) {
-                if (IsConnected) {
+                if (_isDisconnectionRequested) {
+                    if (_isDisconnectedByUser) {
+                        _log.Info($"Shutting connections down due to user request.");
+                        var disconnect = new DisconnectPacket();
+                        Send(disconnect);
+                        Thread.Sleep(10);
+                        IsConnected = false;
+
+                        // Technically, other side should gracefully close the channel, so the following statement is "just in case".
+                        if (_channel.IsConnected) { _channel.Close(); }
+
+                        _isDisconnectionRequested = false;
+                        _isDisconnectedByUser = false;
+                    }
+                    else {
+                        _log.Info($"Shutting connections down due to external sources.");
+                        IsConnected = false;
+                        _channel.Close();
+
+                        if (_channelConnectionOptions.IsReconnectionEnabled) { _isConnectionRequested = true; }
+
+                        _isDisconnectionRequested = false;
+                    }
+
+                    // This is a dummy packet, so it just fits my the event queue.
+                    _eventQueue.Enqueue(new EventSource(new DisconnectPacket(), null));
+                }
+                else if (IsConnected) {
                     _pingStateMachine.Tick(_lastCommunicationTime);
                     if (_pingStateMachine.IsBrokerAlive) {
                         _subscriptionStateMachine.Tick();
@@ -49,7 +76,7 @@ namespace Tevux.Protocols.Mqtt {
 
                     if (isOk) {
                         _lastCommunicationTime = 0;
-                        _isConnectionClosing = false;
+                        _isDisconnectionRequested = false;
                     }
 
                     if (isOk) {
@@ -82,8 +109,10 @@ namespace Tevux.Protocols.Mqtt {
                     }
 
                     IsConnected = isOk;
+                    _isConnectionRequested = false;
                     Thread.Sleep(100);
                 }
+
                 else {
                     Thread.Sleep(1000);
                 }

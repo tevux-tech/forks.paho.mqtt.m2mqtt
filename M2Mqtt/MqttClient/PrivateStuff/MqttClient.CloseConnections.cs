@@ -17,22 +17,14 @@ Contributors:
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
-        private bool _isConnectionClosing;
+        private bool _isDisconnectionRequested;
+        private bool _isDisconnectedByUser;
 
-        private void CloseConnections(bool isClosedManually = false) {
-            if (_isConnectionClosing) { return; }
+        private void CloseConnections(bool isDisconnectedByUser = false) {
+            if (_isDisconnectionRequested) { return; }
 
-            _log.Info($"Shutting connections down due to {(isClosedManually ? "user request" : "external sources")}. ");
-
-            _isConnectionClosing = true;
-            IsConnected = false;
-            _channel.Close();
-
-            // This is a dummy packet, so it just fits my the event queue.
-            _eventQueue.Enqueue(new EventSource(new DisconnectPacket(), null));
-
-            _isConnectionClosing = false;
-            if (_channelConnectionOptions.IsReconnectionEnabled && (isClosedManually == false)) { _isConnectionRequested = true; }
+            _isDisconnectionRequested = true;
+            _isDisconnectedByUser = isDisconnectedByUser;
         }
     }
 }

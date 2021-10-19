@@ -24,7 +24,7 @@ namespace Tevux.Protocols.Mqtt {
             byte packetType = 0;
 
             while (true) {
-                if (_channel.IsConnected) {
+                if (_channel.IsConnected && (_isDisconnectionRequested == false)) {
                     // read first byte (fixed header)
                     var isOk = _channel.TryReceive(fixedHeaderFirstByte);
 
@@ -160,8 +160,14 @@ namespace Tevux.Protocols.Mqtt {
                         }
                     }
                     else {
-                        _log.Error($"Cannot receive needed data for packet type {packetType}. Something is wrong with the data channel.");
-                        CloseConnections();
+                        if (_isDisconnectionRequested) {
+                            // This is be a transdient state, when Socket.TryRead() is unblocked because the socket is being closed at the server side after receiving DISCONNECT packet from us..
+                            // It then reads 0 bytes. This not an error in such case.
+                        }
+                        else {
+                            _log.Error($"Cannot receive needed data for packet type {packetType}. Something is wrong with the data channel.");
+                            CloseConnections();
+                        }
                     }
                 }
                 else {
