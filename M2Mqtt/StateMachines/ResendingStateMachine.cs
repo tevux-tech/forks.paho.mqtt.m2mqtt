@@ -28,6 +28,7 @@ namespace Tevux.Protocols.Mqtt {
         private readonly ConcurrentQueue _itemsToRemove = new ConcurrentQueue();
         private readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         private MqttClient _client;
+        private bool _isResetRequested;
 
         public void EnqueueAndSend(TransmissionContext context) {
             Send(context);
@@ -40,6 +41,10 @@ namespace Tevux.Protocols.Mqtt {
             _client = client;
         }
 
+        public void ResetOnNextTick() {
+            _isResetRequested = true;
+        }
+
         public void Send(TransmissionContext context) {
             PacketTracer.LogOutgoingPacket(context.PacketToSend, context.AttemptNumber);
 
@@ -48,6 +53,14 @@ namespace Tevux.Protocols.Mqtt {
 
         public void Tick() {
             var currentTime = Helpers.GetCurrentTime();
+
+            if (_isResetRequested) {
+                lock (_contexts.SyncRoot) {
+                    _contexts.Clear();
+                }
+
+                _isResetRequested = false;
+            }
 
             lock (_contexts.SyncRoot) {
                 foreach (DictionaryEntry item in _contexts) {

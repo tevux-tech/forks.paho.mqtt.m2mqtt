@@ -104,6 +104,12 @@ namespace Tevux.Protocols.Mqtt {
             }
         }
 
+        public void Reset() {
+            _qos1PublishQueue.ResetOnNextTick();
+            _qos2PublishQueue.ResetOnNextTick();
+            _qos2PubrelQueue.ResetOnNextTick();
+        }
+
         public void Tick() {
             _qos1PublishQueue.Tick();
             _qos2PublishQueue.Tick();

@@ -95,7 +95,9 @@ namespace Tevux.Protocols.Mqtt {
                         if (ConnectionOptions.IsCleanSession) {
                             _pingStateMachine.Reset();
                             _connectStateMachine.Reset();
-#warning need to reset publish state machine, too
+                            _subscriptionStateMachine.Reset();
+                            _incomingPublishStateMachine.Reset();
+                            _outgoingPublishStateMachine.Reset();
                         }
 
                         // These are dummy packets, so it just fits my the event queue.

@@ -76,6 +76,10 @@ namespace Tevux.Protocols.Mqtt {
             PacketTracer.LogOutgoingPacket(pubcompPacket);
         }
 
+        public void Reset() {
+            _qos2PubrecQueue.ResetOnNextTick();
+        }
+
         public void Tick() {
             _qos2PubrecQueue.Tick();
         }

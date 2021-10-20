@@ -40,6 +40,10 @@ namespace Tevux.Protocols.Mqtt {
             InternalProcessPacket(packet);
         }
 
+        public void Reset() {
+            _sendQueue.ResetOnNextTick();
+        }
+
         public bool Subscribe(SubscribePacket packet, bool waitForCompletion = false) {
             return InternalSubscribeUnsubscribe(packet, waitForCompletion);
         }
@@ -50,7 +54,6 @@ namespace Tevux.Protocols.Mqtt {
         public bool Unsubscribe(UnsubscribePacket packet, bool waitForCompletion = false) {
             return InternalSubscribeUnsubscribe(packet, waitForCompletion);
         }
-
         private void HandleRoguePacketReceived(ControlPacketBase packet) {
             PacketTracer.LogIncomingPacket(packet, true);
         }
