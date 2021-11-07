@@ -53,6 +53,8 @@ namespace Tevux.Protocols.Mqtt {
                         _subscriptionStateMachine.Tick();
                         _outgoingPublishStateMachine.Tick();
                         _incomingPublishStateMachine.Tick();
+
+                        Thread.Sleep(1000);
                     }
                     else {
                         _log.Error($"PINGREQ timeouted.");
@@ -114,7 +116,6 @@ namespace Tevux.Protocols.Mqtt {
                     _isConnectionRequested = false;
                     Thread.Sleep(100);
                 }
-
                 else {
                     Thread.Sleep(1000);
                 }
