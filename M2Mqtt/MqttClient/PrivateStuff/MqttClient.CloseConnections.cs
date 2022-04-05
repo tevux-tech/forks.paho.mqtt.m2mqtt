@@ -19,6 +19,7 @@ namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         private bool _isDisconnectionRequested;
         private bool _isDisconnectedByUser;
+        private bool _isWaitingForSocketToClose;
 
         private void CloseConnections(bool isDisconnectedByUser = false) {
             if (_isDisconnectionRequested) { return; }

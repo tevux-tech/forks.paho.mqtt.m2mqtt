@@ -21,27 +21,39 @@ namespace Tevux.Protocols.Mqtt {
         private void MasterTickThread() {
             while (true) {
                 if (_isDisconnectionRequested) {
-                    if (_isDisconnectedByUser) {
-                        _log.Info($"Shutting connections down due to user request.");
-                        var disconnect = new DisconnectPacket();
-                        Send(disconnect);
-                        Thread.Sleep(10);
-                        IsConnected = false;
-
-                        // Technically, other side should gracefully close the channel, so the following statement is "just in case".
-                        if (_channel.IsConnected) { _channel.Close(); }
-
-                        _isDisconnectionRequested = false;
-                        _isDisconnectedByUser = false;
+                    if (_isWaitingForSocketToClose) {
+                        if (_isReceiveThreadActive == false) {
+                            _isWaitingForSocketToClose = false;
+                            _isDisconnectionRequested = false;
+                            if (_isDisconnectedByUser) {
+                                _log.Info("Disconnected from {Server} as per user request.", _channelConnectionOptions.Hostname);
+                                _isDisconnectedByUser = false;
+                            }
+                            else {
+                                _log.Info("Disconnected from {Server} due to some network problems.", _channelConnectionOptions.Hostname);
+                                if (_channelConnectionOptions.IsReconnectionEnabled) {
+                                    _log.Info("Auto-reconnection is enabled.");
+                                    _isConnectionRequested = true;
+                                }
+                            }
+                            IsConnected = false;
+                        }
+                        else {
+                            // TODO: Technically, it is possible for the state to stuck in this place, if the server will not close the connection.
+                        }
                     }
                     else {
-                        _log.Info($"Shutting connections down due to external sources.");
-                        IsConnected = false;
-                        _channel.Close();
+                        if (_isDisconnectedByUser) {
+                            _log.Info($"Shutting connections down due to user request.");
+                            var disconnect = new DisconnectPacket();
+                            Send(disconnect);
+                        }
+                        else {
+                            _log.Info($"Shutting connections down due to external sources.");
+                            _channel.Close();
+                        }
 
-                        if (_channelConnectionOptions.IsReconnectionEnabled) { _isConnectionRequested = true; }
-
-                        _isDisconnectionRequested = false;
+                        _isWaitingForSocketToClose = true;
                     }
 
                     // This is a dummy packet, so it just fits my the event queue.
