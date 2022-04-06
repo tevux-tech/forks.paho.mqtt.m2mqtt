@@ -23,6 +23,8 @@ namespace Tevux.Protocols.Mqtt {
         public void DisconnectAndWait() {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
+            _isReconnectionEnabled = false;
+
             CloseConnections(true);
 
             while (IsConnected) {

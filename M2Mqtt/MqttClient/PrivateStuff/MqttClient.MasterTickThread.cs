@@ -22,8 +22,7 @@ namespace Tevux.Protocols.Mqtt {
             while (true) {
                 if (_isDisconnectionRequested) {
                     if (_isWaitingForSocketToClose) {
-                        if (_isReceiveThreadActive == false) {
-                            _isWaitingForSocketToClose = false;
+                        if ((_isReceiveThreadActive == false) && (_channel.IsConnected == false)) {
                             _isDisconnectionRequested = false;
                             if (_isDisconnectedByUser) {
                                 _log.Info("Disconnected from {Server} as per user request.", _channelConnectionOptions.Hostname);
@@ -31,15 +30,16 @@ namespace Tevux.Protocols.Mqtt {
                             }
                             else {
                                 _log.Info("Disconnected from {Server} due to some network problems.", _channelConnectionOptions.Hostname);
-                                if (_channelConnectionOptions.IsReconnectionEnabled) {
+                                if (_isReconnectionEnabled) {
                                     _log.Info("Auto-reconnection is enabled.");
                                     _isConnectionRequested = true;
                                 }
                             }
                             IsConnected = false;
+                            _isWaitingForSocketToClose = false;
                         }
                         else {
-                            // TODO: Technically, it is possible for the state to stuck in this place, if the server will not close the connection.
+                            // TODO: Technically, it is possible for the state to stick in this place, if the server will not close the connection.
                         }
                     }
                     else {
@@ -53,11 +53,13 @@ namespace Tevux.Protocols.Mqtt {
                             _channel.Close();
                         }
 
+                        // This is a dummy packet, so it just fits my the event queue.
+                        _eventQueue.Enqueue(new EventSource(new DisconnectPacket(), null));
+
                         _isWaitingForSocketToClose = true;
                     }
 
-                    // This is a dummy packet, so it just fits my the event queue.
-                    _eventQueue.Enqueue(new EventSource(new DisconnectPacket(), null));
+                    Thread.Sleep(100);
                 }
                 else if (IsConnected) {
                     _pingStateMachine.Tick(_lastCommunicationTime);
@@ -116,6 +118,8 @@ namespace Tevux.Protocols.Mqtt {
 
                         // These are dummy packets, so it just fits my the event queue.
                         _eventQueue.Enqueue(new EventSource(new ConnackPacket(), new ConnackPacket()));
+
+                        if (_channelConnectionOptions.IsReconnectionEnabled) { _isReconnectionEnabled = true; }
 
                         _log.Info($"Connected to {_channelConnectionOptions}.");
                     }

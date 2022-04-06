@@ -25,7 +25,7 @@ namespace Tevux.Protocols.Mqtt {
             byte packetType = 0;
 
             while (true) {
-                if (_channel.IsConnected && (_isDisconnectionRequested == false)) {
+                if (_channel.IsConnected) {
                     _isReceiveThreadActive = true;
 
                     // read first byte (fixed header)
@@ -86,6 +86,7 @@ namespace Tevux.Protocols.Mqtt {
                             SubackPacket subackPacket = null;
 
                             if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = remainingLength >= 2; }
                             if (isOk) {
                                 payloadBytes = new byte[remainingLength - 2];
                                 isOk = _channel.TryReceive(payloadBytes);
