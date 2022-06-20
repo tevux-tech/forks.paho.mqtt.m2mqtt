@@ -19,6 +19,8 @@ using System.Threading;
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public void Initialize() {
+            if (_isInitialized) { return; }
+
             _pingStateMachine.Initialize(this);
             _connectStateMachine.Initialize(this);
             _subscriptionStateMachine.Initialize(this);
