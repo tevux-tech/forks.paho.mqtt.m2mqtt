@@ -20,6 +20,13 @@ using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
+        private bool _isConnectionRequested;
+
+        // Reason for a separate caching variable is that I do not want reconnection mechanism to kick in until at a successful connection is made first,
+        // by user explicitly issueing a Connect command. Also, reconnection should be disabled if user clicks Disconnect.
+        // Reconnection should only happen if connection is lost from outside.
+        private bool _isReconnectionEnabled;
+
         public void ConnectAndWait() {
             ConnectAndWait(new ChannelConnectionOptions(), new MqttConnectionOptions());
         }
@@ -37,7 +44,7 @@ namespace Tevux.Protocols.Mqtt {
 
             _isConnectionRequested = true;
 
-            while (IsConnected == false) {
+            while ((IsConnected == false) && (_isConnectionRequested == true)) {
                 Thread.Sleep(100);
             }
         }

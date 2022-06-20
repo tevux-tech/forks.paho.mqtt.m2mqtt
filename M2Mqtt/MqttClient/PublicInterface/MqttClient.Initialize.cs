@@ -27,9 +27,9 @@ namespace Tevux.Protocols.Mqtt {
             _outgoingPublishStateMachine.Initialize(this);
             _incomingPublishStateMachine.Initialize(this);
 
-            new Thread(MasterTickThread).Start();
-            new Thread(ReceiveThread).Start();
-            new Thread(ProcessEventQueueThread).Start();
+            new Thread(MasterTickThread) { Name = "MasterTickThread" }.Start();
+            new Thread(ReceiveThread) { Name = "ReceiveTickThread" }.Start();
+            new Thread(ProcessEventQueueThread) { Name = "ProcessEventQueueThread" }.Start();
 
             _isInitialized = true;
         }

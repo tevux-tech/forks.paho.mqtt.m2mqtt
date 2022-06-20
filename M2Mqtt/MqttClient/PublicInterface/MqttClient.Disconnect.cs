@@ -16,13 +16,20 @@ Contributors:
 */
 
 using System;
+using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public void DisconnectAndWait() {
             if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
 
+            _isReconnectionEnabled = false;
+
             CloseConnections(true);
+
+            while (IsConnected) {
+                Thread.Sleep(100);
+            }
         }
     }
 }

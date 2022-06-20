@@ -19,12 +19,15 @@ using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
+        private bool _isReceiveThreadActive;
         private void ReceiveThread() {
             var fixedHeaderFirstByte = new byte[1];
             byte packetType = 0;
 
             while (true) {
-                if (_channel.IsConnected && (_isDisconnectionRequested == false)) {
+                if (_channel.IsConnected) {
+                    _isReceiveThreadActive = true;
+
                     // read first byte (fixed header)
                     var isOk = _channel.TryReceive(fixedHeaderFirstByte);
 
@@ -83,6 +86,7 @@ namespace Tevux.Protocols.Mqtt {
                             SubackPacket subackPacket = null;
 
                             if (isOk) { isOk = _channel.TryReceive(variableHeaderBytes); }
+                            if (isOk) { isOk = remainingLength >= 2; }
                             if (isOk) {
                                 payloadBytes = new byte[remainingLength - 2];
                                 isOk = _channel.TryReceive(payloadBytes);
@@ -171,6 +175,7 @@ namespace Tevux.Protocols.Mqtt {
                     }
                 }
                 else {
+                    _isReceiveThreadActive = false;
                     Thread.Sleep(100);
                 }
             }
