@@ -15,6 +15,7 @@ Contributors:
 */
 
 using System;
+using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace TestApp {
             // Configure NLog.
             var config = new NLog.Config.LoggingConfiguration();
             var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
-            config.AddRule(LogLevel.Trace, LogLevel.Fatal, logconsole);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
             LogManager.Configuration = config;
 
             // Run the test program
@@ -80,6 +81,9 @@ namespace TestApp {
             Console.ReadLine();
 
             client.DisconnectAndWait();
+            Debug.Assert(client.IsConnected == false);
+
+            Console.ReadLine();
         }
 
         private void HandleUnsubscribed(object sender, UnsubscribedEventArgs e) {
