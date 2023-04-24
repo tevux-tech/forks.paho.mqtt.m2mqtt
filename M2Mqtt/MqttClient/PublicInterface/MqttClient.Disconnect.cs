@@ -15,13 +15,12 @@ Contributors:
    Simonas Greicius - 2021 rework
 */
 
-using System;
 using System.Threading;
 
 namespace Tevux.Protocols.Mqtt {
     public partial class MqttClient {
         public void DisconnectAndWait() {
-            if (_isInitialized == false) { throw new InvalidOperationException("MqttClient has not been initialized. Call Initialize() method first."); }
+            if (_isInitialized == false) { return; }
 
             _isReconnectionEnabled = false;
 
