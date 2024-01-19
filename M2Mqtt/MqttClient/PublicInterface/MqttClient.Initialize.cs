@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2021 Simonas Greicius
 
 All rights reserved. This program and the accompanying materials
@@ -27,9 +27,9 @@ namespace Tevux.Protocols.Mqtt {
             _outgoingPublishStateMachine.Initialize(this);
             _incomingPublishStateMachine.Initialize(this);
 
-            new Thread(MasterTickThread) { Name = "MasterTickThread" }.Start();
-            new Thread(ReceiveThread) { Name = "ReceiveTickThread" }.Start();
-            new Thread(ProcessEventQueueThread) { Name = "ProcessEventQueueThread" }.Start();
+            new Thread(MasterTickThread) { Name = "MasterTickThread", IsBackground = true }.Start();
+            new Thread(ReceiveThread) { Name = "ReceiveTickThread", IsBackground = true }.Start();
+            new Thread(ProcessEventQueueThread) { Name = "ProcessEventQueueThread", IsBackground = true }.Start();
 
             _isInitialized = true;
         }
